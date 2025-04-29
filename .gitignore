@@ -1,0 +1,33 @@
+# ===== Maven (backend) =====
+/backend/target/
+
+# ===== Vue.js (frontend) =====
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/frontend/.output/
+
+# ===== IDE 설정 (IntelliJ, Eclipse, VS Code 등) =====
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# ===== OS 찌꺼기 파일 =====
+.DS_Store
+Thumbs.db
+
+# ===== 로그 파일 =====
+*.log
+
+# ===== 환경변수 파일 =====
+.env
+*.env
+/frontend/.env.*
+application-*.properties
+
+# ===== 임시 파일 =====
+*.bak
+*.tmp
