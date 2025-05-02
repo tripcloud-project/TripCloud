@@ -1,6 +1,6 @@
 package com.ssafy.project.domain.activity.entity;
 
-import com.ssafy.project.domain.common.entity.BaseEntity;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +15,10 @@ import lombok.NonNull;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 
-public class Activity extends BaseEntity{
+public class Activity{
 	private @NonNull Long activityId;
 	private @NonNull Long memberId;
 	private @NonNull String activity;
 	private @NonNull Integer quantity;
+	private @NonNull LocalDateTime createdAt;
 }

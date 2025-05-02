@@ -12,10 +12,8 @@ import lombok.NonNull;
 @Builder
 public class Attraction {
 	private @NonNull Long attractionId;
-	private @NonNull String attractionCategoryName;
-	private @NonNull String sido;
-	private @NonNull String sigungu;
-	private @NonNull String eupmyeondong;
+	private @NonNull String attractionCategoryId;
+	private @NonNull String eupmyeondongId;
 	private @NonNull String name;
 	private @NonNull String description;
 	private @NonNull String latitude;
