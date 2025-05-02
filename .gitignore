@@ -31,3 +31,4 @@ application-*.properties
 # ===== 임시 파일 =====
 *.bak
 *.tmp
+/.metadata/
