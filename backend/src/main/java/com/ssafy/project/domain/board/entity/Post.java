@@ -1,7 +1,5 @@
 package com.ssafy.project.domain.board.entity;
 
-import java.time.LocalDateTime;
-
 import com.ssafy.project.domain.common.entity.BaseEntity;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +21,4 @@ public class Post extends BaseEntity{
 	private @NonNull String title;
 	private @NonNull String content;
 	private String filePath;
-	private @NonNull LocalDateTime createdAt;
-	private @NonNull LocalDateTime modifiedAt;
-	private @NonNull Boolean isDeleted;
 }
