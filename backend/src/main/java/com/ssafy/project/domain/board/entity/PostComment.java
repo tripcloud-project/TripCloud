@@ -17,13 +17,9 @@ import lombok.NonNull;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 
-public class Post extends BaseEntity{
-	private @NonNull Long postId;
+public class PostComment extends BaseEntity {
+	private @NonNull Long postCommentId;
 	private @NonNull Long memberId;
-	private @NonNull String title;
+	private @NonNull String postId;
 	private @NonNull String content;
-	private String filePath;
-	private @NonNull LocalDateTime createdAt;
-	private @NonNull LocalDateTime modifiedAt;
-	private @NonNull Boolean isDeleted;
 }
