@@ -2,9 +2,12 @@ package com.ssafy.project.domain.board.entity;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.project.domain.common.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -12,8 +15,9 @@ import lombok.NonNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 
-public class Post {
+public class Post extends BaseEntity{
 	private @NonNull Long postId;
 	private @NonNull Long memberId;
 	private @NonNull String title;
