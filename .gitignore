@@ -32,3 +32,6 @@ application-*.properties
 *.bak
 *.tmp
 /.metadata/
+
+# ===== Minio =====
+minio-storage
