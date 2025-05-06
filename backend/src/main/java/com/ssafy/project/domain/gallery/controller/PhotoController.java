@@ -32,11 +32,18 @@ public class PhotoController {
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
                                     @RequestParam("prefix") String prefix) {
+        if (files == null || files.isEmpty()) {
+            throw new UploadFailException();
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
 
-        List<UploadDto> uploadList = minioService.uploadFiles(files, prefix);
-        photoService.uploadPhotos(uploadList);
-        return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+        try {
+            List<UploadDto> uploadList = minioService.uploadFiles(files, prefix);
+            photoService.uploadPhotos(uploadList);
+            return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+        } catch (Exception e) {
+            throw new UploadFailException();
+        }
     }
 }
