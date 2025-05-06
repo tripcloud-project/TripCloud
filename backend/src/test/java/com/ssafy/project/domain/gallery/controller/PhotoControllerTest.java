@@ -65,5 +65,52 @@ public class PhotoControllerTest {
         verify(photoService).uploadPhotos(anyList());
     }
 
+    @Test
+    @DisplayName("사진 업로드 실패 - minioService에서 예외 발생")
+    @WithMockUser(username = "test@naver.com")
+    void testUploadFileFail() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "files", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test image".getBytes());
+
+        String rawPrefix = "여행폴더/";
+        String expectedPrefix = "test@naver.com/여행폴더/";
+
+        // 업로드 실패 예외 발생 설정
+        when(minioService.uploadFiles(anyList(), eq(expectedPrefix)))
+                .thenThrow(new UploadFailException());
+
+        mockMvc.perform(multipart("/api/v1/gallery/upload")
+                        .file(file)
+                        .param("prefix", rawPrefix))
+                .andDo(print())
+                .andExpect(status().isInternalServerError()); // 500 상태 코드 확인
+
+        // 실패 시 verify 생략 가능 (예외 발생하므로 이후 로직은 호출 안 됨)
+    }
+
+    @Test
+    @DisplayName("사진 업로드 실패 - photoService에서 예외 발생")
+    @WithMockUser(username = "test@naver.com")
+    void testUploadPhotoFailInPhotoService() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "files", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test image".getBytes());
+
+        String rawPrefix = "기타사진/";
+        String expectedPrefix = "test@naver.com/기타사진/";
+
+        UploadDto uploadDto = new UploadDto();
+        when(minioService.uploadFiles(anyList(), eq(expectedPrefix)))
+                .thenReturn(Collections.singletonList(uploadDto));
+
+        // photoService에서 예외 발생하도록 설정
+        doThrow(new UploadFailException())
+                .when(photoService).uploadPhotos(anyList());
+
+        mockMvc.perform(multipart("/api/v1/gallery/upload")
+                        .file(file)
+                        .param("prefix", rawPrefix))
+                .andDo(print())
+                .andExpect(status().isInternalServerError()); // 500 상태코드 확인
+    }
 
 }
