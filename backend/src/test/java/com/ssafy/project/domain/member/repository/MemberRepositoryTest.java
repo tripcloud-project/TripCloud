@@ -9,8 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -43,5 +45,19 @@ class MemberRepositoryTest {
 
         // then
         verify(memberMapper).insert(any());
+    }
+
+    @Test
+    @DisplayName("이메일 중복 체크 테스트")
+    void validateEmail(){
+        // given
+        String email = "test@example.com";
+        given(memberMapper.existsByEmail(anyString())).willReturn(false);
+
+        // when
+        boolean result = memberRepository.existsByEmail(email);
+
+        // then
+        assertThat(result).isFalse();
     }
 }
