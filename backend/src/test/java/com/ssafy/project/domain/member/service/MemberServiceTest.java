@@ -3,6 +3,7 @@ package com.ssafy.project.domain.member.service;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.repository.MemberRepository;
 import org.apache.ibatis.javassist.bytecode.DuplicateMemberException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +19,13 @@ import static org.mockito.Mockito.verify;
 class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
-    @InjectMocks
-    private MemberServiceImpl memberService;
+
+    private MemberService memberService;
+
+    @BeforeEach
+    void setUp() {
+        memberService = new MemberServiceImpl(memberRepository);
+    }
 
 
     @Test
