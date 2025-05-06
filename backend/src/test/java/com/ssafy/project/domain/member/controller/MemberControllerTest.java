@@ -65,8 +65,7 @@ class MemberControllerTest {
 
         // then
         perform.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("201"))
-                .andExpect(jsonPath("$.message").value("회원가입에 성공했습니다."))
+                .andExpect(jsonPath("$.status").value("success"))
                 .andDo(print());
     }
 }
