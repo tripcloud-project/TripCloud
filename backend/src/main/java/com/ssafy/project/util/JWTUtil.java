@@ -4,8 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,6 +26,7 @@ import static io.jsonwebtoken.Jwts.SIG.RS256;
 
 @Component // 객체
 @Slf4j // 로깅
+@RequiredArgsConstructor
 public class JWTUtil {
 
 
@@ -38,6 +44,7 @@ public class JWTUtil {
     @Value("${jwt.refresh-token.expiration}")
     private long jwtRefreshTokenExpiration;
 
+    private final UserDetailsService userDetailsService;
 
     /**
      * Key 파일 읽어 실제 데이터 추출.
@@ -96,15 +103,17 @@ public class JWTUtil {
 
     /**
      * 사용자 이름 추출
+     *
      * @param token JWT token
      * @return 사용자 이름
      */
-    public String extractName(String token) {
+    public String extractId(String token) {
         return extractAllClaims(token).getSubject();
     }
 
     /**
      * 만료 일자 추출
+     *
      * @param token JWT token
      * @return 만료 일자
      */
@@ -114,6 +123,7 @@ public class JWTUtil {
 
     /**
      * 만료 여부
+     *
      * @param token JWT token
      * @return 만료 여부
      */
@@ -127,6 +137,7 @@ public class JWTUtil {
 
     /**
      * 토큰 검증 (서명 및 만료시간만 검증)
+     *
      * @param token JWT token
      * @throws JwtException 토큰이 유효하지 않을 경우 발생하는 예외
      */
@@ -154,7 +165,7 @@ public class JWTUtil {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(email)
+                .subject(String.valueOf(id))
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + jwtAccessTokenExpiration))
                 .id(jwtId)
@@ -174,12 +185,17 @@ public class JWTUtil {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(email)
+                .subject(String.valueOf(id))
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + jwtRefreshTokenExpiration))
                 .id(jwtId)
                 .signWith(privateKey, RS256)
                 .compact();
+    }
+
+    public Authentication getAuthentication(String token) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(extractId(token));
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
 }
