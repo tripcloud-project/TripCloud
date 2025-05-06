@@ -15,8 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 
-import static org.mockito.BDDMockito.given;
-
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -57,8 +56,7 @@ class MemberControllerTest {
         MemberRegisterDto memberRegisterDto = new MemberRegisterDto(email, password, name);
         String requestBody = objectMapper.writeValueAsString(memberRegisterDto);
 
-        given(memberService.createMember(memberRegisterDto))
-                .willReturn(true);
+        willDoNothing().given(memberService).createMember(memberRegisterDto);
 
         // when
         ResultActions perform = doPost("", requestBody);
