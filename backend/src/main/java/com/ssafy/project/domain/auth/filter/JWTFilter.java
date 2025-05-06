@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -79,6 +81,9 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             // 토큰 유효성 검증
             jwtUtil.validateToken(jwt);
+
+            Authentication auth = jwtUtil.getAuthentication(jwt);
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
             // 토큰이 유효하면 다음 필터로 진행
             filterChain.doFilter(request, response);
