@@ -1,7 +1,7 @@
 package com.ssafy.project.domain.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.project.domain.member.dto.request.RegisterDto;
+import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.service.MemberService;
 import com.ssafy.project.util.JWTUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -54,10 +54,10 @@ class MemberControllerTest {
         String password = "testPassword";
         String name = "홍길동";
 
-        RegisterDto registerDto = new RegisterDto(email, password, name);
-        String requestBody = objectMapper.writeValueAsString(registerDto);
+        MemberRegisterDto memberRegisterDto = new MemberRegisterDto(email, password, name);
+        String requestBody = objectMapper.writeValueAsString(memberRegisterDto);
 
-        given(memberService.createMember(registerDto))
+        given(memberService.createMember(memberRegisterDto))
                 .willReturn(true);
 
         // when
