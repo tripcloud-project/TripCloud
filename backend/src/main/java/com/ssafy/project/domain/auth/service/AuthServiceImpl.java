@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.auth.service;
 
 import org.apache.commons.validator.routines.RegexValidator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
 import com.ssafy.project.domain.auth.repository.AuthRepository;
+import com.ssafy.project.domain.auth.repository.RedisRepository;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 import com.ssafy.project.util.JWTUtil;
 
@@ -19,7 +21,11 @@ public class AuthServiceImpl implements AuthService {
 
     private final JWTUtil jwtUtil;
     private final AuthRepository authRepository;
+    private final RedisRepository redisRepository;
 
+    @Value("${jwt.refresh-token.expiration}")
+    private long jwtRefreshTokenExpiration;
+    
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
@@ -51,23 +57,37 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundMemberException();
         }
         
-        loginResponseDto.setAccessToken(
-                jwtUtil.generateAccessToken(
-                		loginResponseDto.getMemberId(),
-                		loginResponseDto.getEmail(),
-                        loginResponseDto.getName(),
-                        loginResponseDto.getRole()
-                )
+        String accessToken = jwtUtil.generateAccessToken(
+        		loginResponseDto.getMemberId(),
+        		loginResponseDto.getEmail(),
+                loginResponseDto.getName(),
+                loginResponseDto.getRole()
         );
-
-        loginResponseDto.setRefreshToken(
-                jwtUtil.generateRefreshToken(
-                		loginResponseDto.getMemberId(),
-                		loginResponseDto.getEmail()
-                )
+        
+        String refreshToken = jwtUtil.generateRefreshToken(
+        		loginResponseDto.getMemberId(),
+        		loginResponseDto.getEmail()
         );
-
+        
+        loginResponseDto.setAccessToken(accessToken);
+        loginResponseDto.setRefreshToken(refreshToken);
+        String memberId = String.valueOf(loginResponseDto.getMemberId());
+        
+        redisRepository.delete("refresh: " + memberId);
+        redisRepository.save("refresh: " + memberId, refreshToken, jwtRefreshTokenExpiration);
+  
         return loginResponseDto;
     }
 
+	@Override
+	public void logout(String authorization, String refreshToken) {
+		String accessToken = jwtUtil.resolveToken(authorization);
+		String memberId = jwtUtil.extractId(accessToken);
+		
+		// refreshToken 삭제
+		redisRepository.delete("refresh: " + memberId);
+		
+		// accessToken 블랙리스트 등록, 7일간
+		redisRepository.save("logout: " + accessToken, "logout", 604800000L);
+	}
 }

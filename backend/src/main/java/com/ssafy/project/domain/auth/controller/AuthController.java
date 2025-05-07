@@ -53,16 +53,11 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(
             @RequestHeader("Authorization") String authorization,
-            @CookieValue("refresh_token") String refreshToken
-    ) {
+            @CookieValue("refresh_token") String refreshToken) {
 
-        //authService.logout(authorization, refreshToken);
+        authService.logout(authorization, refreshToken);
 
-        // AccessToken은 HTTP Header에 담아 전송.
         HttpHeaders httpHeaders = new HttpHeaders();
-
-        // RefreshToken은 Cookie에 담는다.
-        // Http Only 로 반드시 전송해주어야한다. --> Client에서 JS로 접근을 못하게 막는다. (XSS 공격 방지)
         ResponseCookie responseCookie = ResponseCookie
                 .from("refresh_token", "")
                 .httpOnly(true)
