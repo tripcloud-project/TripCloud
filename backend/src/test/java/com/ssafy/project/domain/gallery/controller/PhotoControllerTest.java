@@ -2,9 +2,9 @@ package com.ssafy.project.domain.gallery.controller;
 
 
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
-import com.ssafy.project.exception.UploadFailException;
 import com.ssafy.project.util.JWTUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

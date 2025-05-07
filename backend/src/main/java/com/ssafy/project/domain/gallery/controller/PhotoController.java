@@ -5,9 +5,10 @@ import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
 import com.ssafy.project.domain.gallery.dto.request.RenameRequest;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
+import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
-import com.ssafy.project.exception.UploadFailException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

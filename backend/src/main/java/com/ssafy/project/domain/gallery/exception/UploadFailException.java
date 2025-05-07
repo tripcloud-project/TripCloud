@@ -1,4 +1,4 @@
-package com.ssafy.project.exception;
+package com.ssafy.project.domain.gallery.exception;
 
 public class UploadFailException extends RuntimeException{
 }
