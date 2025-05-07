@@ -19,4 +19,8 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 		photoMapper.insertPhotos(photos);
 	}
 
+	@Override
+	public void renamePhoto(String oldKey, String newKey, String filename) {
+		photoMapper.renamePhoto(oldKey, newKey, filename);
+	}
 }

@@ -6,4 +6,5 @@ import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
 
 public interface PhotoRepository {
 	void insertPhotos(List<PhotoDto> photos);
+	void renamePhoto(String oldKey, String newKey, String filename);
 }
