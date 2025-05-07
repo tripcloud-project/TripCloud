@@ -1,0 +1,49 @@
+package com.ssafy.project.domain.gallery.controller;
+
+import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.service.MinioService;
+import com.ssafy.project.domain.gallery.service.PhotoService;
+import com.ssafy.project.exception.UploadFailException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/gallery")
+@Slf4j
+public class PhotoController {
+    private final MinioService minioService;
+    private final PhotoService photoService;
+
+    @Value("${minio.bucket}")
+    private String buckName;
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
+                                    @RequestParam("prefix") String prefix) {
+        if (files == null || files.isEmpty()) {
+            throw new UploadFailException();
+        }
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
+
+        try {
+            List<UploadDto> uploadList = minioService.uploadFiles(files, prefix);
+            photoService.uploadPhotos(uploadList);
+            return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+        } catch (Exception e) {
+            throw new UploadFailException();
+        }
+    }
+}
