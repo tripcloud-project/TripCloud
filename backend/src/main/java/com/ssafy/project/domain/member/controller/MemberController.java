@@ -1,6 +1,6 @@
 package com.ssafy.project.domain.member.controller;
 
-import com.ssafy.project.domain.auth.service.MemberDetailImpl;
+import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class MemberController {
 
     @GetMapping("/nothing")
     private ResponseEntity<?> doNothing() {
-        MemberDetailImpl member = (MemberDetailImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails member = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         System.out.println("member = " + member.member());
         return ResponseEntity.noContent().build();
     }

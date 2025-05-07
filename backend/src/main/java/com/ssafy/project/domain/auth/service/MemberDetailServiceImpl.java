@@ -19,6 +19,6 @@ public class MemberDetailServiceImpl implements UserDetailsService {
         Member member = memberRepository.selectById(Long.parseLong(memberId));
         if (member == null || member.getIsDeleted())
             throw new NotFoundMemberException();
-        return new MemberDetailImpl(member);
+        return new MemberDetails(member);
     }
 }
