@@ -46,4 +46,14 @@ public class ControllerExceptionHandler {
                 .body(errorResponse);
     }
 
+    // 파일 업로드 예외
+    @ExceptionHandler(UploadFailException.class)
+    public ResponseEntity<?> handleUploadFailException(UploadFailException e) {
+        ErrorCode code = ErrorCode.UPLOAD_FAIL;
+        ApiResponse<?> errorResponse = ApiResponse.createError(code.getMessage());
+        return ResponseEntity
+                .status(code.getHttpStatus())
+                .body(errorResponse);
+
+
 }
