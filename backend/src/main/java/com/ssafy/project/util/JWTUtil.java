@@ -132,7 +132,7 @@ public class JWTUtil {
      * @param token JWT token
      * @return 만료 여부
      */
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         try {
             return extractExpiration(token).before(new Date());
         } catch (ExpiredJwtException e) {
