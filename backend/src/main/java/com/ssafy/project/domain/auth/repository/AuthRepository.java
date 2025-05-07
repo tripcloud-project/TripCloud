@@ -1,8 +1,7 @@
 package com.ssafy.project.domain.auth.repository;
 
-import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
-import com.ssafy.project.domain.auth.dto.response.LoginResponse;
+import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
 
 public interface AuthRepository {
-    LoginResponse findByEmailAndPassword(LoginRequestDto loginRequestDto);
+    LoginResponseDto findByEmail(String email);
 }

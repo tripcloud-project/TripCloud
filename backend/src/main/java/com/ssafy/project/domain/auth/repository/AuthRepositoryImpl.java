@@ -1,11 +1,9 @@
 package com.ssafy.project.domain.auth.repository;
 
-import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
-import com.ssafy.project.domain.auth.dto.response.LoginResponse;
-import com.ssafy.project.domain.auth.mapper.AuthMapper;
-import com.ssafy.project.domain.member.entity.Member;
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
+import com.ssafy.project.domain.auth.mapper.AuthMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,21 +14,15 @@ public class AuthRepositoryImpl implements AuthRepository {
     private final AuthMapper authMapper;
 
     @Override
-    public LoginResponse findByEmailAndPassword(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto findByEmail(String email) {
 
-        Member member = authMapper.selectByEmailAndPassword(loginRequestDto);
-        member.setMemberId(1L);
+        LoginResponseDto loginResponseDto = authMapper.selectByEmail(email);
 
-        if(member == null) {
+        if(loginResponseDto == null) {
             return null;
         }
 
-        return LoginResponse.builder()
-                .memberId(member.getMemberId())
-                .email(member.getEmail())
-                .name(member.getName())
-                .role(member.getRole())
-                .build();
+        return loginResponseDto;
     }
 
 }
