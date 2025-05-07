@@ -45,7 +45,11 @@
   </update>
 
   <select id="findPhotoDetailByS3Key">
-    SELECT s3_key, filename, size, content_type, sido, sigungu, eupmyeondong, latitude, longitude, is_deleted, created_at, taken_at
+    SELECT
+      s3_key, filename, size, content_type,
+      sido, sigungu, eupmyeondong,
+      latitude, longitude,
+      is_deleted, created_at, taken_at
     FROM photo
     WHERE s3_key = #{key}
   </select>
