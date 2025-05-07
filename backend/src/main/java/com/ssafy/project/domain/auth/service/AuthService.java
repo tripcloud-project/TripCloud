@@ -1,8 +1,8 @@
 package com.ssafy.project.domain.auth.service;
 
 import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
-import com.ssafy.project.domain.auth.dto.response.LoginResponse;
+import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
 
 public interface AuthService {
-    LoginResponse login(LoginRequestDto loginRequestDto);
+    LoginResponseDto login(LoginRequestDto loginRequestDto);
 }
