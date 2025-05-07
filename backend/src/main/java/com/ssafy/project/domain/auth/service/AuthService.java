@@ -5,4 +5,5 @@ import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
 
 public interface AuthService {
     LoginResponseDto login(LoginRequestDto loginRequestDto);
+	void logout(String authorization, String refreshToken);
 }
