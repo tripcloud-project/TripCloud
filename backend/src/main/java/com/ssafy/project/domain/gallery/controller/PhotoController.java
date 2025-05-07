@@ -1,7 +1,9 @@
 package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.dto.request.RenameRequest;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
@@ -9,10 +11,13 @@ import com.ssafy.project.exception.UploadFailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +60,31 @@ public class PhotoController {
         prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
 		DirectoryResponse directoryResponse = minioService.listDirectory(prefix);
 	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponse));
+	}
+    
+    
+	@PutMapping("/rename")
+	public ResponseEntity<?> rename(@RequestBody RenameRequest renameRequest) {
+    	String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		String oldKey = renameRequest.getOldKey();
+		oldKey = String.format("%s/%s", email, oldKey.replaceAll("^/+", ""));
+		String newKey = renameRequest.getNewKey();
+		newKey = String.format("%s/%s", email, newKey.replaceAll("^/+", ""));
+		try {
+			if (oldKey.endsWith("/")) {
+				// 디렉토리 이름 번경
+				List<S3KeyUpdateDto> renameList = minioService.directoryKeyUpdate(oldKey, newKey);
+				photoService.renamePhotos(renameList);
+			} else {
+				// 파일 이름 변경
+				minioService.keyUpdate(oldKey, newKey);
+				photoService.renamePhoto(oldKey, newKey);
+			}
+
+			return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("이름 변경 실패: " + e.getMessage());
+		}
 	}
 }
