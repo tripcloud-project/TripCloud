@@ -2,7 +2,7 @@ package com.ssafy.project.domain.auth.controller;
 
 import java.time.Duration;
 
-import com.ssafy.project.domain.auth.dto.request.LoginRequest;
+import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponse;
 import com.ssafy.project.domain.auth.service.AuthService;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +24,7 @@ public class AuthController {
 
     private final AuthService authService;
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
 
         LoginResponse loginResponse = authService.login(loginRequest);
 

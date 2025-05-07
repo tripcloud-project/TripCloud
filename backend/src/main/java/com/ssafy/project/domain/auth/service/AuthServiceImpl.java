@@ -1,6 +1,6 @@
 package com.ssafy.project.domain.auth.service;
 
-import com.ssafy.project.domain.auth.dto.request.LoginRequest;
+import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponse;
 import com.ssafy.project.domain.auth.repository.AuthRepository;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
@@ -43,9 +43,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        loginRequest.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
-        LoginResponse loginResponse = authRepository.findByEmailAndPassword(loginRequest);
+    public LoginResponse login(LoginRequestDto loginRequestDto) {
+    	loginRequestDto.setPassword(passwordEncoder.encode(loginRequestDto.getPassword()));
+        LoginResponse loginResponse = authRepository.findByEmailAndPassword(loginRequestDto);
 
         if(loginResponse == null) {
             throw new NotFoundMemberException();

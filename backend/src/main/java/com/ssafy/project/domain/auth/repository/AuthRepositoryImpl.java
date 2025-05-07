@@ -1,6 +1,6 @@
 package com.ssafy.project.domain.auth.repository;
 
-import com.ssafy.project.domain.auth.dto.request.LoginRequest;
+import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponse;
 import com.ssafy.project.domain.auth.mapper.AuthMapper;
 import com.ssafy.project.domain.member.entity.Member;
@@ -16,9 +16,9 @@ public class AuthRepositoryImpl implements AuthRepository {
     private final AuthMapper authMapper;
 
     @Override
-    public LoginResponse findByEmailAndPassword(LoginRequest loginRequest) {
+    public LoginResponse findByEmailAndPassword(LoginRequestDto loginRequestDto) {
 
-        Member member = authMapper.selectByEmailAndPassword(loginRequest);
+        Member member = authMapper.selectByEmailAndPassword(loginRequestDto);
         member.setMemberId(1L);
 
         if(member == null) {
