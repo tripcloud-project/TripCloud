@@ -71,11 +71,11 @@ public class AuthServiceImpl implements AuthService {
         
         loginResponseDto.setAccessToken(accessToken);
         loginResponseDto.setRefreshToken(refreshToken);
+        String memberId = String.valueOf(loginResponseDto.getMemberId());
         
-        redisRepository.delete(loginResponseDto.getEmail());
-        redisRepository.save(loginResponseDto.getEmail(), refreshToken, jwtRefreshTokenExpiration);
+        redisRepository.delete("refresh: " + memberId);
+        redisRepository.save("refresh: " + memberId, refreshToken, jwtRefreshTokenExpiration);
   
         return loginResponseDto;
     }
-
 }
