@@ -53,8 +53,6 @@ public class JWTFilter extends OncePerRequestFilter {
     public boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
 
-        System.out.println("path = " + path);
-
         // 지정된 URL 패턴이 포함된 경로 제외
         return EXCLUDE_URL.stream()
                 .anyMatch(path::contains);

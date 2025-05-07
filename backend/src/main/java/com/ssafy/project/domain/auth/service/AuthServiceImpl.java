@@ -3,7 +3,7 @@ package com.ssafy.project.domain.auth.service;
 import com.ssafy.project.domain.auth.dto.request.LoginRequest;
 import com.ssafy.project.domain.auth.dto.response.LoginResponse;
 import com.ssafy.project.domain.auth.repository.AuthRepository;
-import com.ssafy.project.exception.NotFoundMemberException;
+import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 import com.ssafy.project.util.JWTUtil;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
 
-        String regex = "^[a-zA-Z\\\\d`~!@#$%^&*()-_=+]{8,24}$";
+        String regex = "^[a-zA-Z\\d`~!@#$%^&*()\\-_=+]{8,24}$";
 
         RegexValidator validator = new RegexValidator(regex);
 
@@ -42,13 +42,9 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-
-
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-
-//        loginRequest.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
-        loginRequest.setPassword(loginRequest.getPassword());
+        loginRequest.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
         LoginResponse loginResponse = authRepository.findByEmailAndPassword(loginRequest);
 
         if(loginResponse == null) {
@@ -70,8 +66,6 @@ public class AuthServiceImpl implements AuthService {
                         loginResponse.getEmail()
                 )
         );
-
-        System.out.println("loginResponse = " + loginResponse);
 
         return loginResponse;
     }
