@@ -2,6 +2,7 @@ package com.ssafy.project.exception;
 
 
 import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.InvalidPasswordException;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 
