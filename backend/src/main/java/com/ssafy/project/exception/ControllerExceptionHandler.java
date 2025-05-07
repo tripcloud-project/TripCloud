@@ -54,6 +54,6 @@ public class ControllerExceptionHandler {
         return ResponseEntity
                 .status(code.getHttpStatus())
                 .body(errorResponse);
-
+    }
 
 }
