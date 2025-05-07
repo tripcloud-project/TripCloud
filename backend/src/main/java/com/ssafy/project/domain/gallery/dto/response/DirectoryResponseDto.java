@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DirectoryResponse {
+public class DirectoryResponseDto {
     private String prefix;
     private long totalSize; // 현재 디렉토리 내 총 파일 크기
     private List<DirectoryDto> entries;

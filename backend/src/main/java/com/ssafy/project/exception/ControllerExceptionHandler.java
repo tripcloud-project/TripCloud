@@ -1,16 +1,15 @@
 package com.ssafy.project.exception;
 
+import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.gallery.exception.UploadFailException;
+import com.ssafy.project.domain.member.exception.InvalidPasswordException;
+import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 
-import org.apache.ibatis.javassist.bytecode.DuplicateMemberException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.exception.InvalidTokenException;
-import com.ssafy.project.domain.member.exception.InvalidPasswordException;
-import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 
 
 // 예외가 발생하면 이 클래스에서 담당.
