@@ -1,5 +1,6 @@
 package com.ssafy.project.domain.member.service;
 
+import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,11 @@ public class MemberServiceImpl implements MemberService {
         memberRegisterDto.setPassword(passwordEncoder.encode(memberRegisterDto.getPassword()));
 
         memberRepository.insertMember(memberRegisterDto);
+    }
+
+    @Override
+    public ValidateEmailResponseDto isEmailDuplicated(String email) {
+        return new ValidateEmailResponseDto(memberRepository.existsByEmail(email));
     }
 
     private boolean isValid(String rawPassword) {
