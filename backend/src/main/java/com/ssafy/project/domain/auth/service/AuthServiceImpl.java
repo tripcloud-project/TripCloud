@@ -3,7 +3,7 @@ package com.ssafy.project.domain.auth.service;
 import com.ssafy.project.domain.auth.dto.request.LoginRequest;
 import com.ssafy.project.domain.auth.dto.response.LoginResponse;
 import com.ssafy.project.domain.auth.repository.AuthRepository;
-import com.ssafy.project.exception.NotFoundMemberException;
+import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 import com.ssafy.project.util.JWTUtil;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

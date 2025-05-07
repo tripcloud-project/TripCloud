@@ -4,12 +4,13 @@ import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.javassist.bytecode.DuplicateMemberException;
+
+import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -18,7 +19,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    private ResponseEntity<?> registerMember(@RequestBody MemberRegisterDto memberRegisterDto) throws DuplicateMemberException {
+    private ResponseEntity<?> registerMember(@RequestBody MemberRegisterDto memberRegisterDto) {
         memberService.createMember(memberRegisterDto);
         return ResponseEntity.status(201)
                 .body(createSuccessWithNoContent());
