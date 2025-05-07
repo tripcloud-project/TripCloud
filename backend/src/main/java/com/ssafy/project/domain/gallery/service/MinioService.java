@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
 
 public interface MinioService {
 	List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix);
+	DirectoryResponse listDirectory(String prefix);
 }
