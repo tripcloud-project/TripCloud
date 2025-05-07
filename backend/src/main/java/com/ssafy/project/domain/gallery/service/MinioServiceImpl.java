@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.gallery.service;
 
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
 
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CommonPrefix;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
@@ -34,17 +36,8 @@ public class MinioServiceImpl implements MinioService {
     @Value("${minio.bucket}")
     private String bucketName;
 
-    public void uploadFile(MultipartFile file, String s3Key) throws IOException {
-        s3Client.putObject(
-                PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(s3Key)
-                        .contentType(file.getContentType())
-                        .build(),
-                RequestBody.fromInputStream(file.getInputStream(), file.getSize())
-        );
-    }
     
+    // [upload]
 	@Override
 	public List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix) {
 		List<UploadDto> uploadList = new ArrayList<>();
@@ -76,6 +69,17 @@ public class MinioServiceImpl implements MinioService {
         }
         return uploadList;
 	}
+	
+    public void uploadFile(MultipartFile file, String s3Key) throws IOException {
+        s3Client.putObject(
+                PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .contentType(file.getContentType())
+                        .build(),
+                RequestBody.fromInputStream(file.getInputStream(), file.getSize())
+        );
+    }
 	
 	public String generatePresignedUrl(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -208,4 +212,46 @@ public class MinioServiceImpl implements MinioService {
         ListObjectsV2Response listRes = s3Client.listObjectsV2(listReq);
         return listRes.contents();
     }
+    
+    
+    
+    // [rename]
+    @Override
+    public List<S3KeyUpdateDto> directoryKeyUpdate(String oldPrefix, String newPrefix) {
+        List<S3KeyUpdateDto> renameList = new ArrayList<>();
+        try{
+            for (S3Object obj : getContents(oldPrefix)) {
+                String relativePath = obj.key().substring(oldPrefix.length());
+                String destinationKey = newPrefix + relativePath;
+
+                keyUpdate(obj.key(), destinationKey);
+                renameList.add(new S3KeyUpdateDto(obj.key(), destinationKey));
+            }
+        }catch (Exception e){
+
+        }
+        return renameList;
+    }
+    
+    @Override
+    public void keyUpdate(String oldKey, String newKey) {
+        copyFile(oldKey, newKey);
+        deleteFile(oldKey);
+    }
+    
+    public void copyFile(String oldKey, String newKey){
+        s3Client.copyObject(CopyObjectRequest.builder()
+                .sourceBucket(bucketName)
+                .sourceKey(oldKey)
+                .destinationBucket(bucketName)
+                .destinationKey(newKey)
+                .build());
+    }
+    public void deleteFile(String key){
+        s3Client.deleteObject(builder -> builder
+                .bucket(bucketName)
+                .key(key)
+                .build());
+    }
+    
 }

@@ -5,6 +5,7 @@ import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.AddressDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
 import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
 import com.ssafy.project.util.ExifUtil;
 
@@ -23,6 +24,7 @@ public class PhotoServiceImpl implements PhotoService {
 	private final KakaoGeocodingService kakaoGeocodingService;
 	private final PhotoRepository photoRepository;
 	
+	// [upload]
 	public PhotoDto uploadPhoto(MultipartFile file, String s3Key){
         String filename = Paths.get(s3Key).getFileName().toString();  // ✅ 파일명만 추출
         // ✅ 사진 객체 생성
@@ -63,5 +65,15 @@ public class PhotoServiceImpl implements PhotoService {
         photoRepository.insertPhotos(photos);
     }
 	
+	// [rename]
+    public void renamePhoto(String oldKey, String newKey) {
+        String filename = Paths.get(newKey).getFileName().toString();
+        photoRepository.renamePhoto(oldKey, newKey, filename);
+    }
 
+    public void renamePhotos(List<S3KeyUpdateDto> renameList) {
+        for(S3KeyUpdateDto key : renameList){
+            renamePhoto(key.getOldKey(), key.getNewKey());
+        }
+    }
 }
