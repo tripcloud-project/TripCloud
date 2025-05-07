@@ -5,6 +5,7 @@ import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
 import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
@@ -23,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -86,6 +89,20 @@ public class PhotoController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("이름 변경 실패: " + e.getMessage());
+		}
+	}
+
+
+	@GetMapping("/detail")
+	public ResponseEntity<?> viewMeta(@RequestParam String key) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		key = String.format("%s/%s", email, key.replaceAll("^/+", ""));
+		try {
+			PhotoDetailResponseDto photoDetailResponse = photoService.getDetailPhoto(key);
+			return ResponseEntity.ok(ApiResponse.createSuccess(photoDetailResponse));
+		} catch (NoSuchKeyException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("error", "파일이 존재하지 않습니다", "key", key));
 		}
 	}
 }
