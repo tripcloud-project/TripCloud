@@ -1,17 +1,9 @@
 package com.ssafy.project.domain.gallery.service;
 
-
-import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class PhotoService {
+import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
 
-    public void uploadPhotos(List<UploadDto> uploadList) {
-
-    }
+public interface PhotoService {
+	void uploadPhotos(List<UploadDto> uploadList);
 }
