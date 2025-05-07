@@ -12,4 +12,21 @@
         FROM member
         WHERE email = #{email}
     </select>
+
+    <select id="selectById" resultType="com.ssafy.project.domain.member.entity.Member" parameterType="long">
+        SELECT member_id,
+               email,
+               password,
+               role,
+               name,
+               profile_image,
+               used_storage,
+               created_at,
+               modified_at,
+               is_deleted,
+               main_badge_id,
+               max_stroage
+        FROM Member
+        WHERE member_id = #{id}
+    </select>
 </mapper>

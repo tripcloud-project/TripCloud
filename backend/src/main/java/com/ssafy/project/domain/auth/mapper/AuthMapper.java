@@ -9,8 +9,25 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface AuthMapper {
 
-    @Select("SELECT u.id, email, password, u.name, r.name AS 'role', created_at, updated_at, deleted_at\r\n"
-            + "FROM users u \r\n"
-            + "    JOIN roles r on u.role_id = r.id WHERE email=#{email} AND password=#{password}")
+    @Select("""
+                SELECT 
+                    member_id,
+                    email,
+                    password,
+                    role,
+                    name,
+                    profile_image,
+                    used_storage,
+                    created_at,
+                    modified_at,
+                    is_deleted,
+                    main_badge_id,
+                    max_stroage
+                FROM 
+                    Member
+                WHERE 
+                    email = #{email}
+            """)
     Member selectByEmailAndPassword(LoginRequest loginRequest);
+
 }

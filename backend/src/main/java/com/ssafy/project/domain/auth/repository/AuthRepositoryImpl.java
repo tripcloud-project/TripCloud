@@ -17,9 +17,7 @@ public class AuthRepositoryImpl implements AuthRepository {
 
     @Override
     public LoginResponse findByEmailAndPassword(LoginRequest loginRequest) {
-
         Member member = authMapper.selectByEmailAndPassword(loginRequest);
-        member.setMemberId(1L);
 
         if(member == null) {
             return null;

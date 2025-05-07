@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,9 +19,14 @@ import lombok.NonNull;
 public class Member extends BaseEntity{
 	private @NonNull Long memberId;
 	private @NonNull String email;
+	private @NonNull String password;
 	private @NonNull String role;
 	private @NonNull String name;
 	private String profileImage;
-	private @NonNull Integer storage;
+	private @NonNull Integer usedStorage;
+	private LocalDateTime createdAt;
+	private LocalDateTime modifiedAt;
+	private Boolean isDeleted;
 	private Long mainBadgeId;
+	private Integer maxStorage;
 }
