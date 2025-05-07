@@ -1,18 +1,10 @@
 package com.ssafy.project.domain.auth.filter;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.project.common.response.ApiResponse;
-import com.ssafy.project.exception.ErrorCode;
-import com.ssafy.project.util.JWTUtil;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -20,20 +12,35 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.auth.exception.InvalidTokenException;
+import com.ssafy.project.domain.auth.repository.RedisRepository;
+import com.ssafy.project.exception.ErrorCode;
+import com.ssafy.project.util.JWTUtil;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * JWT Authentication Filter
  * 특정 엔드포인트에 대해 JWT 인증 적용
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
-    private final ObjectMapper objectMapper;
+    private final RedisRepository redisRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     // 필터를 적용하지 않을 URL 패턴 목록
     private static final List<String> EXCLUDE_URL = Arrays.asList(
             "/api/v1/auth/login",
@@ -42,22 +49,16 @@ public class JWTFilter extends OncePerRequestFilter {
             "/api/v1/members/checkEmail",
             "/api/v1/members"
     );
-
-    public JWTFilter(JWTUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-        this.objectMapper = new ObjectMapper();
-    }
-
     /**
      * 특정 요청에 대해 필터를 적용하지 않도록 설정
      */
     @Override
     public boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
-
+        
         // 지정된 URL 패턴이 포함된 경로 제외
         return EXCLUDE_URL.stream()
-                .anyMatch(path::contains);
+                .anyMatch(path::equals);
     }
 
     @Override
@@ -81,6 +82,9 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             // 토큰 유효성 검증
             jwtUtil.validateToken(jwt);
+            
+            if(redisRepository.exists("logout: " + jwt))
+            	throw new InvalidTokenException();
 
             Authentication auth = jwtUtil.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(auth);
@@ -93,6 +97,9 @@ public class JWTFilter extends OncePerRequestFilter {
             sendErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             log.error("JWT Token expired: {}", e.getMessage());
+            sendErrorResponse(response, ErrorCode.INVALID_TOKEN);
+        } catch (InvalidTokenException e) {
+            log.error("Black List JWT Token used: {}", e.getMessage());
             sendErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {
             log.error("JWT Authentication failed: {}", e.getMessage());
