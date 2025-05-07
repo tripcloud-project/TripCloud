@@ -37,4 +37,11 @@
       false, NOW()
     )
   </insert>
+ 
+  <update id="renamePhoto">
+    UPDATE photo
+    SET s3_key = #{newKey}, filename = #{filename}
+    WHERE s3_key = #{oldKey}
+  </update>
+  
 </mapper>
