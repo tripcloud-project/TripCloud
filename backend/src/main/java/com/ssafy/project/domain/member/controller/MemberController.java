@@ -24,11 +24,4 @@ public class MemberController {
         return ResponseEntity.status(201)
                 .body(createSuccessWithNoContent());
     }
-
-    @GetMapping("/nothing")
-    private ResponseEntity<?> doNothing() {
-        MemberDetails member = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("member = " + member.member());
-        return ResponseEntity.noContent().build();
-    }
 }
