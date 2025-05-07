@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.member.service;
 
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
+import com.ssafy.project.domain.member.repository.BadgeRepository;
 import com.ssafy.project.domain.member.repository.MemberRepository;
 import org.apache.ibatis.javassist.bytecode.DuplicateMemberException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,12 +20,14 @@ import static org.mockito.Mockito.verify;
 class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private BadgeRepository badgeRepository;
 
     private MemberService memberService;
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberServiceImpl(memberRepository);
+        memberService = new MemberServiceImpl(memberRepository, badgeRepository);
     }
 
 
