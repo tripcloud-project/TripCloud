@@ -1,17 +1,67 @@
 package com.ssafy.project.domain.gallery.service;
 
 
+import com.drew.lang.GeoLocation;
+import com.ssafy.project.domain.gallery.dto.internal.AddressDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
+import com.ssafy.project.domain.gallery.repository.PhotoRepository;
+import com.ssafy.project.util.ExifUtil;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PhotoServiceImpl implements PhotoService {
-	@Override
-	public void uploadPhotos(List<UploadDto> uploadList) {
+	private final KakaoGeocodingService kakaoGeocodingService;
+	private final PhotoRepository photoRepository;
+	
+	public PhotoDto uploadPhoto(MultipartFile file, String s3Key){
+        String filename = Paths.get(s3Key).getFileName().toString();  // ✅ 파일명만 추출
+        // ✅ 사진 객체 생성
+        PhotoDto photo = new PhotoDto();
+        photo.setS3Key(s3Key);
+        photo.setFilename(filename);
+        photo.setSize(file.getSize());
+        photo.setContentType(file.getContentType());
 
-	}
+        // ✅ 위치 정보 로그
+        GeoLocation location = ExifUtil.extractGps(file);
+        if (location != null) {
+            photo.setLatitude(location.getLatitude());
+            photo.setLongitude(location.getLongitude());
+
+            AddressDto address = kakaoGeocodingService.reverseGeocode(location.getLatitude(), location.getLongitude());
+            if (address != null) {
+                photo.setSido(address.getSido());
+                photo.setSigungu(address.getSigungu());
+                photo.setEupmyeondong(address.getEupmyeondong());
+            }
+        }
+
+        // ✅ 사진 촬영일 추가
+        LocalDateTime takenAt = ExifUtil.extractDateTaken(file);
+        if(takenAt != null){
+            photo.setTakenAt(takenAt);
+        }
+        return photo;
+    }
+	
+	@Override
+    public void uploadPhotos(List<UploadDto> uploadList){
+        List<PhotoDto> photos = new ArrayList<>();
+        for(UploadDto uploadDto : uploadList){
+            photos.add(uploadPhoto(uploadDto.getFile(), uploadDto.getKey()));
+        }
+        photoRepository.insertPhotos(photos);
+    }
+	
+
 }
