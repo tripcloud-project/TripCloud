@@ -1,15 +1,15 @@
 package com.ssafy.project.domain.auth.service;
 
-import com.ssafy.project.domain.auth.dto.request.LoginRequest;
-import com.ssafy.project.domain.auth.dto.response.LoginResponse;
-import com.ssafy.project.domain.auth.repository.AuthRepository;
-import com.ssafy.project.domain.member.exception.NotFoundMemberException;
-import com.ssafy.project.util.JWTUtil;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
+import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
+import com.ssafy.project.domain.auth.repository.AuthRepository;
+import com.ssafy.project.domain.member.exception.NotFoundMemberException;
+import com.ssafy.project.util.JWTUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,31 +43,31 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        loginRequest.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
-        LoginResponse loginResponse = authRepository.findByEmailAndPassword(loginRequest);
-
-        if(loginResponse == null) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+    	LoginResponseDto loginResponseDto = authRepository.findByEmail(loginRequestDto.getEmail());
+    	
+    	// 이메일에 맞는 회원 정보가 없거나 비밀번호 불일치
+        if(loginResponseDto == null || !passwordEncoder.matches(loginRequestDto.getPassword(), loginResponseDto.getPassword())) {
             throw new NotFoundMemberException();
         }
-
-        loginResponse.setAccessToken(
+        
+        loginResponseDto.setAccessToken(
                 jwtUtil.generateAccessToken(
-                        loginResponse.getMemberId(),
-                        loginResponse.getEmail(),
-                        loginResponse.getName(),
-                        loginResponse.getRole()
+                		loginResponseDto.getMemberId(),
+                		loginResponseDto.getEmail(),
+                        loginResponseDto.getName(),
+                        loginResponseDto.getRole()
                 )
         );
 
-        loginResponse.setRefreshToken(
+        loginResponseDto.setRefreshToken(
                 jwtUtil.generateRefreshToken(
-                        loginResponse.getMemberId(),
-                        loginResponse.getEmail()
+                		loginResponseDto.getMemberId(),
+                		loginResponseDto.getEmail()
                 )
         );
 
-        return loginResponse;
+        return loginResponseDto;
     }
 
 }

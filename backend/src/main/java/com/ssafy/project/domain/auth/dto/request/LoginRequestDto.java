@@ -10,7 +10,7 @@ import lombok.NonNull;
 @NoArgsConstructor // 기본 생성자
 @AllArgsConstructor // 파라미터 생성자
 @Builder // 빌더 패턴
-public class LoginRequest {
+public class LoginRequestDto {
     private @NonNull String email;
     private @NonNull String password;
 }
