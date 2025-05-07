@@ -13,4 +13,5 @@ public class DirectoryDto {
     private String name;
     private boolean directory;
     private long size; // byte 단위
+    private String presignedUrl;
 }
