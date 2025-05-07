@@ -3,8 +3,8 @@ package com.ssafy.project.domain.gallery.controller;
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
-import com.ssafy.project.domain.gallery.dto.request.RenameRequest;
-import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
+import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
@@ -59,17 +59,17 @@ public class PhotoController {
 	public ResponseEntity<?> list(@RequestParam String prefix) {
     	String email = SecurityContextHolder.getContext().getAuthentication().getName();
         prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-		DirectoryResponse directoryResponse = minioService.listDirectory(prefix);
-	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponse));
+		DirectoryResponseDto directoryResponseDto = minioService.listDirectory(prefix);
+	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponseDto));
 	}
     
     
 	@PutMapping("/rename")
-	public ResponseEntity<?> rename(@RequestBody RenameRequest renameRequest) {
+	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
     	String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		String oldKey = renameRequest.getOldKey();
+		String oldKey = renameRequestDto.getOldKey();
 		oldKey = String.format("%s/%s", email, oldKey.replaceAll("^/+", ""));
-		String newKey = renameRequest.getNewKey();
+		String newKey = renameRequestDto.getNewKey();
 		newKey = String.format("%s/%s", email, newKey.replaceAll("^/+", ""));
 		try {
 			if (oldKey.endsWith("/")) {

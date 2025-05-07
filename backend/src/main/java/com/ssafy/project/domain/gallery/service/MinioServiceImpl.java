@@ -3,7 +3,7 @@ package com.ssafy.project.domain.gallery.service;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
-import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -160,7 +160,7 @@ public class MinioServiceImpl implements MinioService {
     
     // [list]
     @Override
-    public DirectoryResponse listDirectory(String prefix){
+    public DirectoryResponseDto listDirectory(String prefix){
         ListObjectsV2Request listReq = ListObjectsV2Request.builder()
                 .bucket(bucketName)
                 .prefix(prefix)
@@ -194,7 +194,7 @@ public class MinioServiceImpl implements MinioService {
         // 유저 이름은 보내지 않기.
         int idx = prefix.indexOf('/');
         String result = (idx != -1) ? prefix.substring(idx + 1) : "";
-        return new DirectoryResponse(result, totalSize, entries);
+        return new DirectoryResponseDto(result, totalSize, entries);
     }
     
     private long calculateDirectoryTotalSize(String prefix) {

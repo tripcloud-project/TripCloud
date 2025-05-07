@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RenameRequest {
+public class RenameRequestDto {
     private String oldKey;
     private String newKey;
 }
