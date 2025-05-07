@@ -2,6 +2,9 @@ package com.ssafy.project.exception;
 
 
 import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.member.exception.InvalidPasswordException;
+import com.ssafy.project.domain.member.exception.NotFoundMemberException;
+
 import org.apache.ibatis.javassist.bytecode.DuplicateMemberException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
