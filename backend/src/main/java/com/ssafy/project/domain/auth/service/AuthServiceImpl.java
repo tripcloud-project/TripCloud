@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
+import com.ssafy.project.domain.auth.exception.InvalidTokenException;
 import com.ssafy.project.domain.auth.repository.AuthRepository;
 import com.ssafy.project.domain.auth.repository.RedisRepository;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
@@ -78,4 +79,20 @@ public class AuthServiceImpl implements AuthService {
   
         return loginResponseDto;
     }
+
+	@Override
+	public void logout(String authorization, String refreshToken) {
+		if(jwtUtil.isTokenExpired(refreshToken)) {
+			throw new InvalidTokenException();
+		}
+
+		String memberId = jwtUtil.extractId(refreshToken);
+		String accessToken = jwtUtil.resolveToken(authorization);
+		
+		// refreshToken 삭제
+		redisRepository.delete(memberId);
+		
+		// accessToken 블랙리스트 등록, 7일간
+		redisRepository.save("logout: " + accessToken, "logout", 604800000L);
+	}
 }
