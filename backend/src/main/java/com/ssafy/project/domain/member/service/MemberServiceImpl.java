@@ -1,15 +1,17 @@
 package com.ssafy.project.domain.member.service;
 
-import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
-import com.ssafy.project.domain.member.repository.MemberRepository;
-import com.ssafy.project.exception.InvalidPasswordException;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.validator.routines.RegexValidator;
-import org.apache.ibatis.javassist.bytecode.DuplicateMemberException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
+import com.ssafy.project.domain.member.exception.DuplicateMemberException;
+import com.ssafy.project.domain.member.exception.InvalidPasswordException;
+import com.ssafy.project.domain.member.repository.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public void createMember(MemberRegisterDto memberRegisterDto) throws DuplicateMemberException {
+    public void createMember(MemberRegisterDto memberRegisterDto) {
 
         // 이메일이 중복될 경우
         if (memberRepository.existsByEmail(memberRegisterDto.getEmail())) {
