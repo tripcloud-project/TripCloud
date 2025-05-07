@@ -19,12 +19,12 @@ import com.ssafy.project.domain.auth.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
-@RestController // 이 클래스는 REST Controller 임을 명시.
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth") // URI 지정.
+@RequestMapping("/api/v1/auth")
 public class AuthController {
-
     private final AuthService authService;
+    
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
         LoginResponseDto loginResponseDto = authService.login(loginRequest);
