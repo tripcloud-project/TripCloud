@@ -9,13 +9,16 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 public class S3Config {
+	// 내부 접근용 (Java 코드, S3Client)
     @Value("${minio.endpoint}")
     private String endpoint;
     
+    // 외부 노출용 Presigned URL (도메인 기반 or 외부에서 접근 가능한 IP)
     @Value("${minio.endpoint.public}")
     private String endpointPublic;
 
@@ -57,6 +60,11 @@ public class S3Config {
                         )
                 )
                 .region(Region.US_EAST_1)
+                .serviceConfiguration(
+                        S3Configuration.builder()
+                            .pathStyleAccessEnabled(true) // << ✅ path-style URL 사용
+                            .build()
+                    )
                 .build();
     }
 

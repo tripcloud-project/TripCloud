@@ -2,6 +2,7 @@ package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryResponse;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import com.ssafy.project.exception.UploadFailException;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,4 +48,12 @@ public class PhotoController {
             throw new UploadFailException();
         }
     }
+    
+    @GetMapping("/list")
+	public ResponseEntity<?> list(@RequestParam String prefix) {
+    	String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
+		DirectoryResponse directoryResponse = minioService.listDirectory(prefix);
+	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponse));
+	}
 }
