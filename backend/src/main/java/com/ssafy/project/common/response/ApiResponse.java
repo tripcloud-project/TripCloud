@@ -20,11 +20,11 @@ public class ApiResponse<T> {
     private static final String ERROR_STATUS = "error";
 
     private String status;
-    private T data;
+    private T result;
     private String message;
 
-    public static <T> ApiResponse<T> createSuccess(T data) {
-        return new ApiResponse<>(SUCCESS_STATUS, data, null);
+    public static <T> ApiResponse<T> createSuccess(T result) {
+        return new ApiResponse<>(SUCCESS_STATUS, result, null);
     }
 
     public static ApiResponse<?> createSuccessWithNoContent() {
@@ -51,9 +51,9 @@ public class ApiResponse<T> {
         return new ApiResponse<>(ERROR_STATUS, null, message);
     }
 
-    private ApiResponse(String status, T data, String message) {
+    private ApiResponse(String status, T result, String message) {
         this.status = status;
-        this.data = data;
+        this.result = result;
         this.message = message;
     }
 }

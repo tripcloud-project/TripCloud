@@ -8,6 +8,7 @@ import com.ssafy.project.domain.auth.filter.JWTFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,7 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/api/v1/auth/**").permitAll() // /auth/** 경로에 해당하는 모든 요청은 그냥 허용
-                                .anyRequest().authenticated() // 나머지 요청은 확인 필요.
+                                .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll() // POST /members만 허용
+                                .anyRequest().authenticated() // 그 외는 인증 필요                                .anyRequest().authenticated() // 나머지 요청은 확인 필요.
                 )
                 .formLogin(AbstractHttpConfigurer::disable) // Spring Security 기본 로그인 비활성화.
                 .httpBasic(AbstractHttpConfigurer::disable)// Spring Security 인증 메커니즘 비활성화.

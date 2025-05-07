@@ -20,7 +20,6 @@ public class AuthRepositoryImpl implements AuthRepository {
 
         Member member = authMapper.selectByEmailAndPassword(loginRequest);
         member.setMemberId(1L);
-        System.out.println("member = " + member);
 
         if(member == null) {
             return null;
