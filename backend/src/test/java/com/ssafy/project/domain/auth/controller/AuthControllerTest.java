@@ -57,9 +57,19 @@ class AuthControllerTest {
         LoginRequestDto loginRequestDto = new LoginRequestDto(email, password);
         String requestBody = objectMapper.writeValueAsString(loginRequestDto);
 
+        Long memberId = 1L;
+        String name = "홍길동";
+        String role = "USER";
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";
-        LoginResponseDto loginResponseDto = new LoginResponseDto(accessToken, refreshToken);
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+        									.memberId(memberId)
+        									.email(email)
+        									.name(name)
+        									.role(role)
+        									.accessToken(accessToken)
+        									.refreshToken(refreshToken)
+        									.build();
         
         given(authService.login(loginRequestDto)).willReturn(loginResponseDto);
 
