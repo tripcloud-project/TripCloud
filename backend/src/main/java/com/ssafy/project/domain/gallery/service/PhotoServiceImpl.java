@@ -2,10 +2,8 @@ package com.ssafy.project.domain.gallery.service;
 
 
 import com.drew.lang.GeoLocation;
-import com.ssafy.project.domain.gallery.dto.internal.AddressDto;
-import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
-import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
+import com.ssafy.project.domain.gallery.dto.internal.*;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
 import com.ssafy.project.util.ExifUtil;
@@ -24,6 +22,7 @@ import java.util.List;
 public class PhotoServiceImpl implements PhotoService {
 	private final KakaoGeocodingService kakaoGeocodingService;
 	private final PhotoRepository photoRepository;
+    private final MinioService minioService;
 	
 	// [upload]
 	public PhotoDto uploadPhoto(MultipartFile file, String s3Key){
@@ -85,4 +84,28 @@ public class PhotoServiceImpl implements PhotoService {
         return photoRepository.findPhotoDetailByS3Key(key);
     }
 
+
+    // [list]
+    @Override
+    public DirectoryResponseDto listDirectory(String prefix){
+        List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefix(prefix);
+        List<FileDto> files = photoRepository.findFilesByPrefix(prefix);
+        for(FileDto file : files){
+            file.setPresignedUrl(minioService.generatePresignedUrl(file.getS3Key()));
+        }
+
+        // prefix 앞에 사용자 email 제거해서 반환
+        String currentPrefix = prefix.contains("/") ? prefix.substring(prefix.indexOf('/') + 1) : "";
+
+        DirectoryResponseDto directoryResponseDto = DirectoryResponseDto.builder()
+                .prefix(currentPrefix)
+                .directories(directories)
+                .files(files)
+                .totalSize(
+                        directories.stream().mapToLong(d -> d.getSize() != null ? d.getSize() : 0L).sum() +
+                                files.stream().mapToLong(f -> f.getSize() != null ? f.getSize() : 0L).sum()
+                )
+                .build();
+        return directoryResponseDto;
+    }
 }
