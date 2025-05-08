@@ -2,6 +2,8 @@ package com.ssafy.project.domain.gallery.repository;
 
 import java.util.List;
 
+import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
+import com.ssafy.project.domain.gallery.dto.internal.FileDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import org.springframework.stereotype.Repository;
 
@@ -28,5 +30,15 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	@Override
 	public PhotoDetailResponseDto findPhotoDetailByS3Key(String key) {
 		return photoMapper.findPhotoDetailByS3Key(key);
+	}
+
+	@Override
+	public List<DirectoryDto> findDirectoriesByPrefix(String prefix){
+		return photoMapper.findDirectoriesByPrefix(prefix);
+	}
+
+	@Override
+	public List<FileDto> findFilesByPrefix(String prefix){
+		return photoMapper.findFilesByPrefix(prefix);
 	}
 }
