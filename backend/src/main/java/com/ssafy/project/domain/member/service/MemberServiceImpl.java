@@ -1,6 +1,13 @@
 package com.ssafy.project.domain.member.service;
 
+import com.ssafy.project.domain.auth.service.MemberDetails;
+import com.ssafy.project.domain.member.dto.response.BadgeResponseDto;
+import com.ssafy.project.domain.member.dto.response.MemberResponseDto;
+import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
+import com.ssafy.project.domain.member.entity.Member;
+import com.ssafy.project.domain.member.repository.BadgeRepository;
 import org.apache.commons.validator.routines.RegexValidator;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final MemberRepository memberRepository;
+    private final BadgeRepository badgeRepository;
 
     @Transactional
     @Override
@@ -37,6 +45,26 @@ public class MemberServiceImpl implements MemberService {
         memberRegisterDto.setPassword(passwordEncoder.encode(memberRegisterDto.getPassword()));
 
         memberRepository.insertMember(memberRegisterDto);
+    }
+
+    @Override
+    public ValidateEmailResponseDto isEmailDuplicated(String email) {
+        return new ValidateEmailResponseDto(memberRepository.existsByEmail(email));
+    }
+
+    @Override
+    public MemberResponseDto getCurrentMemberInfo(Authentication authentication) {
+        Member member = ((MemberDetails) authentication.getPrincipal()).member();
+        BadgeResponseDto mainBadge = badgeRepository.selectById(member.getMainBadgeId());
+
+        return MemberResponseDto.builder()
+                .email(member.getEmail())
+                .role(member.getRole())
+                .name(member.getName())
+                .profileImage(member.getProfileImage())
+                .usedStorage(member.getUsedStorage())
+                .maxStorage(member.getMaxStorage())
+                .mainBadge(mainBadge.getName()).build();
     }
 
     private boolean isValid(String rawPassword) {

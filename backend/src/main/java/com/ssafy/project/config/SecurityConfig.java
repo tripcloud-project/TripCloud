@@ -38,14 +38,12 @@ public class SecurityConfig {
                         authorize
                                 .requestMatchers("/api/v1/auth/**").permitAll() // /auth/** 경로에 해당하는 모든 요청은 그냥 허용
                                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll() // POST /members만 허용
-                                .anyRequest().authenticated() // 그 외는 인증 필요                                .anyRequest().authenticated() // 나머지 요청은 확인 필요.
+                                .requestMatchers(HttpMethod.GET, "/api/v1/members/checkEmail").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable) // Spring Security 기본 로그인 비활성화.
                 .httpBasic(AbstractHttpConfigurer::disable)// Spring Security 인증 메커니즘 비활성화.
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-
         return httpSecurity.build();
     }
 

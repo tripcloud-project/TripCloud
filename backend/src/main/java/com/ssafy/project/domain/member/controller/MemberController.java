@@ -1,16 +1,14 @@
 package com.ssafy.project.domain.member.controller;
 
-import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import static com.ssafy.project.common.response.ApiResponse.createSuccess;
 import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -18,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
     private final MemberService memberService;
 
+    // 회원가입
     @PostMapping
     private ResponseEntity<?> registerMember(@RequestBody MemberRegisterDto memberRegisterDto) {
         memberService.createMember(memberRegisterDto);
@@ -25,10 +24,17 @@ public class MemberController {
                 .body(createSuccessWithNoContent());
     }
 
-    @GetMapping("/nothing")
-    private ResponseEntity<?> doNothing() {
-        MemberDetails member = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("member = " + member.member());
-        return ResponseEntity.noContent().build();
+    // 이메일 중복 검사
+    @GetMapping("/checkEmail")
+    private ResponseEntity<?> checkEmail(@RequestParam String email) {
+        return ResponseEntity.status(200)
+                .body(createSuccess(memberService.isEmailDuplicated(email)));
+    }
+
+    // 마이페이지 조회
+    @GetMapping("/me")
+    private ResponseEntity<?> getMyInformation(Authentication authentication) {
+        return ResponseEntity.status(200)
+                .body(createSuccess(memberService.getCurrentMemberInfo(authentication)));
     }
 }

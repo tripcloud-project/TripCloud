@@ -4,6 +4,7 @@ import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.InvalidPasswordException;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
+import com.ssafy.project.domain.member.exception.DuplicateMemberException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
