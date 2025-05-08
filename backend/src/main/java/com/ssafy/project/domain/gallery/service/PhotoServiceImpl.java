@@ -92,6 +92,7 @@ public class PhotoServiceImpl implements PhotoService {
         List<FileDto> files = photoRepository.findFilesByPrefix(prefix);
         for(FileDto file : files){
             file.setPresignedUrl(minioService.generatePresignedUrl(file.getS3Key()));
+            file.setS3Key(null);
         }
 
         // prefix 앞에 사용자 email 제거해서 반환
