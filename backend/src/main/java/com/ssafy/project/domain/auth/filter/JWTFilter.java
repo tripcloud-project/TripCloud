@@ -43,6 +43,9 @@ public class JWTFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
     // 필터를 적용하지 않을 URL 패턴 목록
     private static final List<String> EXCLUDE_URL = Arrays.asList(
+    		// TODO: 01-1. Vue 추가시 삭제 필요합니다.
+    		"/",	
+    		"/index.html",
             "/api/v1/auth/login",
             "/api/v1/auth/logout",
             "/api/v1/auth/refresh-token", // 추가 필요
