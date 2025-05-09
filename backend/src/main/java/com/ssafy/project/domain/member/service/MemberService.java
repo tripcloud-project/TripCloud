@@ -1,7 +1,5 @@
 package com.ssafy.project.domain.member.service;
 
-import org.springframework.security.core.Authentication;
-
 import java.time.LocalDateTime;
 
 import org.springframework.security.core.Authentication;
@@ -15,5 +13,8 @@ import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
 public interface MemberService {
     void createMember(MemberRegisterDto memberRegisterDto);
     ValidateEmailResponseDto isEmailDuplicated(String email);
-    MemberResponseDto getCurrentMemberInfo(Authentication authentication);
+    MemberResponseDto getCurrentMemberInfo(Authentication authentication);    
+    PageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor, Integer size);
+	BadgeListResponseDto getCurrentMemberBadges(Authentication authentication);
+    void putCurrentMemberInfo(MemberUpdateRequestDto requestDto, Authentication authentication);
 }
