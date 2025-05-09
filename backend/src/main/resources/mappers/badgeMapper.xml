@@ -4,6 +4,7 @@
 <mapper namespace="com.ssafy.project.domain.member.mapper.BadgeMapper">
     <select id="selectById" resultType="com.ssafy.project.domain.member.dto.response.BadgeResponseDto">
         SELECT
+        	badge_id as badgeId,
             name,
             description,
             image
@@ -13,6 +14,7 @@
     
     <select id="selectAllByMemberId" resultType="com.ssafy.project.domain.member.dto.response.BadgeResponseDto">
     	SELECT
+    		b.badge_id as badgeId,
     		b.name,
     		b.description,
     		b.image
