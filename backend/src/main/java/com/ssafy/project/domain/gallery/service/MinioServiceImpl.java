@@ -1,20 +1,12 @@
 package com.ssafy.project.domain.gallery.service;
 
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
-import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CommonPrefix;
-import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
@@ -32,7 +24,7 @@ import java.util.List;
 public class MinioServiceImpl implements MinioService {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
-    
+
     @Value("${minio.bucket}")
     private String bucketName;
 
@@ -80,7 +72,8 @@ public class MinioServiceImpl implements MinioService {
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize())
         );
     }
-	
+
+    @Override
 	public String generatePresignedUrl(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
@@ -156,54 +149,7 @@ public class MinioServiceImpl implements MinioService {
 
         return resolvedPrefix;
     }
-    
-    
-    // [list]
-    @Override
-    public DirectoryResponseDto listDirectory(String prefix){
-        ListObjectsV2Request listReq = ListObjectsV2Request.builder()
-                .bucket(bucketName)
-                .prefix(prefix)
-                .delimiter("/") // 슬래시를 기준으로 디렉토리 구분
-                .build();
 
-        ListObjectsV2Response listRes = s3Client.listObjectsV2(listReq);
-
-        List<DirectoryDto> entries = new ArrayList<>();
-
-        // 하위 디렉토리 목록 추가 (크기 포함)
-        for (CommonPrefix dir : listRes.commonPrefixes()) {
-            String name = dir.prefix().substring(prefix.length());
-            long dirSize = calculateDirectoryTotalSize(dir.prefix()); // ✅ 하위 디렉토리 용량까지 계산
-            entries.add(new DirectoryDto(name, true, dirSize, null));
-        }
-        
-        // 현재 디렉토리의 파일 목록 추가
-        for (S3Object file : listRes.contents()) {
-            if (!file.key().equals(prefix)) {
-                String name = file.key().substring(prefix.length());
-                String url = generatePresignedUrl(file.key());
-                entries.add(new DirectoryDto(name, false, file.size(), url));
-            }
-        }
-
-        // 디렉토리 전체 하위 포함 파일 크기 계산
-        long totalSize = calculateDirectoryTotalSize(prefix);
-        
-        
-        // 유저 이름은 보내지 않기.
-        int idx = prefix.indexOf('/');
-        String result = (idx != -1) ? prefix.substring(idx + 1) : "";
-        return new DirectoryResponseDto(result, totalSize, entries);
-    }
-    
-    private long calculateDirectoryTotalSize(String prefix) {
-        return getContents(prefix).stream()
-                .filter(obj -> !obj.key().equals(prefix))
-                .mapToLong(S3Object::size)
-                .sum();
-    }
-    
     public List<S3Object> getContents(String key){
         ListObjectsV2Request listReq = ListObjectsV2Request.builder()
                 .bucket(bucketName)
@@ -253,5 +199,5 @@ public class MinioServiceImpl implements MinioService {
                 .key(key)
                 .build());
     }
-    
+
 }
