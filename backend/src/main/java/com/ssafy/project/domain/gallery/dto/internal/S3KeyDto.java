@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class S3KeyDto {
-    private String key;
+    private String s3Key;
 }

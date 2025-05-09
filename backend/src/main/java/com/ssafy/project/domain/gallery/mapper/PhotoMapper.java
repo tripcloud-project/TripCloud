@@ -14,7 +14,7 @@ import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
 public interface PhotoMapper {
 	void insertPhoto(PhotoDto photo);
 	void insertPhotos(List<PhotoDto> photos);
-	void renamePhoto(@Param("oldKey") String oldKey, @Param("newKey") String newKey, @Param("filename") String filename);
+	void renamePhoto(@Param("oldKey") String oldKey, @Param("newKey") String newKey, @Param("originalFilename") String originalFilename);
 	PhotoDetailResponseDto findPhotoDetailByS3Key(String key);
 	List<DirectoryDto> findDirectoriesByPrefix(@Param("prefix") String prefix);
 	List<FileDto> findFilesByPrefix(@Param("prefix") String prefix);

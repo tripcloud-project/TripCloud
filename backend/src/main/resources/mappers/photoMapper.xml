@@ -7,7 +7,7 @@
 
   <insert id="insertPhotos">
     INSERT INTO photo (
-      s3_key, filename, size, content_type,
+      s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude, taken_at,
       is_deleted, created_at
@@ -15,7 +15,7 @@
     VALUES
     <foreach collection="photos" item="p" separator=",">
       (
-      #{p.s3Key}, #{p.filename}, #{p.size}, #{p.contentType},
+      #{p.s3Key}, #{p.originalFilename}, #{p.size}, #{p.contentType},
       #{p.sido}, #{p.sigungu}, #{p.eupmyeondong},
       #{p.latitude}, #{p.longitude}, #{p.takenAt},
       false, NOW()
@@ -25,13 +25,13 @@
 
   <insert id="insertPhoto">
     INSERT INTO photo (
-      s3_key, filename, size, content_type,
+      s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude, taken_at,
       is_deleted, created_at
     ) 
     VALUES (
-      #{s3Key}, #{filename}, #{size}, #{contentType},
+      #{s3Key}, #{originalFilename}, #{size}, #{contentType},
       #{sido}, #{sigungu}, #{eupmyeondong},
       #{latitude}, #{longitude}, #{takenAt},
       false, NOW()
@@ -40,13 +40,13 @@
  
   <update id="renamePhoto">
     UPDATE photo
-    SET s3_key = #{newKey}, filename = #{filename}
+    SET s3_key = #{newKey}, original_filename = #{originalFilename}
     WHERE s3_key = #{oldKey}
   </update>
 
   <select id="findPhotoDetailByS3Key">
     SELECT
-      s3_key, filename, size, content_type,
+      s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude,
       is_deleted, created_at, taken_at
@@ -79,7 +79,7 @@
   </select>
 
   <select id="findFilesByPrefix">
-    SELECT photo_id, s3_key, filename as name, size
+    SELECT photo_id, s3_key, original_filename as name, size
     FROM photo
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
