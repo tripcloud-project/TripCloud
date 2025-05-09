@@ -10,5 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class UploadDto {
     private MultipartFile file;
-    private String key;
+    private String s3Key;
+    private String originalFilename;
 }

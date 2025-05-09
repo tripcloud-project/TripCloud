@@ -5,7 +5,10 @@ import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
+import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
+import com.ssafy.project.infra.kakao.KakaoGeocodingService;
+import com.ssafy.project.infra.s3.S3Service;
 import com.ssafy.project.util.ExifUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -22,15 +25,17 @@ import java.util.List;
 public class PhotoServiceImpl implements PhotoService {
 	private final KakaoGeocodingService kakaoGeocodingService;
 	private final PhotoRepository photoRepository;
-    private final MinioService minioService;
+    private final S3Service s3Service;
 	
 	// [upload]
-	public PhotoDto uploadPhoto(MultipartFile file, String s3Key){
-        String filename = Paths.get(s3Key).getFileName().toString();  // ✅ 파일명만 추출
+	public PhotoDto uploadPhoto(UploadDto uploadDto){
+		MultipartFile file = uploadDto.getFile();
+		String s3Key = uploadDto.getS3Key();
+		String originalFileName = uploadDto.getOriginalFilename();
         // ✅ 사진 객체 생성
         PhotoDto photo = new PhotoDto();
         photo.setS3Key(s3Key);
-        photo.setFilename(filename);
+        photo.setOriginalFilename(originalFileName);
         photo.setSize(file.getSize());
         photo.setContentType(file.getContentType());
 
@@ -57,10 +62,17 @@ public class PhotoServiceImpl implements PhotoService {
     }
 	
 	@Override
-    public void uploadPhotos(List<UploadDto> uploadList){
-        List<PhotoDto> photos = new ArrayList<>();
+    public void uploadPhotos(List<MultipartFile> files, String prefix){
+		if (files == null || files.isEmpty()) {
+            throw new UploadFailException("빈 파일 업로드 에러");
+        }
+		List<PhotoDto> photos = new ArrayList<>();
+		
+		// s3에 업로드된 list
+		List<UploadDto> uploadList = s3Service.uploadObjects(files, prefix);
+		
         for(UploadDto uploadDto : uploadList){
-            photos.add(uploadPhoto(uploadDto.getFile(), uploadDto.getKey()));
+            photos.add(uploadPhoto(uploadDto));
         }
         photoRepository.insertPhotos(photos);
     }
@@ -91,7 +103,7 @@ public class PhotoServiceImpl implements PhotoService {
         List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefix(prefix);
         List<FileDto> files = photoRepository.findFilesByPrefix(prefix);
         for(FileDto file : files){
-            file.setPresignedUrl(minioService.generatePresignedUrl(file.getS3Key()));
+            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
             file.setS3Key(null);
         }
 

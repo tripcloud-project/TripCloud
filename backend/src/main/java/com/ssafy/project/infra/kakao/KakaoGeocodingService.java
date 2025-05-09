@@ -1,4 +1,4 @@
-package com.ssafy.project.domain.gallery.service;
+package com.ssafy.project.infra.kakao;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -14,13 +14,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Service
-public class KakaoGeocodingServiceImpl implements KakaoGeocodingService {
+public class KakaoGeocodingService{
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
     
     private final OkHttpClient client = new OkHttpClient();
 
-    @Override
 	public AddressDto reverseGeocode(double lat, double lng) {
         String url = String.format(
             "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=%f&y=%f",

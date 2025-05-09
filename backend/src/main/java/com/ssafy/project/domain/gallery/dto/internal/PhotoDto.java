@@ -18,7 +18,7 @@ import lombok.NonNull;
 public class PhotoDto {
     private Long photoId;
     private String s3Key;
-    private String filename;
+    private String originalFilename;
     private Long size;
     private String contentType;
     private String sido;       // 시/도
