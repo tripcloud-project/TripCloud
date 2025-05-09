@@ -11,5 +11,5 @@ public interface MemberRepository {
     Boolean existsByEmail(@NonNull String email);
     Member selectById(@NonNull Long id);
 	void updateMember(Long memberId, MemberUpdateRequestDto requestDto);
-
+	void deleteMember(@NonNull Long memberId);
 }
