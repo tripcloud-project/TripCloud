@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
-import com.ssafy.project.domain.member.dto.request.MemberUpdateRequestDto;
 import com.ssafy.project.domain.member.dto.response.BadgeListResponseDto;
 import com.ssafy.project.domain.member.dto.response.BadgeResponseDto;
 import com.ssafy.project.domain.member.dto.response.MemberResponseDto;
@@ -94,26 +93,5 @@ public class MemberServiceImpl implements MemberService {
 				.badges(badges)
 				.size(badges.size())
 				.build();
-	}
-
-	@Transactional
-	@Override
-	public void putCurrentMemberInfo(MemberUpdateRequestDto requestDto, Authentication authentication) {
-        Member member = ((MemberDetails) authentication.getPrincipal()).member();
-        
-		// 비밀번호 조건 미충족시
-        if(isValid(requestDto.getPassword())) {
-            throw new InvalidPasswordException("비밀번호는 8~24자의 영문, 숫자, 특수문자를 포함해야 합니다.");
-        }
-        
-        Boolean hasBadge = badgeRepository.existsByMemberId(member.getMemberId());
-        
-        // 보유하지 않은 칭호로 변경 시도
-        if(!hasBadge) {
-        	throw new BadgeNotFoundException("해당 칭호를 보유하지 않았습니다.");
-        }
-        
-        requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        memberRepository.updateMember(requestDto);
 	}
 }
