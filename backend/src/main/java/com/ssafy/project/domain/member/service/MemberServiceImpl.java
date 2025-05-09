@@ -27,6 +27,8 @@ import com.ssafy.project.domain.member.repository.ActivityRepository;
 import com.ssafy.project.domain.member.repository.BadgeRepository;
 import com.ssafy.project.domain.member.repository.MemberRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
