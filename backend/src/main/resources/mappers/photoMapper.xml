@@ -10,7 +10,8 @@
       s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude, taken_at,
-      is_deleted, created_at
+      is_deleted, created_at,
+      member_id
     )
     VALUES
     <foreach collection="photos" item="p" separator=",">
@@ -18,7 +19,8 @@
       #{p.s3Key}, #{p.originalFilename}, #{p.size}, #{p.contentType},
       #{p.sido}, #{p.sigungu}, #{p.eupmyeondong},
       #{p.latitude}, #{p.longitude}, #{p.takenAt},
-      false, NOW()
+      false, NOW(),
+      #{memberId}
       )
     </foreach>
   </insert>
@@ -44,14 +46,15 @@
     WHERE s3_key = #{oldKey}
   </update>
 
-  <select id="findPhotoDetailByS3Key">
+  <select id="findPhotoDetailByPhotoIdAndMemberId">
     SELECT
       s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude,
       is_deleted, created_at, taken_at
     FROM photo
-    WHERE s3_key = #{key}
+    WHERE photo_id = #{photoId}
+    	AND member_id = #{memberId}
   </select>
 
 

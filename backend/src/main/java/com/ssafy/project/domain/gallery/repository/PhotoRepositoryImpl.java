@@ -18,8 +18,8 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	private final PhotoMapper photoMapper;
 	
 	@Override
-	public void insertPhotos(List<PhotoDto> photos) {
-		photoMapper.insertPhotos(photos);
+	public void insertPhotos(List<PhotoDto> photos, Long memberId) {
+		photoMapper.insertPhotos(photos, memberId);
 	}
 
 	@Override
@@ -28,9 +28,10 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	}
 
 	@Override
-	public PhotoDetailResponseDto findPhotoDetailByS3Key(String key) {
-		return photoMapper.findPhotoDetailByS3Key(key);
+	public PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId) {
+		return photoMapper.findPhotoDetailByPhotoIdAndMemberId(photoId, memberId);
 	}
+
 
 	@Override
 	public List<DirectoryDto> findDirectoriesByPrefix(String prefix){

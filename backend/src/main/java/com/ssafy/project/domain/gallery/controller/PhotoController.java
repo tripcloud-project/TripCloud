@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,10 +78,10 @@ public class PhotoController {
 	}
 
 
-	@GetMapping("/detail")
-	public ResponseEntity<?> viewMeta(@RequestParam String key) {
+	@GetMapping("/detail/{photoId}")
+	public ResponseEntity<?> viewMeta(@PathVariable Long photoId) {
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(makeMemberPrefix(key))));
+				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(photoId)));
 	}
 	
 	

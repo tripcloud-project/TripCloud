@@ -12,6 +12,6 @@ public interface PhotoService {
 	void uploadPhotos(List<MultipartFile> files, String prefix);
 	void renamePhotos(List<S3KeyUpdateDto> renameList);
 	void renamePhoto(String oldKey, String newKey);
-	PhotoDetailResponseDto getDetailPhoto(String key);
+	PhotoDetailResponseDto getDetailPhoto(Long photoId);
 	DirectoryResponseDto listDirectory(String prefix);
 }
