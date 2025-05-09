@@ -58,7 +58,8 @@ public class MemberController {
     @PutMapping("/me")
     private ResponseEntity<?> putMyInformation(@RequestBody MemberUpdateRequestDto requestDto,
     		Authentication authentication){
+    	memberService.putCurrentMemberInfo(requestDto, authentication);
     	return ResponseEntity.status(200)
-    			.body(createSuccess(memberService.putCurrentMemberInfo(requestDto, authentication)));
+    			.body(createSuccessWithNoContent());
     }
 }
