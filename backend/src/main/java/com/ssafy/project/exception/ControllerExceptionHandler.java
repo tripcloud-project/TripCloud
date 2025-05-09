@@ -1,6 +1,9 @@
 package com.ssafy.project.exception;
 
 import com.ssafy.project.common.response.ApiResponse;
+import com.ssafy.project.domain.gallery.exception.DownloadFailException;
+import com.ssafy.project.domain.gallery.exception.PhotoNotFoundException;
+import com.ssafy.project.domain.gallery.exception.RenameFailException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.InvalidPasswordException;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
@@ -46,6 +49,24 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(UploadFailException.class)
     public ResponseEntity<?> handleUploadFailException(UploadFailException e) {
     	return errorResponse(ErrorCode.UPLOAD_FAIL);
+    }
+    
+    // 파일 이름 변경 실패
+    @ExceptionHandler(RenameFailException.class)
+    public ResponseEntity<?> renameFailException(RenameFailException e){
+    	return errorResponse(ErrorCode.RENAME_FAIL);    	
+    }
+    
+    // 파일 조회 실패
+    @ExceptionHandler(PhotoNotFoundException.class)
+    public ResponseEntity<?> photoNotFoundException(PhotoNotFoundException e){
+    	return errorResponse(ErrorCode.PHOTO_NOT_FOUND);    	
+    }
+    
+    // 파일 다운로드 실패
+    @ExceptionHandler(DownloadFailException.class)
+    public ResponseEntity<?> downloadFailException(DownloadFailException e){
+    	return errorResponse(ErrorCode.DOWNLOAD_FAIL);    	
     }
     
     // 유효하지 않은 토큰 사용
