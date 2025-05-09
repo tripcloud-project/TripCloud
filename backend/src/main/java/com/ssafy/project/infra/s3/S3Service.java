@@ -1,4 +1,4 @@
-package com.ssafy.project.domain.gallery.service;
+package com.ssafy.project.infra.s3;
 
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MinioServiceImpl implements MinioService {
+public class S3Service{
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
@@ -30,7 +30,6 @@ public class MinioServiceImpl implements MinioService {
 
     
     // [upload]
-	@Override
 	public List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix) {
 		List<UploadDto> uploadList = new ArrayList<>();
         boolean isDirectory = hasDirectory(files);
@@ -73,7 +72,6 @@ public class MinioServiceImpl implements MinioService {
         );
     }
 
-    @Override
 	public String generatePresignedUrl(String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
@@ -162,7 +160,6 @@ public class MinioServiceImpl implements MinioService {
     
     
     // [rename]
-    @Override
     public List<S3KeyUpdateDto> directoryKeyUpdate(String oldPrefix, String newPrefix) {
         List<S3KeyUpdateDto> renameList = new ArrayList<>();
         try{
@@ -179,7 +176,6 @@ public class MinioServiceImpl implements MinioService {
         return renameList;
     }
     
-    @Override
     public void keyUpdate(String oldKey, String newKey) {
         copyFile(oldKey, newKey);
         deleteFile(oldKey);

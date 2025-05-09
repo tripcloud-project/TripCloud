@@ -6,6 +6,8 @@ import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
+import com.ssafy.project.infra.kakao.KakaoGeocodingService;
+import com.ssafy.project.infra.s3.S3Service;
 import com.ssafy.project.util.ExifUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ import java.util.List;
 public class PhotoServiceImpl implements PhotoService {
 	private final KakaoGeocodingService kakaoGeocodingService;
 	private final PhotoRepository photoRepository;
-    private final MinioService minioService;
+    private final S3Service s3Service;
 	
 	// [upload]
 	public PhotoDto uploadPhoto(MultipartFile file, String s3Key){
@@ -91,7 +93,7 @@ public class PhotoServiceImpl implements PhotoService {
         List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefix(prefix);
         List<FileDto> files = photoRepository.findFilesByPrefix(prefix);
         for(FileDto file : files){
-            file.setPresignedUrl(minioService.generatePresignedUrl(file.getS3Key()));
+            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
             file.setS3Key(null);
         }
 
