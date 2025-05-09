@@ -41,4 +41,12 @@
  			member_id = #{memberId}
  	</update>
  	
+ 	<update id="delete">
+ 		UPDATE member
+ 		SET
+ 			is_deleted = TRUE
+ 		WHERE
+ 			member_id = #{memberId}
+ 	</update>
+ 	
 </mapper>
