@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 
 import com.ssafy.project.common.response.PageResponse;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
+import com.ssafy.project.domain.member.dto.request.MemberUpdateRequestDto;
 import com.ssafy.project.domain.member.dto.response.BadgeListResponseDto;
 import com.ssafy.project.domain.member.dto.response.MemberResponseDto;
 import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
@@ -17,4 +18,5 @@ public interface MemberService {
     PageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor, Integer size);
 	BadgeListResponseDto getCurrentMemberBadges(Authentication authentication);
     void putCurrentMemberInfo(MemberUpdateRequestDto requestDto, Authentication authentication);
+	void deleteCurrentMember(Authentication authentication);
 }

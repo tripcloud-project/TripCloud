@@ -4,6 +4,7 @@
 <mapper namespace="com.ssafy.project.domain.member.mapper.BadgeMapper">
     <select id="selectById" resultType="com.ssafy.project.domain.member.dto.response.BadgeResponseDto">
         SELECT
+        	badge_id,
             name,
             description,
             image
@@ -13,6 +14,7 @@
     
     <select id="selectAllByMemberId" resultType="com.ssafy.project.domain.member.dto.response.BadgeResponseDto">
     	SELECT
+    		b.badge_id,
     		b.name,
     		b.description,
     		b.image
@@ -21,4 +23,11 @@
     			AND mb.badge_id = b.badge_id
     </select>
     
+    <select id="existsByMemberIdAndBadgeId" resultType="boolean">
+    	SELECT
+    		COUNT(*) > 0
+    	FROM Member_Badge
+    	WHERE member_id = #{memberId}
+    			AND badge_id = #{badgeId}
+    </select>
 </mapper>

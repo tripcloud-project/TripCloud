@@ -9,4 +9,5 @@ import lombok.NonNull;
 public interface BadgeRepository {
     BadgeResponseDto selectById(Long badgeId);
 	List<BadgeResponseDto> selectAllByMemberId(@NonNull Long memberId);
+	Boolean existsByMemberIdAndBadgeId(@NonNull Long memberId, Long mainBadgeId);
 }
