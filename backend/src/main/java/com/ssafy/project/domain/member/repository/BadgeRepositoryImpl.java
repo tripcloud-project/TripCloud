@@ -29,9 +29,4 @@ public class BadgeRepositoryImpl implements BadgeRepository {
 	public List<BadgeResponseDto> selectAllByMemberId(@NonNull Long memberId) {
 		return badgeMapper.selectAllByMemberId(memberId);
 	}
-
-	@Override
-	public Boolean existsByMemberIdAndBadgeId(@NonNull Long memberId, Long badgeId) {
-		return badgeMapper.existsByMemberIdAndBadgeId(memberId, badgeId);
-	}
 }
