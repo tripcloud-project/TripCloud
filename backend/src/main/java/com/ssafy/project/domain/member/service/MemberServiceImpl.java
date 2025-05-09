@@ -74,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
                 .profileImage(member.getProfileImage())
                 .usedStorage(member.getUsedStorage())
                 .maxStorage(member.getMaxStorage())
-                .mainBadge(mainBadge.getName()).build();
+                .mainBadge(mainBadge).build();
     }
 
     private boolean isValid(String rawPassword) {
