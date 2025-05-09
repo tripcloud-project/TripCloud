@@ -27,8 +27,6 @@ import com.ssafy.project.domain.member.repository.ActivityRepository;
 import com.ssafy.project.domain.member.repository.BadgeRepository;
 import com.ssafy.project.domain.member.repository.MemberRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
@@ -74,7 +72,7 @@ public class MemberServiceImpl implements MemberService {
                 .profileImage(member.getProfileImage())
                 .usedStorage(member.getUsedStorage())
                 .maxStorage(member.getMaxStorage())
-                .mainBadge(mainBadge).build();
+                .mainBadge(mainBadge.getName()).build();
     }
 
     private boolean isValid(String rawPassword) {

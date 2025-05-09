@@ -1,14 +1,11 @@
 package com.ssafy.project.domain.member.repository;
 
-import org.springframework.stereotype.Repository;
-
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
-import com.ssafy.project.domain.member.dto.request.MemberUpdateRequestDto;
 import com.ssafy.project.domain.member.entity.Member;
 import com.ssafy.project.domain.member.mapper.MemberMapper;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,9 +26,4 @@ public class MemberRepositoryImpl implements MemberRepository {
     public Member selectById(@NonNull Long id) {
         return memberMapper.selectById(id);
     }
-
-	@Override
-	public void updateMember(Long memberId, MemberUpdateRequestDto requestDto) {
-		memberMapper.update(memberId, requestDto);
-	}
 }

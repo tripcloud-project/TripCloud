@@ -29,15 +29,4 @@
         FROM Member
         WHERE member_id = #{id}
     </select>
-    
- 	<update id="update">
- 		UPDATE member
- 		SET
- 			password = #{requestDto.password},
- 			name = #{requestDto.name},
- 			profile_image = #{requestDto.profileImage},
- 			main_badge_id = #{requestDto.mainBadgeId}
- 		WHERE
- 			member_id = #{memberId}
- 	</update>
 </mapper>
