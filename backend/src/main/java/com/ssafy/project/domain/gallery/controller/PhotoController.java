@@ -42,38 +42,22 @@ public class PhotoController {
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
                                     @RequestParam("prefix") String prefix) {
-        if (files == null || files.isEmpty()) {
-            throw new UploadFailException("빈 파일 업로드 에러");
-        }
-		String email = SecurityUtil.getCurrentMemberEmail();
-        prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-
-        try {
-            List<UploadDto> uploadList = s3Service.uploadFiles(files, prefix);
-            photoService.uploadPhotos(uploadList);
-            return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
-        } catch (Exception e) {
-            throw new UploadFailException("파일 업로드 실패");
-        }
+        photoService.uploadPhotos(files, makeMemberPrefix(prefix));
+        return ResponseEntity.status(201)
+        		.body(ApiResponse.createSuccessWithNoContent());
     }
     
     @GetMapping("/list")
 	public ResponseEntity<?> list(@RequestParam String prefix) {
-    	String email = SecurityUtil.getCurrentMemberEmail();
-    	System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-		DirectoryResponseDto directoryResponseDto = photoService.listDirectory(prefix);
-	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponseDto));
+	    return ResponseEntity.status(200)
+	    		.body(ApiResponse.createSuccess(photoService.listDirectory(makeMemberPrefix(prefix))));
 	}
     
     
 	@PutMapping("/rename")
 	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
-		String email = SecurityUtil.getCurrentMemberEmail();
-		String oldKey = renameRequestDto.getOldKey();
-		oldKey = String.format("%s/%s", email, oldKey.replaceAll("^/+", ""));
-		String newKey = renameRequestDto.getNewKey();
-		newKey = String.format("%s/%s", email, newKey.replaceAll("^/+", ""));
+		String oldKey = makeMemberPrefix(renameRequestDto.getOldKey());
+		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
 		try {
 			if (oldKey.endsWith("/")) {
 				// 디렉토리 이름 번경
@@ -95,15 +79,14 @@ public class PhotoController {
 
 	@GetMapping("/detail")
 	public ResponseEntity<?> viewMeta(@RequestParam String key) {
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(makeMemberPrefix(key))));
+	}
+	
+	
+	private String makeMemberPrefix(String prefix) {
 		String email = SecurityUtil.getCurrentMemberEmail();
-		key = String.format("%s/%s", email, key.replaceAll("^/+", ""));
-		try {
-			PhotoDetailResponseDto photoDetailResponse = photoService.getDetailPhoto(key);
-			return ResponseEntity.ok(ApiResponse.createSuccess(photoDetailResponse));
-		} catch (NoSuchKeyException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("error", "파일이 존재하지 않습니다", "key", key));
-		}
+        return String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
 	}
 
 }
