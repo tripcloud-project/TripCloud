@@ -3,8 +3,11 @@ package com.ssafy.project.domain.member.controller;
 import static com.ssafy.project.common.response.ApiResponse.createSuccess;
 import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
 
+<<<<<<< backend/src/main/java/com/ssafy/project/domain/member/controller/MemberController.java
+=======
 import java.time.LocalDateTime;
 
+>>>>>>> backend/src/main/java/com/ssafy/project/domain/member/controller/MemberController.java
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,12 +49,19 @@ public class MemberController {
         return ResponseEntity.status(200)
                 .body(createSuccess(memberService.getCurrentMemberInfo(authentication)));
     }
-    
+
     // 유저 활동 내역 조회
     @GetMapping("/me/activities")
     private ResponseEntity<?> getMyActivities(Authentication authentication,
     		@RequestParam LocalDateTime cursor, @RequestParam Integer size){
     	return ResponseEntity.status(200)
     			.body(createSuccess(memberService.getMyActivities(authentication, cursor, size)));
+    }
+
+    // 보유 칭호 조회
+    @GetMapping("/me/badges")
+    private ResponseEntity<?> getMyBadges(Authentication authentication){
+    	return ResponseEntity.status(200)
+    			.body(createSuccess(memberService.getCurrentMemberBadges(authentication)));
     }
 }

@@ -1,6 +1,5 @@
 package com.ssafy.project.domain.member.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.commons.validator.routines.RegexValidator;
@@ -10,21 +9,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.project.common.response.PageResponse;
 import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
-import com.ssafy.project.domain.member.dto.response.ActivityResponseDto;
+import com.ssafy.project.domain.member.dto.response.BadgeListResponseDto;
 import com.ssafy.project.domain.member.dto.response.BadgeResponseDto;
 import com.ssafy.project.domain.member.dto.response.MemberResponseDto;
 import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
 import com.ssafy.project.domain.member.entity.Member;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
 import com.ssafy.project.domain.member.exception.InvalidPasswordException;
-import com.ssafy.project.domain.member.repository.ActivityRepository;
 import com.ssafy.project.domain.member.repository.BadgeRepository;
 import com.ssafy.project.domain.member.repository.MemberRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -89,6 +84,16 @@ public class MemberServiceImpl implements MemberService {
     }
 
 	@Override
+	public BadgeListResponseDto getCurrentMemberBadges(Authentication authentication) {
+        Member member = ((MemberDetails) authentication.getPrincipal()).member();
+        List<BadgeResponseDto> badges = badgeRepository.selectAllByMemberId(member.getMemberId());
+        
+		return BadgeListResponseDto.builder()
+				.badges(badges)
+				.size(badges.size())
+				.build();
+    }
+
 	public PageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor,
 			Integer size) {
         Member member = ((MemberDetails) authentication.getPrincipal()).member();

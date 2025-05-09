@@ -10,4 +10,15 @@
         FROM badge
         WHERE badge_id = #{badgeId}
     </select>
+    
+    <select id="selectAllByMemberId" resultType="com.ssafy.project.domain.member.dto.response.BadgeResponseDto">
+    	SELECT
+    		b.name,
+    		b.description,
+    		b.image
+    	FROM Member_Badge mb, Badge b
+    	WHERE mb.member_id = #{memberId}
+    			AND mb.badge_id = b.badge_id
+    </select>
+    
 </mapper>
