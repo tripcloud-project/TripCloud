@@ -21,14 +21,13 @@ import com.ssafy.project.domain.member.exception.InvalidPasswordException;
 import com.ssafy.project.domain.member.repository.BadgeRepository;
 import com.ssafy.project.domain.member.repository.MemberRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final MemberRepository memberRepository;
     private final BadgeRepository badgeRepository;
+    private final ActivityRepository activityRepository;
 
     @Transactional
     @Override
@@ -93,5 +92,26 @@ public class MemberServiceImpl implements MemberService {
 				.badges(badges)
 				.size(badges.size())
 				.build();
+    }
+
+	public PageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor,
+			Integer size) {
+        Member member = ((MemberDetails) authentication.getPrincipal()).member();
+        
+        List<ActivityResponseDto> activityList = activityRepository.selectByMemberIdAfterCursor(member.getMemberId(), cursor, size+1);
+        
+        Boolean hasNext = activityList.size() == size + 1;
+        List<ActivityResponseDto> content = hasNext ? activityList.subList(0, size) : activityList;
+        LocalDateTime nextCursor = activityList.get(size-1).getCreatedAt();
+        Integer answerSize = hasNext ? size : activityList.size();
+        
+        PageResponse<ActivityResponseDto> pageResponse = PageResponse.<ActivityResponseDto>builder()
+        		.content(content)
+        		.hasNext(hasNext)
+        		.size(answerSize)
+        		.nextCursor(nextCursor)
+        		.build();
+        
+        return pageResponse;
 	}
 }

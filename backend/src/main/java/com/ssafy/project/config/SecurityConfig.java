@@ -36,11 +36,20 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Session 사용 안함.
                 .authorizeHttpRequests(authorize ->
                         authorize
+                        		// TODO: 01-2. Vue 추가시 삭제 필요합니다.
+                        		.requestMatchers("/").permitAll()
+                        		.requestMatchers("/index.html").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll() // /auth/** 경로에 해당하는 모든 요청은 그냥 허용
                                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll() // POST /members만 허용
                                 .requestMatchers(HttpMethod.GET, "/api/v1/members/checkEmail").permitAll()
                                 .anyRequest().authenticated()
                 )
+                // TODO: 01-3. Vue 추가시 삭제 필요합니다.
+                .exceptionHandling(exception -> 
+	                exception.authenticationEntryPoint((request, response, authException) -> {
+	                    response.sendRedirect("/"); // 인증 실패 시 이동할 기본 페이지
+	                })
+    			)
                 .formLogin(AbstractHttpConfigurer::disable) // Spring Security 기본 로그인 비활성화.
                 .httpBasic(AbstractHttpConfigurer::disable)// Spring Security 인증 메커니즘 비활성화.
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

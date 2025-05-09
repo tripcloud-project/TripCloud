@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
 import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 
 public interface PhotoService {
@@ -11,4 +12,5 @@ public interface PhotoService {
 	void renamePhotos(List<S3KeyUpdateDto> renameList);
 	void renamePhoto(String oldKey, String newKey);
 	PhotoDetailResponseDto getDetailPhoto(String key);
+	DirectoryResponseDto listDirectory(String prefix);
 }

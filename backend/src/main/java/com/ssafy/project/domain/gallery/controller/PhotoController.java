@@ -10,12 +10,11 @@ import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.MinioService;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 
+import com.ssafy.project.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,7 +45,8 @@ public class PhotoController {
         if (files == null || files.isEmpty()) {
             throw new UploadFailException();
         }
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		String email = SecurityUtil.getCurrentMemberEmail();
+		System.out.println("upload: "+email);
         prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
 
         try {
@@ -60,16 +60,16 @@ public class PhotoController {
     
     @GetMapping("/list")
 	public ResponseEntity<?> list(@RequestParam String prefix) {
-    	String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    	String email = SecurityUtil.getCurrentMemberEmail();
         prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-		DirectoryResponseDto directoryResponseDto = minioService.listDirectory(prefix);
+		DirectoryResponseDto directoryResponseDto = photoService.listDirectory(prefix);
 	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponseDto));
 	}
     
     
 	@PutMapping("/rename")
 	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
-    	String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		String email = SecurityUtil.getCurrentMemberEmail();
 		String oldKey = renameRequestDto.getOldKey();
 		oldKey = String.format("%s/%s", email, oldKey.replaceAll("^/+", ""));
 		String newKey = renameRequestDto.getNewKey();
@@ -95,7 +95,7 @@ public class PhotoController {
 
 	@GetMapping("/detail")
 	public ResponseEntity<?> viewMeta(@RequestParam String key) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		String email = SecurityUtil.getCurrentMemberEmail();
 		key = String.format("%s/%s", email, key.replaceAll("^/+", ""));
 		try {
 			PhotoDetailResponseDto photoDetailResponse = photoService.getDetailPhoto(key);
@@ -105,4 +105,5 @@ public class PhotoController {
 					.body(Map.of("error", "파일이 존재하지 않습니다", "key", key));
 		}
 	}
+
 }
