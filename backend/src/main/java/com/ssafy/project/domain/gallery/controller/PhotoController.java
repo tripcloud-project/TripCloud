@@ -34,7 +34,6 @@ import java.util.Map;
 @RequestMapping("/api/v1/gallery")
 @Slf4j
 public class PhotoController {
-    private final S3Service s3Service;
     private final PhotoService photoService;
 
     @Value("${minio.bucket}")
@@ -43,7 +42,7 @@ public class PhotoController {
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
                                     @RequestParam("prefix") String prefix) {
-        photoService.uploadPhotos(files, makeMemberPrefix(prefix));
+        photoService.uploadPhotos(files, prefix);
         return ResponseEntity.status(201)
         		.body(ApiResponse.createSuccessWithNoContent());
     }
@@ -51,30 +50,15 @@ public class PhotoController {
     @GetMapping("/list")
 	public ResponseEntity<?> list(@RequestParam String prefix) {
 	    return ResponseEntity.status(200)
-	    		.body(ApiResponse.createSuccess(photoService.listDirectory(makeMemberPrefix(prefix))));
+	    		.body(ApiResponse.createSuccess(photoService.listDirectory(prefix)));
 	}
     
     
 	@PutMapping("/rename")
 	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
-		String oldKey = makeMemberPrefix(renameRequestDto.getOldKey());
-		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
-		try {
-			if (oldKey.endsWith("/")) {
-				// 디렉토리 이름 번경
-				List<S3KeyUpdateDto> renameList = s3Service.directoryKeyUpdate(oldKey, newKey);
-				photoService.renamePhotos(renameList);
-			} else {
-				// 파일 이름 변경
-				s3Service.keyUpdate(oldKey, newKey);
-				photoService.renamePhoto(oldKey, newKey);
-			}
-
-			return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("이름 변경 실패: " + e.getMessage());
-		}
+		photoService.renameObjects(renameRequestDto);
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccessWithNoContent());
 	}
 
 
@@ -83,11 +67,4 @@ public class PhotoController {
 		return ResponseEntity.status(200)
 				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(photoId)));
 	}
-	
-	
-	private String makeMemberPrefix(String prefix) {
-		String email = SecurityUtil.getCurrentMemberEmail();
-        return String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-	}
-
 }
