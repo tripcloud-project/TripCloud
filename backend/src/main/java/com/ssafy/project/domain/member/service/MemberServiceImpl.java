@@ -17,7 +17,6 @@ import com.ssafy.project.domain.member.dto.response.BadgeResponseDto;
 import com.ssafy.project.domain.member.dto.response.MemberResponseDto;
 import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
 import com.ssafy.project.domain.member.entity.Member;
-import com.ssafy.project.domain.member.exception.BadgeNotFoundException;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
 import com.ssafy.project.domain.member.exception.InvalidPasswordException;
 import com.ssafy.project.domain.member.repository.BadgeRepository;
@@ -107,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
             throw new InvalidPasswordException("비밀번호는 8~24자의 영문, 숫자, 특수문자를 포함해야 합니다.");
         }
         
-        Boolean hasBadge = badgeRepository.existsByMemberIdAndBadgeId(member.getMemberId(), requestDto.getMainBadgeId());
+        Boolean hasBadge = badgeRepository.existsByMemberId(member.getMemberId());
         
         // 보유하지 않은 칭호로 변경 시도
         if(!hasBadge) {
@@ -115,6 +114,6 @@ public class MemberServiceImpl implements MemberService {
         }
         
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        memberRepository.updateMember(member.getMemberId(), requestDto);
+        memberRepository.updateMember(requestDto);
 	}
 }
