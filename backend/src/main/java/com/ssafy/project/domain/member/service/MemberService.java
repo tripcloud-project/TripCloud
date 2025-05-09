@@ -18,4 +18,5 @@ public interface MemberService {
     PageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor, Integer size);
 	BadgeListResponseDto getCurrentMemberBadges(Authentication authentication);
     void putCurrentMemberInfo(MemberUpdateRequestDto requestDto, Authentication authentication);
+	void deleteCurrentMember(Authentication authentication);
 }

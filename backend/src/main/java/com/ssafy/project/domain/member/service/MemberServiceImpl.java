@@ -143,4 +143,11 @@ public class MemberServiceImpl implements MemberService {
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         memberRepository.updateMember(member.getMemberId(), requestDto);
 	}
+
+	@Transactional
+	@Override
+	public void deleteCurrentMember(Authentication authentication) {
+        Member member = ((MemberDetails) authentication.getPrincipal()).member();
+        memberRepository.deleteMember(member.getMemberId());
+	}
 }
