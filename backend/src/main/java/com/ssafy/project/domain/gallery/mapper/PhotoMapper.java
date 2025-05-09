@@ -12,10 +12,9 @@ import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
 
 @Mapper
 public interface PhotoMapper {
-	void insertPhoto(PhotoDto photo);
-	void insertPhotos(List<PhotoDto> photos);
+	void insertPhotos(List<PhotoDto> photos, Long memberId);
 	void renamePhoto(@Param("oldKey") String oldKey, @Param("newKey") String newKey, @Param("originalFilename") String originalFilename);
-	PhotoDetailResponseDto findPhotoDetailByS3Key(String key);
+	PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId);
 	List<DirectoryDto> findDirectoriesByPrefix(@Param("prefix") String prefix);
 	List<FileDto> findFilesByPrefix(@Param("prefix") String prefix);
 }

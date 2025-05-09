@@ -10,6 +10,7 @@ import com.ssafy.project.domain.gallery.repository.PhotoRepository;
 import com.ssafy.project.infra.kakao.KakaoGeocodingService;
 import com.ssafy.project.infra.s3.S3Service;
 import com.ssafy.project.util.ExifUtil;
+import com.ssafy.project.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,9 @@ public class PhotoServiceImpl implements PhotoService {
         for(UploadDto uploadDto : uploadList){
             photos.add(uploadPhoto(uploadDto));
         }
-        photoRepository.insertPhotos(photos);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        photoRepository.insertPhotos(photos, memberId);
+
     }
 	
 	// [rename]
@@ -92,8 +95,9 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public PhotoDetailResponseDto getDetailPhoto(String key) {
-        return photoRepository.findPhotoDetailByS3Key(key);
+    public PhotoDetailResponseDto getDetailPhoto(Long photoId) {
+    	Long memberId = SecurityUtil.getCurrentMemberId();
+        return photoRepository.findPhotoDetailByPhotoIdAndMemberId(photoId, memberId);
     }
 
 
