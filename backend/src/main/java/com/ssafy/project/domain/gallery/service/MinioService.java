@@ -2,6 +2,7 @@ package com.ssafy.project.domain.gallery.service;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
@@ -10,7 +11,8 @@ import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 
 public interface MinioService {
 	List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix);
-	DirectoryResponseDto listDirectory(String prefix);
+	String generatePresignedUrl(String key);
 	List<S3KeyUpdateDto> directoryKeyUpdate(String oldPrefix, String newPrefix);
 	void keyUpdate(String oldKey, String newKey);
+
 }

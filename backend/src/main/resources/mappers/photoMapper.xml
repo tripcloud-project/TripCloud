@@ -53,4 +53,39 @@
     FROM photo
     WHERE s3_key = #{key}
   </select>
+
+
+  <select id="findDirectoriesByPrefix">
+    SELECT
+    CONCAT(SUBSTRING_INDEX(TRIM(TRAILING '/' FROM d.dir_name), '/', -1),'/') AS name,
+    SUM(p.size) AS size
+    FROM (
+    SELECT DISTINCT
+    CONCAT(
+    SUBSTRING_INDEX(s3_key, '/',
+    CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
+    ),
+    '/'
+    ) AS dir_name
+    FROM photo
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
+    CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
+    )
+    ) AS d
+    JOIN photo p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
+    WHERE p.is_deleted = false
+    GROUP BY d.dir_name
+  </select>
+
+  <select id="findFilesByPrefix">
+    SELECT photo_id, s3_key, filename as name, size
+    FROM photo
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
+    CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', ''))
+    )
+    AND is_deleted=false
+  </select>
+
 </mapper>
