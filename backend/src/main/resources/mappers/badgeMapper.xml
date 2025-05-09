@@ -23,4 +23,12 @@
     			AND mb.badge_id = b.badge_id
     </select>
     
+    <select id="existsByMemberIdAndBadgeId" resultType="boolean">
+    	SELECT
+    		COUNT(*) > 0
+    	FROM Member_Badge
+    	WHERE member_id = #{memberId}
+    			AND badge_id = #{badgeId}
+    </select>
+    
 </mapper>
