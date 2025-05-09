@@ -16,5 +16,5 @@ public class MemberResponseDto {
     private String profileImage;
     private Integer usedStorage;
     private Integer maxStorage;
-    private BadgeResponseDto mainBadge;
+    private String mainBadge;
 }
