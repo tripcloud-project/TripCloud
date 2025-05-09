@@ -65,6 +65,7 @@ public class PhotoServiceImpl implements PhotoService {
 	
 	@Override
     public void uploadPhotos(List<MultipartFile> files, String prefix){
+		prefix = makeMemberPrefix(prefix);
 		if (files == null || files.isEmpty()) {
             throw new UploadFailException("빈 파일 업로드 에러");
         }
@@ -120,6 +121,7 @@ public class PhotoServiceImpl implements PhotoService {
     // [list]
     @Override
     public DirectoryResponseDto listDirectory(String prefix){
+    	prefix = makeMemberPrefix(prefix);
         List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefix(prefix);
         List<FileDto> files = photoRepository.findFilesByPrefix(prefix);
         for(FileDto file : files){
