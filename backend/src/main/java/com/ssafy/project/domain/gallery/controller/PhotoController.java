@@ -57,24 +57,11 @@ public class PhotoController {
     
 	@PutMapping("/rename")
 	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
-		String oldKey = makeMemberPrefix(renameRequestDto.getOldKey());
-		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
-		try {
-			if (oldKey.endsWith("/")) {
-				// 디렉토리 이름 번경
-				List<S3KeyUpdateDto> renameList = s3Service.directoryKeyUpdate(oldKey, newKey);
-				photoService.renamePhotos(renameList);
-			} else {
-				// 파일 이름 변경
-				s3Service.keyUpdate(oldKey, newKey);
-				photoService.renamePhoto(oldKey, newKey);
-			}
-
-			return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("이름 변경 실패: " + e.getMessage());
-		}
+//		String oldKey = makeMemberPrefix(renameRequestDto.getOldKey());
+//		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
+		photoService.renameObjects(renameRequestDto);
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccessWithNoContent());
 	}
 
 

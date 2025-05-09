@@ -3,6 +3,7 @@ package com.ssafy.project.domain.gallery.service;
 
 import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
+import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
@@ -81,17 +82,32 @@ public class PhotoServiceImpl implements PhotoService {
     }
 	
 	// [rename]
-    @Override
-    public void renamePhoto(String oldKey, String newKey) {
+	@Override
+	public void renameObjects(RenameRequestDto renameRequestDto) {
+		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
+		
+		// isDirectory?
+		if(renameRequestDto.getPhotoId() == null) {
+			String oldKey = makeMemberPrefix(renameRequestDto.getOldKey()); 
+			s3Service.directoryKeyUpdate(oldKey, newKey);
+			renamePhotos(oldKey, newKey);
+		}else {
+			Long photoId = renameRequestDto.getPhotoId();
+			renamePhoto(photoId, newKey);
+		}
+	}
+	
+	// 파일 이름 수정
+    private void renamePhoto(Long photoId, String newKey) {
         String filename = Paths.get(newKey).getFileName().toString();
-        photoRepository.renamePhoto(oldKey, newKey, filename);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        photoRepository.renamePhoto(photoId, filename, memberId);
     }
 
-    @Override
-    public void renamePhotos(List<S3KeyUpdateDto> renameList) {
-        for(S3KeyUpdateDto key : renameList){
-            renamePhoto(key.getOldKey(), key.getNewKey());
-        }
+    
+    // 디렉토리 이름 수정
+    private void renamePhotos(String oldKey, String newKey) {
+    	photoRepository.renamePhotos(oldKey, newKey);
     }
 
     @Override
@@ -125,4 +141,14 @@ public class PhotoServiceImpl implements PhotoService {
                 .build();
         return directoryResponseDto;
     }
+    
+    
+    
+    
+    
+    
+	private String makeMemberPrefix(String prefix) {
+		String email = SecurityUtil.getCurrentMemberEmail();
+        return String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
+	}
 }

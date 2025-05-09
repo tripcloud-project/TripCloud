@@ -23,10 +23,15 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	}
 
 	@Override
-	public void renamePhoto(String oldKey, String newKey, String filename) {
-		photoMapper.renamePhoto(oldKey, newKey, filename);
+	public void renamePhoto(Long photoId, String filename, Long memberId) {
+		photoMapper.renamePhoto(photoId, filename, memberId);
 	}
 
+	@Override
+	public void renamePhotos(String oldKey, String newKey) {
+		photoMapper.renamePhotos(oldKey, newKey);
+	}
+	
 	@Override
 	public PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId) {
 		return photoMapper.findPhotoDetailByPhotoIdAndMemberId(photoId, memberId);
@@ -42,4 +47,5 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	public List<FileDto> findFilesByPrefix(String prefix){
 		return photoMapper.findFilesByPrefix(prefix);
 	}
+	
 }

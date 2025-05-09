@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class RenameRequestDto {
     private String oldKey;
     private String newKey;
+    private Long photoId;
 }

@@ -174,20 +174,12 @@ public class S3Service{
     
     
     // [rename]
-    public List<S3KeyUpdateDto> directoryKeyUpdate(String oldPrefix, String newPrefix) {
-        List<S3KeyUpdateDto> renameList = new ArrayList<>();
-        try{
-            for (S3Object obj : getContents(oldPrefix)) {
-                String relativePath = obj.key().substring(oldPrefix.length());
-                String destinationKey = newPrefix + relativePath;
-
-                keyUpdate(obj.key(), destinationKey);
-                renameList.add(new S3KeyUpdateDto(obj.key(), destinationKey));
-            }
-        }catch (Exception e){
-
-        }
-        return renameList;
+    public void directoryKeyUpdate(String oldPrefix, String newPrefix) {
+    	for (S3Object obj : getContents(oldPrefix)) {
+    		String relativePath = obj.key().substring(oldPrefix.length());
+    		String destinationKey = newPrefix + relativePath;
+    		keyUpdate(obj.key(), destinationKey);
+    	}
     }
     
     public void keyUpdate(String oldKey, String newKey) {

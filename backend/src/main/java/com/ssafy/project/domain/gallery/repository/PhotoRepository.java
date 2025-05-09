@@ -9,8 +9,9 @@ import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 
 public interface PhotoRepository {
 	void insertPhotos(List<PhotoDto> photos, Long memberId);
-	void renamePhoto(String oldKey, String newKey, String filename);
+	void renamePhoto(Long photoId, String filename, Long memberId);
 	PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId);
     List<DirectoryDto> findDirectoriesByPrefix(String prefix);
     List<FileDto> findFilesByPrefix(String prefix);
+	void renamePhotos(String oldKey, String newKey);
 }
