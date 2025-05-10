@@ -8,6 +8,8 @@ import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
+import com.ssafy.project.domain.gallery.service.helper.DownloadHelper;
+import com.ssafy.project.domain.gallery.service.helper.UploadHelper;
 import com.ssafy.project.infra.kakao.KakaoGeocodingService;
 import com.ssafy.project.infra.s3.S3Service;
 import com.ssafy.project.util.ExifUtil;
@@ -34,7 +36,7 @@ public class PhotoServiceImpl implements PhotoService {
 	private final PhotoRepository photoRepository;
     private final S3Service s3Service;
 	
-	// [upload]
+	// [/upload]
 	@Override
     public void uploadPhotos(List<MultipartFile> files, String prefix){
 		prefix = makeMemberPrefix(prefix);
@@ -42,7 +44,7 @@ public class PhotoServiceImpl implements PhotoService {
             throw new UploadFailException("빈 파일 업로드 에러");
         }
         List<UploadDto> uploadList = new ArrayList<>();
-        Map<String, List<MultipartFile>> grouped = groupFilesByDirectory(files);
+        Map<String, List<MultipartFile>> grouped = UploadHelper.groupFilesByDirectory(files);
 
         for (Map.Entry<String, List<MultipartFile>> entry : grouped.entrySet()) {
             String dirName = entry.getKey();
@@ -63,30 +65,15 @@ public class PhotoServiceImpl implements PhotoService {
         photoRepository.insertPhotos(photos, memberId);
     }
 
-    // 파일이 업로드될 때, 여러 파일과 여러 디렉토리가 함께 올 수 있어요.
-    private Map<String, List<MultipartFile>> groupFilesByDirectory(List<MultipartFile> files) {
-        Map<String, List<MultipartFile>> grouped = new HashMap<>();
-
-        for (MultipartFile file : files) {
-            String fullPath = file.getOriginalFilename(); // 예: "여행/독도/img1.jpg"
-            if (fullPath == null) continue;
-
-            // 디렉토리 이름 추출 (마지막 슬래시 앞까지)
-            String dir = fullPath.contains("/") ? fullPath.substring(0, fullPath.indexOf("/")) : "";
-
-            grouped.computeIfAbsent(dir, k -> new ArrayList<>()).add(file);
-        }
-        return grouped;
-    }
 
     // 파일들만 업로드합니다. 중복 이름 걱정은 없습니다.
-    public List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix) {
+    private List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix) {
         List<UploadDto> uploadList = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
                 if(file.isEmpty()) continue;
                 String originalFilename = file.getOriginalFilename();
-                String s3Key = generateUuidS3Key(prefix + originalFilename);
+                String s3Key = UploadHelper.generateUuidS3Key(prefix + originalFilename);
                 s3Service.uploadObject(file, s3Key);
                 uploadList.add(new UploadDto(file, s3Key, originalFilename));
             } catch (IOException e) {
@@ -97,7 +84,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     // 디렉토리 단위로 파일을 업로드합니다. 중복 이름을 고려해야합니다.
-    public List<UploadDto> uploadDirectoryFiles(List<MultipartFile> files, String prefix) {
+    private List<UploadDto> uploadDirectoryFiles(List<MultipartFile> files, String prefix) {
         List<UploadDto> uploadList = new ArrayList<>();
         String resolvedPrefix = resolveUniquePrefix(files, prefix);
 
@@ -107,7 +94,7 @@ public class PhotoServiceImpl implements PhotoService {
                 String originalPath = file.getOriginalFilename();
                 String originalFilename = Paths.get(originalPath).getFileName().toString();
                 String relativePath = originalPath.substring(originalPath.indexOf("/") + 1);
-                String s3Key = generateUuidS3Key(resolvedPrefix + relativePath);
+                String s3Key = UploadHelper.generateUuidS3Key(resolvedPrefix + relativePath);
                 s3Service.uploadObject(file, s3Key);
                 uploadList.add(new UploadDto(file, s3Key, originalFilename));
             } catch (IOException e) {
@@ -115,21 +102,6 @@ public class PhotoServiceImpl implements PhotoService {
             }
         }
         return uploadList;
-    }
-
-    // uuid를 붙인 유니크 키를 생성합니다.
-    private String generateUuidS3Key(String s3Key) {
-        String filename = Paths.get(s3Key).getFileName().toString(); // "photo.jpg"
-        String uuid = UUID.randomUUID().toString();
-
-        // 확장자 유지
-        int dotIndex = filename.lastIndexOf('.');
-        String extension = (dotIndex != -1) ? filename.substring(dotIndex) : "";
-        String newFilename = uuid + extension;
-
-        // 경로만 따로 추출
-        String parentPath = s3Key.substring(0, s3Key.lastIndexOf("/") + 1);
-        return parentPath + newFilename;
     }
 
     // 동일한 이름의 디렉토리가 있을 경우, 이름 뒤에 (1)을 붙입니다.
@@ -158,7 +130,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     // 사진 객체를 생성합니다.
-    public PhotoDto makePhotoDto(UploadDto uploadDto){
+    private PhotoDto makePhotoDto(UploadDto uploadDto){
         MultipartFile file = uploadDto.getFile();
         String s3Key = uploadDto.getS3Key();
         String originalFileName = uploadDto.getOriginalFilename();
@@ -191,7 +163,8 @@ public class PhotoServiceImpl implements PhotoService {
         return photo;
     }
 
-	// [rename]
+    // TODO: 사진/디렉토리 서비스 로직 분리 필요.
+	// [/rename]
 	@Override
 	public void renameObjects(RenameRequestDto renameRequestDto) {
 		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
@@ -223,7 +196,7 @@ public class PhotoServiceImpl implements PhotoService {
     	photoRepository.renamePhotos(oldKey, newKey);
     }
 
-    // [detail]
+    // [/detail/{photoId}]
     @Override
     public PhotoDetailResponseDto getDetailPhoto(Long photoId) {
     	Long memberId = SecurityUtil.getCurrentMemberId();
@@ -231,7 +204,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
 
-    // [list]
+    // [/list]
     @Override
     public DirectoryResponseDto listDirectory(String prefix){
     	prefix = makeMemberPrefix(prefix);
@@ -257,7 +230,7 @@ public class PhotoServiceImpl implements PhotoService {
         return directoryResponseDto;
     }
 
-    // [download]
+    // [/download/{photoId}]
     @Override
     public DownloadDto downloadPhoto(Long photoId){
         Long memberId = SecurityUtil.getCurrentMemberId();
@@ -266,42 +239,26 @@ public class PhotoServiceImpl implements PhotoService {
 
         return DownloadDto.builder()
                 .resource(resource)
-                .contentDisposition(makeContentDisposition(s3KeyOriginalFilenameDto.getOriginalFilename()))
+                .contentDisposition(DownloadHelper.makeContentDisposition(s3KeyOriginalFilenameDto.getOriginalFilename()))
                 .build();
     }
 
+    // [/download]
     @Override
     public DownloadDto downloadDirectory(String prefix){
         prefix = makeMemberPrefix(prefix);
         Long memberId = SecurityUtil.getCurrentMemberId();
         List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames = photoRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId);
         Resource zipResource = s3Service.createZipResource(prefix, s3KeyOriginalFilenames);
-        String zipFilename = getZipFilenameFromKey(prefix);
+        String zipFilename = DownloadHelper.getZipFilenameFromKey(prefix);
 
         return DownloadDto.builder()
                 .resource(zipResource)
-                .contentDisposition(makeContentDisposition(zipFilename))
+                .contentDisposition(DownloadHelper.makeContentDisposition(zipFilename))
                 .build();
     }
 
-    private String getZipFilenameFromKey(String prefix) {
-        String dirName = prefix;
-        if (dirName.endsWith("/")) {
-            dirName = dirName.substring(0, dirName.length() - 1);
-        }
-        dirName = dirName.substring(dirName.lastIndexOf('/') + 1);
-        return dirName + ".zip";
-    }
-
-    // Content-Disposition 헤더를 UTF-8으로 설정하여 파일명에 한글, 공백이 있을 경우에도 올바르게 처리
-    private String makeContentDisposition(String filename){
-        return ContentDisposition.attachment()
-                .filename(filename, StandardCharsets.UTF_8)
-                .build()
-                .toString();
-    }
-    
-
+    // prefix 앞에 member의 email을 추가합니다.
 	private String makeMemberPrefix(String prefix) {
 		String email = SecurityUtil.getCurrentMemberEmail();
         return String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
