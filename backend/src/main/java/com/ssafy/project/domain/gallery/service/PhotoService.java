@@ -3,6 +3,8 @@ package com.ssafy.project.domain.gallery.service;
 import java.util.List;
 
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
+import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
@@ -14,6 +16,5 @@ public interface PhotoService {
 	void renameObjects(RenameRequestDto renameRequestDto);
 	PhotoDetailResponseDto getDetailPhoto(Long photoId);
 	DirectoryResponseDto listDirectory(String prefix);
-	DownloadDto downloadPhoto(Long photoId);
-	DownloadDto downloadDirectory(String prefix);
+	DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto);
 }

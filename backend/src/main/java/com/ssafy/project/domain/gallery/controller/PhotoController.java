@@ -2,6 +2,7 @@ package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
+import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import lombok.RequiredArgsConstructor;
@@ -58,18 +59,9 @@ public class PhotoController {
 				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(photoId)));
 	}
 
-	@GetMapping("/download/{photoId}")
-	public ResponseEntity<?> downloadPhoto(@PathVariable Long photoId) {
-		DownloadDto downloadDto = photoService.downloadPhoto(photoId);
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, downloadDto.getContentDisposition())
-				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.body(downloadDto.getResource());
-	}
-
-	@GetMapping("/download")
-	public ResponseEntity<?> downloadDirectory(@RequestParam String prefix) {
-		DownloadDto downloadDto = photoService.downloadDirectory(prefix);
+	@PostMapping("/download")
+	public ResponseEntity<?> download(@RequestBody DownloadRequestDto downloadRequestDto) {
+		DownloadDto downloadDto = photoService.downloadBulk(downloadRequestDto);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, downloadDto.getContentDisposition())
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
