@@ -2,8 +2,8 @@ package com.ssafy.project.domain.gallery.service;
 
 import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
+import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;

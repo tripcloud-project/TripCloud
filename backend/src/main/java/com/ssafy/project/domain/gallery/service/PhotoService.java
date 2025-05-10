@@ -3,6 +3,7 @@ package com.ssafy.project.domain.gallery.service;
 import java.util.List;
 
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
+import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import org.springframework.web.multipart.MultipartFile;
