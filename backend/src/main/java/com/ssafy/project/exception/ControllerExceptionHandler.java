@@ -1,19 +1,21 @@
 package com.ssafy.project.exception;
 
-import com.ssafy.project.common.response.ApiResponse;
-import com.ssafy.project.domain.gallery.exception.DownloadFailException;
-import com.ssafy.project.domain.gallery.exception.PhotoNotFoundException;
-import com.ssafy.project.domain.gallery.exception.RenameFailException;
-import com.ssafy.project.domain.gallery.exception.UploadFailException;
-import com.ssafy.project.domain.member.exception.InvalidPasswordException;
-import com.ssafy.project.domain.member.exception.NotFoundMemberException;
-import com.ssafy.project.domain.member.exception.DuplicateMemberException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.exception.InvalidTokenException;
+import com.ssafy.project.domain.gallery.exception.DownloadFailException;
+import com.ssafy.project.domain.gallery.exception.PhotoNotFoundException;
+import com.ssafy.project.domain.gallery.exception.RenameFailException;
+import com.ssafy.project.domain.gallery.exception.UploadFailException;
+import com.ssafy.project.domain.member.exception.DuplicateMemberException;
+import com.ssafy.project.domain.member.exception.InvalidPasswordException;
+import com.ssafy.project.domain.member.exception.NotFoundMemberException;
+
+import io.jsonwebtoken.JwtException;
 
 
 // 예외가 발생하면 이 클래스에서 담당.
@@ -70,7 +72,7 @@ public class ControllerExceptionHandler {
     }
     
     // 유효하지 않은 토큰 사용
-    @ExceptionHandler(InvalidTokenException.class)
+    @ExceptionHandler({InvalidTokenException.class, JwtException.class})
     public ResponseEntity<?> invalidTokenException() {
     	return errorResponse(ErrorCode.INVALID_TOKEN);
     }
