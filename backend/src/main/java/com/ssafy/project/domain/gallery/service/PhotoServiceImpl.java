@@ -2,7 +2,7 @@ package com.ssafy.project.domain.gallery.service;
 
 import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
-import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
@@ -18,12 +18,10 @@ import com.ssafy.project.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -163,38 +161,27 @@ public class PhotoServiceImpl implements PhotoService {
         return photo;
     }
 
-    // TODO: 사진/디렉토리 서비스 로직 분리 필요.
-	// [/rename]
-	@Override
-	public void renameObjects(RenameRequestDto renameRequestDto) {
-		String newKey = makeMemberPrefix(renameRequestDto.getNewKey());
-		
-		// isDirectory?
-		if(renameRequestDto.getPhotoId() == null) {
-            if(existsInS3(newKey)){
-                throw new RenameFailException("동일한 이름이 디렉토리가 존재합니다.");
-            }
-            String oldKey = makeMemberPrefix(renameRequestDto.getOldKey());
-            s3Service.directoryKeyUpdate(oldKey, newKey);
-			renamePhotos(oldKey, newKey);
-		}else {
-			Long photoId = renameRequestDto.getPhotoId();
-			renamePhoto(photoId, newKey);
-		}
-	}
-	
-	// 파일 이름 수정. 단순하게 DB의 originalFilename만 수정하면 됩니다.
-    private void renamePhoto(Long photoId, String newKey) {
-        String filename = Paths.get(newKey).getFileName().toString();
+    // 파일 이름 수정
+    // [/rename/{photoId}]
+    @Override
+    public void renamePhoto(Long photoId, String filename) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         photoRepository.renamePhoto(photoId, filename, memberId);
     }
 
-    
     // 디렉토리 이름 수정
-    private void renamePhotos(String oldKey, String newKey) {
-    	photoRepository.renamePhotos(oldKey, newKey);
-    }
+    // [/rename]
+	@Override
+	public void renameDirectory(DirectoryRenameRequestDto directoryRenameRequestDto) {
+        String oldPrefix = makeMemberPrefix(directoryRenameRequestDto.getOldPrefix());
+        String newPrefix = makeMemberPrefix(directoryRenameRequestDto.getNewPrefix());
+        if(existsInS3(newPrefix)){
+            throw new RenameFailException("동일한 이름이 디렉토리가 존재합니다.");
+        }
+        s3Service.directoryKeyUpdate(oldPrefix, newPrefix);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        photoRepository.renamePhotos(oldPrefix, newPrefix, memberId);
+	}
 
     // [/detail/{photoId}]
     @Override

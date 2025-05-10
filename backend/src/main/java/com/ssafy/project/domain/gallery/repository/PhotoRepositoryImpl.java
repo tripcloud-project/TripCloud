@@ -29,15 +29,14 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	}
 
 	@Override
-	public void renamePhotos(String oldKey, String newKey) {
-		photoMapper.renamePhotos(oldKey, newKey);
+	public void renamePhotos(String oldPrefix, String newPrefix, Long memberId) {
+		photoMapper.renamePhotos(oldPrefix, newPrefix, memberId);
 	}
 	
 	@Override
 	public PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId) {
 		return photoMapper.findPhotoDetailByPhotoIdAndMemberId(photoId, memberId);
 	}
-
 
 	@Override
 	public List<DirectoryDto> findDirectoriesByPrefix(String prefix){
