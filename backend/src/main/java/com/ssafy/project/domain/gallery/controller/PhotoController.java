@@ -37,7 +37,7 @@ public class PhotoController {
     @GetMapping("/list")
 	public ResponseEntity<?> list(@RequestParam String prefix) {
 	    return ResponseEntity.status(200)
-	    		.body(ApiResponse.createSuccess(photoService.listDirectory(prefix)));
+	    		.body(ApiResponse.createSuccess(photoService.listDirectory(prefix, false)));
 	}
 
 	@PutMapping("/rename/{photoId}")
@@ -76,8 +76,11 @@ public class PhotoController {
 				.body(ApiResponse.createSuccessWithNoContent());
 	}
 
-	// TODO: 휴지통 조회 endpoint 추가
-
+	@GetMapping("/trash/list")
+	public ResponseEntity<?> trashList() {
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccess(photoService.listDirectory("/", true)));
+	}
 	// TODO: 파일 복원 endpoint 추가
 
 	// TODO: 영구삭제 endpoint 추가
