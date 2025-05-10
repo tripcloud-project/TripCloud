@@ -82,9 +82,13 @@ public class PhotoController {
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}
-	// TODO: 영구삭제 endpoint 추가
 
-	// TODO: 휴지통 endpoint 추가
+	@DeleteMapping("/trash/delete")
+	public ResponseEntity<?> delete(@RequestBody DeleteRequestDto deleteRequestDto) {
+		photoService.delete(deleteRequestDto);
+		return ResponseEntity.status(200)
+				.body(createSuccessWithNoContent());
+	}
 
 	// TODO: 파일 이름 검색 endpoint 추가
 
