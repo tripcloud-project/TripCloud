@@ -44,6 +44,7 @@ public class PhotoController {
 	    		.body(ApiResponse.createSuccess(photoService.listDirectory(prefix)));
 	}
 
+	// TODO: 사진/디렉토리 endpoint 분리 필요.
 	@PutMapping("/rename")
 	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
 		photoService.renameObjects(renameRequestDto);
@@ -74,4 +75,18 @@ public class PhotoController {
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
 				.body(downloadDto.getResource());
 	}
+
+	// TODO: 휴지통 보내기 endpoint 추가
+
+	// TODO: 휴지통 조회 endpoint 추가
+
+	// TODO: 파일 복원 endpoint 추가
+
+	// TODO: 영구삭제 endpoint 추가
+
+	// TODO: 휴지통 endpoint 추가
+
+	// TODO: 파일 이름 검색 endpoint 추가
+
+	// TODO: 해시태그 검색 endpoint 추가
 }

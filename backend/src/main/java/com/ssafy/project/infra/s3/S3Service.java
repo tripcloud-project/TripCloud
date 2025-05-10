@@ -126,6 +126,7 @@ public class S3Service{
                         s3Stream.transferTo(zos);
                         zos.closeEntry();
                     }catch(ZipException e){
+                        // TODO: 중복이름 저장 로직 필요. 파일 이름 끝에 (1) 추가
                         /*
                          클라우드 내 중복 이름을 허용
                          다운로드할 때는 객체 스토리지에서 파일 스토리지로 전송하는 것이기 때문에
