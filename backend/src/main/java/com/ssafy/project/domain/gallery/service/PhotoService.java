@@ -5,6 +5,7 @@ import java.util.List;
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
 import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.RestoreRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +20,5 @@ public interface PhotoService {
 	DirectoryResponseDto listDirectory(String prefix, Boolean isDeleted);
 	DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto);
 	void trashBulk(TrashRequestDto trashRequestDto);
+	void restore(RestoreRequestDto restoreRequestDto);
 }

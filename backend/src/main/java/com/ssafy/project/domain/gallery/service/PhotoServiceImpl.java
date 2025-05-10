@@ -4,6 +4,7 @@ import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.RestoreRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
@@ -274,6 +275,21 @@ public class PhotoServiceImpl implements PhotoService {
         }
         if(!prefixList.isEmpty()){
             photoRepository.softDeletePhotosByPrefixes(prefixList, memberId);
+        }
+    }
+
+    // [/restore]
+    public void restore(RestoreRequestDto restoreRequestDto){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<Long> photoIdList = restoreRequestDto.getPhotoIdList();
+        List<String> prefixList = restoreRequestDto.getPrefixList().stream()
+                .map(this::makeMemberPrefix)
+                .toList();
+        if(!photoIdList.isEmpty()){
+            photoRepository.restorePhotosByIds(photoIdList, memberId);
+        }
+        if(!prefixList.isEmpty()){
+            photoRepository.restorePhotosByPrefixes(prefixList, memberId);
         }
     }
 
