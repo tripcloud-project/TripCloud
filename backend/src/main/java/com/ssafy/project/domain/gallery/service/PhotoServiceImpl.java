@@ -14,9 +14,12 @@ import com.ssafy.project.util.ExifUtil;
 import com.ssafy.project.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -107,6 +110,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     
     // 디렉토리 이름 수정
+    // TODO: [rename] 디렉토리 이름 중복은 불가능하게 막아야합니다.
     private void renamePhotos(String oldKey, String newKey) {
     	photoRepository.renamePhotos(oldKey, newKey);
     }
@@ -143,11 +147,50 @@ public class PhotoServiceImpl implements PhotoService {
                 .build();
         return directoryResponseDto;
     }
-    
-    
-    
-    
-    
+
+    // [download]
+    @Override
+    public DownloadDto downloadPhoto(Long photoId){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        S3KeyOriginalFilenameDto s3KeyOriginalFilenameDto = photoRepository.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId);
+        Resource resource = s3Service.createResource(s3KeyOriginalFilenameDto.getS3Key());
+
+        return DownloadDto.builder()
+                .resource(resource)
+                .contentDisposition(makeContentDisposition(s3KeyOriginalFilenameDto.getOriginalFilename()))
+                .build();
+    }
+
+    @Override
+    public DownloadDto downloadDirectory(String prefix){
+        prefix = makeMemberPrefix(prefix);
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames = photoRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId);
+        Resource zipResource = s3Service.createZipResource(prefix, s3KeyOriginalFilenames);
+        String zipFilename = getZipFilenameFromKey(prefix);
+
+        return DownloadDto.builder()
+                .resource(zipResource)
+                .contentDisposition(makeContentDisposition(zipFilename))
+                .build();
+    }
+
+    private String getZipFilenameFromKey(String prefix) {
+        String dirName = prefix;
+        if (dirName.endsWith("/")) {
+            dirName = dirName.substring(0, dirName.length() - 1);
+        }
+        dirName = dirName.substring(dirName.lastIndexOf('/') + 1);
+        return dirName + ".zip";
+    }
+
+    // Content-Disposition 헤더를 UTF-8으로 설정하여 파일명에 한글, 공백이 있을 경우에도 올바르게 처리
+    private String makeContentDisposition(String filename){
+        return ContentDisposition.attachment()
+                .filename(filename, StandardCharsets.UTF_8)
+                .build()
+                .toString();
+    }
     
 	private String makeMemberPrefix(String prefix) {
 		String email = SecurityUtil.getCurrentMemberEmail();
