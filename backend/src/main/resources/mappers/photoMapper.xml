@@ -131,4 +131,24 @@
     AND is_deleted=false
     AND member_id=#{memberId};
   </select>
+
+  <update id="softDeletePhotosByIds">
+    UPDATE photo
+    SET is_deleted = true, deleted_at = NOW()
+    WHERE member_id = #{memberId}
+    AND photo_id IN
+    <foreach item="id" collection="photoIdList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="softDeletePhotosByPrefixes">
+    UPDATE photo
+    SET is_deleted = true, deleted_at = NOW()
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+    </foreach>
+  </update>
 </mapper>
