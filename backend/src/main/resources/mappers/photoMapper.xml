@@ -98,4 +98,19 @@
     AND is_deleted=false
   </select>
 
+
+  <select id="findS3KeyAndOriginalFilenameByPhotoIdAndMemberId">
+    SELECT s3_key, original_filename
+    FROM photo
+    WHERE photo_id=#{photoId}
+      AND member_id=#{memberId}
+  </select>
+
+  <select id="findS3KeysAndOriginalFilenamesByPrefixAndMemberId">
+    SELECT s3_key, original_filename
+    FROM photo
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND is_deleted=false
+    AND member_id=#{memberId};
+  </select>
 </mapper>
