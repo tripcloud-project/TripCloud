@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class S3KeyDto {
+public class S3KeyOriginalFilenameDto {
     private String s3Key;
+    private String originalFilename;
 }
