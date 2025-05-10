@@ -21,4 +21,6 @@ public interface PhotoMapper {
 	boolean existsByPrefix(String prefix);
 	S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId);
 	List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId);
+	void softDeletePhotosByIds(List<Long> photoIdList, Long memberId);
+	void softDeletePhotosByPrefixes(List<String> prefixList, Long memberId);
 }

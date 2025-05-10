@@ -62,4 +62,14 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	public List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId){
 		return photoMapper.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId);
 	}
+
+	@Override
+	public void softDeletePhotosByIds(List<Long> photoIdList, Long memberId){
+		photoMapper.softDeletePhotosByIds(photoIdList, memberId);
+	}
+
+	@Override
+	public void softDeletePhotosByPrefixes(List<String> prefixeList, Long memberId){
+		photoMapper.softDeletePhotosByPrefixes(prefixeList, memberId);
+	}
 }

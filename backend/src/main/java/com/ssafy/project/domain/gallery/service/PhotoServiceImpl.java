@@ -2,7 +2,9 @@ package com.ssafy.project.domain.gallery.service;
 
 import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
-import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
@@ -217,9 +219,39 @@ public class PhotoServiceImpl implements PhotoService {
         return directoryResponseDto;
     }
 
-    // [/download/{photoId}]
+    // [/download]
     @Override
-    public DownloadDto downloadPhoto(Long photoId){
+    public DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto){
+        List<String> prefixList = downloadRequestDto.getPrefixList();
+        List<Long> photoIdList = downloadRequestDto.getPhotoIdList();
+        String currentPrefix = downloadRequestDto.getCurrentPrefix();
+
+        // 단일 파일 다운로드. zip일 필요가 없는 경우
+        if(prefixList.isEmpty() && photoIdList.size()==1){
+            return downloadPhoto(photoIdList.get(0));
+        }else{
+            currentPrefix=makeMemberPrefix(currentPrefix);
+            Long memberId = SecurityUtil.getCurrentMemberId();
+            List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames = new ArrayList<>();
+            for(String prefix : prefixList){
+                prefix = makeMemberPrefix(prefix);
+                s3KeyOriginalFilenames.addAll(photoRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId));
+            }
+            for(Long photoId : photoIdList){
+                s3KeyOriginalFilenames.add(photoRepository.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId));
+            }
+            Resource zipResource = s3Service.createZipResource(currentPrefix, s3KeyOriginalFilenames);
+            String zipFilename = DownloadHelper.getZipFilenameFromKey(currentPrefix);
+
+            return DownloadDto.builder()
+                    .resource(zipResource)
+                    .contentDisposition(DownloadHelper.makeContentDisposition(zipFilename))
+                    .build();
+        }
+    }
+
+    // 단일 파일 zip 없이 다운로드
+    private DownloadDto downloadPhoto(Long photoId){
         Long memberId = SecurityUtil.getCurrentMemberId();
         S3KeyOriginalFilenameDto s3KeyOriginalFilenameDto = photoRepository.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId);
         Resource resource = s3Service.createResource(s3KeyOriginalFilenameDto.getS3Key());
@@ -230,20 +262,21 @@ public class PhotoServiceImpl implements PhotoService {
                 .build();
     }
 
-    // [/download]
-    @Override
-    public DownloadDto downloadDirectory(String prefix){
-        prefix = makeMemberPrefix(prefix);
+    // [/trash]
+    public void trashBulk(TrashRequestDto trashRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames = photoRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId);
-        Resource zipResource = s3Service.createZipResource(prefix, s3KeyOriginalFilenames);
-        String zipFilename = DownloadHelper.getZipFilenameFromKey(prefix);
-
-        return DownloadDto.builder()
-                .resource(zipResource)
-                .contentDisposition(DownloadHelper.makeContentDisposition(zipFilename))
-                .build();
+        List<Long> photoIdList = trashRequestDto.getPhotoIdList();
+        List<String> prefixList = trashRequestDto.getPrefixList().stream()
+                .map(this::makeMemberPrefix)
+                .toList();
+        if(!photoIdList.isEmpty()){
+            photoRepository.softDeletePhotosByIds(photoIdList, memberId);
+        }
+        if(!prefixList.isEmpty()){
+            photoRepository.softDeletePhotosByPrefixes(prefixList, memberId);
+        }
     }
+
 
     // prefix 앞에 member의 email을 추가합니다.
 	private String makeMemberPrefix(String prefix) {

@@ -2,21 +2,15 @@ package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
-import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.PhotoRenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -66,25 +60,21 @@ public class PhotoController {
 				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(photoId)));
 	}
 
-	@GetMapping("/download/{photoId}")
-	public ResponseEntity<?> downloadPhoto(@PathVariable Long photoId) {
-		DownloadDto downloadDto = photoService.downloadPhoto(photoId);
+	@PostMapping("/download")
+	public ResponseEntity<?> download(@RequestBody DownloadRequestDto downloadRequestDto) {
+		DownloadDto downloadDto = photoService.downloadBulk(downloadRequestDto);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, downloadDto.getContentDisposition())
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
 				.body(downloadDto.getResource());
 	}
 
-	@GetMapping("/download")
-	public ResponseEntity<?> downloadDirectory(@RequestParam String prefix) {
-		DownloadDto downloadDto = photoService.downloadDirectory(prefix);
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, downloadDto.getContentDisposition())
-				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.body(downloadDto.getResource());
+	@DeleteMapping("/trash")
+	public ResponseEntity<?> trash(@RequestBody TrashRequestDto trashRequestDto) {
+		photoService.trashBulk(trashRequestDto);
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccessWithNoContent());
 	}
-
-	// TODO: 휴지통 보내기 endpoint 추가
 
 	// TODO: 휴지통 조회 endpoint 추가
 
