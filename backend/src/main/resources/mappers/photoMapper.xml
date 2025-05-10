@@ -55,13 +55,22 @@
 
   <select id="findPhotoDetailByPhotoIdAndMemberId">
     SELECT
-      s3_key, original_filename, size, content_type,
-      sido, sigungu, eupmyeondong,
-      latitude, longitude,
-      is_deleted, created_at, taken_at
-    FROM photo
-    WHERE photo_id = #{photoId}
-    	AND member_id = #{memberId}
+    p.original_filename,
+    p.size,
+    p.content_type,
+    p.sido,
+    p.sigungu,
+    p.eupmyeondong,
+    p.latitude,
+    p.longitude,
+    p.is_deleted,
+    p.created_at,
+    p.taken_at,
+    m.name AS member_name
+    FROM photo p
+    JOIN member m ON p.member_id = m.member_id
+    WHERE p.photo_id = #{photoId}
+    AND p.member_id = #{memberId}
   </select>
 
 

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class PhotoDetailResponseDto {
-    private String s3Key;
+    private String memberName;
     private String originalFilename;
     private Long size;
     private String contentType;
