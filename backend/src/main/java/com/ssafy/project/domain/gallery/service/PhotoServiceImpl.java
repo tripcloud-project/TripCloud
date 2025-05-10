@@ -4,6 +4,7 @@ import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
@@ -19,7 +20,6 @@ import com.ssafy.project.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -273,6 +273,22 @@ public class PhotoServiceImpl implements PhotoService {
                 .contentDisposition(DownloadHelper.makeContentDisposition(s3KeyOriginalFilenameDto.getOriginalFilename()))
                 .build();
     }
+
+    // [/trash]
+    public void trashBulk(TrashRequestDto trashRequestDto){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<Long> photoIdList = trashRequestDto.getPhotoIdList();
+        List<String> prefixList = trashRequestDto.getPrefixList().stream()
+                .map(this::makeMemberPrefix)
+                .toList();
+        if(!photoIdList.isEmpty()){
+            photoRepository.softDeletePhotosByIds(photoIdList, memberId);
+        }
+        if(!prefixList.isEmpty()){
+            photoRepository.softDeletePhotosByPrefixes(prefixList, memberId);
+        }
+    }
+
 
     // prefix 앞에 member의 email을 추가합니다.
 	private String makeMemberPrefix(String prefix) {
