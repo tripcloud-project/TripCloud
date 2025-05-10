@@ -148,12 +148,14 @@ public class JWTUtil {
      */
     public void validateToken(String token) {
         // 토큰 검증 - 실패 시 관련 예외가 발생함
-
+        if(extractExpiration(token).before(new Date())) {
+        	throw new ExpiredJwtException(null, null, "만료된 토큰입니다.");
+        }
+        
         Jwts.parser()
                 .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token);
-
     }
 
     public String generateAccessToken(Long id, String email, String name, String role) {

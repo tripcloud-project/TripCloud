@@ -48,9 +48,10 @@
   </update>
   
   <update id="renamePhotos">
-     UPDATE photo
-     SET s3_key = REPLACE(s3_key, #{oldKey}, #{newKey})
-     WHERE s3_key LIKE CONCAT(#{oldKey}, '%')
+    UPDATE photo
+    SET s3_key = REPLACE(s3_key, #{oldPrefix}, #{newPrefix})
+    WHERE s3_key LIKE CONCAT(#{oldPrefix}, '%')
+      AND member_id = #{memberId}
   </update>
 
   <select id="findPhotoDetailByPhotoIdAndMemberId">

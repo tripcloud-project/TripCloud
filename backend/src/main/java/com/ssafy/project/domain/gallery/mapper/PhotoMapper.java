@@ -14,10 +14,10 @@ import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
 public interface PhotoMapper {
 	void insertPhotos(List<PhotoDto> photos, Long memberId);
 	void renamePhoto(Long photoId, String filename, Long memberId);
+	void renamePhotos(String oldPrefix, String newPrefix, Long memberId);
 	PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId);
 	List<DirectoryDto> findDirectoriesByPrefix(String prefix);
 	List<FileDto> findFilesByPrefix(String prefix);
-	void renamePhotos(String oldKey, String newKey);
 	boolean existsByPrefix(String prefix);
 	S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId);
 	List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId);

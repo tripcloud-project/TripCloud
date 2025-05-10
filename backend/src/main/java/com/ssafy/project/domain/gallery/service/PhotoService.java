@@ -7,13 +7,13 @@ import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 
 public interface PhotoService {
 	void uploadPhotos(List<MultipartFile> files, String prefix);
-	void renameObjects(RenameRequestDto renameRequestDto);
+	void renameDirectory(DirectoryRenameRequestDto directoryRenameRequestDto);
+	void renamePhoto(Long photoId, String filename);
 	PhotoDetailResponseDto getDetailPhoto(Long photoId);
 	DirectoryResponseDto listDirectory(String prefix);
 	DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto);

@@ -1,20 +1,23 @@
 package com.ssafy.project.domain.auth.controller;
 
+import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
+
 import java.time.Duration;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
+import com.ssafy.project.domain.auth.dto.response.TokenResponseDto;
 import com.ssafy.project.domain.auth.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -44,7 +47,7 @@ public class AuthController {
 
         return ResponseEntity.status(200)
                 .headers(httpHeaders)
-                .body(ApiResponse.createSuccessWithNoContent());
+                .body(createSuccessWithNoContent());
     }
 
 
@@ -68,10 +71,31 @@ public class AuthController {
 
         httpHeaders.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(200)
                 .headers(httpHeaders)
                 .build();
     }
 
+    @GetMapping("/refresh-token")
+    public ResponseEntity<?> reissueToken(
+    		@CookieValue("refresh_token") String refreshToken){
+    	TokenResponseDto tokenResponseDto = authService.reissueToken(refreshToken);
+    	
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenResponseDto.getAccessToken());
 
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refresh_token", tokenResponseDto.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        httpHeaders.add(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
+        return ResponseEntity.status(200)
+                .headers(httpHeaders)
+                .body(createSuccessWithNoContent());
+    }
 }

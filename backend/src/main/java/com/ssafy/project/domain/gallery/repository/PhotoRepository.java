@@ -14,7 +14,7 @@ public interface PhotoRepository {
 	PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId);
     List<DirectoryDto> findDirectoriesByPrefix(String prefix);
     List<FileDto> findFilesByPrefix(String prefix);
-	void renamePhotos(String oldKey, String newKey);
+	void renamePhotos(String oldPrefix, String newPrefix, Long memberId);
 	boolean existsByPrefix(String prefix);
 	S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId);
 	List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId);
