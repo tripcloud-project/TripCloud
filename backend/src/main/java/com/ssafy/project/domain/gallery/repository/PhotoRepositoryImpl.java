@@ -47,5 +47,9 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	public List<FileDto> findFilesByPrefix(String prefix){
 		return photoMapper.findFilesByPrefix(prefix);
 	}
-	
+
+	@Override
+	public boolean existsByPrefix(String prefix){
+		return photoMapper.existsByPrefix(prefix);
+	}
 }

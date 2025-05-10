@@ -98,4 +98,13 @@
     AND is_deleted=false
   </select>
 
+  <select id="existsByPrefix" resultType="boolean">
+    SELECT EXISTS (
+    SELECT 1 FROM photo
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND is_deleted = false
+    LIMIT 1
+    )
+  </select>
+
 </mapper>

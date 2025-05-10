@@ -18,4 +18,5 @@ public interface PhotoMapper {
 	List<DirectoryDto> findDirectoriesByPrefix(String prefix);
 	List<FileDto> findFilesByPrefix(String prefix);
 	void renamePhotos(String oldKey, String newKey);
+	boolean existsByPrefix(String prefix);
 }
