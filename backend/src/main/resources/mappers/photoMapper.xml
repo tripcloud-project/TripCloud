@@ -152,4 +152,24 @@
       s3_key LIKE CONCAT(#{prefix}, '%')
     </foreach>
   </update>
+
+  <update id="restorePhotosByIds">
+    UPDATE photo
+    SET is_deleted = false, deleted_at = NULL
+    WHERE member_id = #{memberId}
+    AND photo_id IN
+    <foreach item="id" collection="photoIdList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="restorePhotosByPrefixes">
+    UPDATE photo
+    SET is_deleted = false, deleted_at = NULL
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+    </foreach>
+  </update>
 </mapper>

@@ -20,4 +20,6 @@ public interface PhotoRepository {
 	List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId);
 	void softDeletePhotosByIds(List<Long> photoIdList, Long memberId);
 	void softDeletePhotosByPrefixes(List<String> prefixeList, Long memberId);
+	void restorePhotosByIds(List<Long> photoIdList, Long memberId);
+	void restorePhotosByPrefixes(List<String> prefixList, Long memberId);
 }

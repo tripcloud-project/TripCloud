@@ -72,4 +72,14 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	public void softDeletePhotosByPrefixes(List<String> prefixeList, Long memberId){
 		photoMapper.softDeletePhotosByPrefixes(prefixeList, memberId);
 	}
+
+	@Override
+	public void restorePhotosByIds(List<Long> photoIdList, Long memberId){
+		photoMapper.restorePhotosByIds(photoIdList, memberId);
+	}
+
+	@Override
+	public void restorePhotosByPrefixes(List<String> prefixList, Long memberId){
+		photoMapper.restorePhotosByPrefixes(prefixList, memberId);
+	}
 }

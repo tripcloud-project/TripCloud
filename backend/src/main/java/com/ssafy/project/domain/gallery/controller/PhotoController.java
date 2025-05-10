@@ -2,10 +2,7 @@ package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
-import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.PhotoRenameRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.*;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,8 +78,13 @@ public class PhotoController {
 		return ResponseEntity.status(200)
 				.body(ApiResponse.createSuccess(photoService.listDirectory("/", true)));
 	}
-	// TODO: 파일 복원 endpoint 추가
 
+	@PutMapping("/trash/restore")
+	public ResponseEntity<?> restore(@RequestBody RestoreRequestDto restoreRequestDto) {
+		photoService.restore(restoreRequestDto);
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccessWithNoContent());
+	}
 	// TODO: 영구삭제 endpoint 추가
 
 	// TODO: 휴지통 endpoint 추가
