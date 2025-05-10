@@ -16,8 +16,8 @@ public interface PhotoMapper {
 	void renamePhoto(Long photoId, String filename, Long memberId);
 	void renamePhotos(String oldPrefix, String newPrefix, Long memberId);
 	PhotoDetailResponseDto findPhotoDetailByPhotoIdAndMemberId(Long photoId, Long memberId);
-	List<DirectoryDto> findDirectoriesByPrefix(String prefix);
-	List<FileDto> findFilesByPrefix(String prefix);
+	List<DirectoryDto> findDirectoriesByPrefixAndIsDeleted(String prefix, Boolean isDeleted);
+	List<FileDto> findFilesByPrefixAndIsDeleted(String prefix, Boolean isDeleted);
 	boolean existsByPrefix(String prefix);
 	S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId);
 	List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId);

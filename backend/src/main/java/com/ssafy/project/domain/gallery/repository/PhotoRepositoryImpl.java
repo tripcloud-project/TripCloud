@@ -39,13 +39,13 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	}
 
 	@Override
-	public List<DirectoryDto> findDirectoriesByPrefix(String prefix){
-		return photoMapper.findDirectoriesByPrefix(prefix);
+	public List<DirectoryDto> findDirectoriesByPrefixAndIsDeleted(String prefix, Boolean isDeleted){
+		return photoMapper.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
 	}
 
 	@Override
-	public List<FileDto> findFilesByPrefix(String prefix){
-		return photoMapper.findFilesByPrefix(prefix);
+	public List<FileDto> findFilesByPrefixAndIsDeleted(String prefix, Boolean isDeleted){
+		return photoMapper.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
 	}
 
 	@Override

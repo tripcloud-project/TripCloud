@@ -195,10 +195,10 @@ public class PhotoServiceImpl implements PhotoService {
 
     // [/list]
     @Override
-    public DirectoryResponseDto listDirectory(String prefix){
+    public DirectoryResponseDto listDirectory(String prefix, Boolean isDeleted){
     	prefix = makeMemberPrefix(prefix);
-        List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefix(prefix);
-        List<FileDto> files = photoRepository.findFilesByPrefix(prefix);
+        List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
+        List<FileDto> files = photoRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
         for(FileDto file : files){
             file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
             file.setS3Key(null);
@@ -276,7 +276,6 @@ public class PhotoServiceImpl implements PhotoService {
             photoRepository.softDeletePhotosByPrefixes(prefixList, memberId);
         }
     }
-
 
     // prefix 앞에 member의 email을 추가합니다.
 	private String makeMemberPrefix(String prefix) {

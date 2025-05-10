@@ -75,7 +75,7 @@
   </select>
 
 
-  <select id="findDirectoriesByPrefix">
+  <select id="findDirectoriesByPrefixAndIsDeleted">
     SELECT
     CONCAT(SUBSTRING_INDEX(TRIM(TRAILING '/' FROM d.dir_name), '/', -1),'/') AS name,
     SUM(p.size) AS size
@@ -94,18 +94,18 @@
     )
     ) AS d
     JOIN photo p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
-    WHERE p.is_deleted = false
+    WHERE p.is_deleted = #{isDeleted}
     GROUP BY d.dir_name
   </select>
 
-  <select id="findFilesByPrefix">
+  <select id="findFilesByPrefixAndIsDeleted">
     SELECT photo_id, s3_key, original_filename as name, size
     FROM photo
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
     CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', ''))
     )
-    AND is_deleted=false
+    AND is_deleted=#{isDeleted}
   </select>
 
   <select id="existsByPrefix" resultType="boolean">

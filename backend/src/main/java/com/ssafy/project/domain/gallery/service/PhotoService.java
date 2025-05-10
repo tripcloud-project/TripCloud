@@ -16,7 +16,7 @@ public interface PhotoService {
 	void renameDirectory(DirectoryRenameRequestDto directoryRenameRequestDto);
 	void renamePhoto(Long photoId, String filename);
 	PhotoDetailResponseDto getDetailPhoto(Long photoId);
-	DirectoryResponseDto listDirectory(String prefix);
+	DirectoryResponseDto listDirectory(String prefix, Boolean isDeleted);
 	DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto);
 	void trashBulk(TrashRequestDto trashRequestDto);
 }
