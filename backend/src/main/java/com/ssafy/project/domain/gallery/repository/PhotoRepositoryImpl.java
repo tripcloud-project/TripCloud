@@ -82,4 +82,14 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	public void restorePhotosByPrefixes(List<String> prefixList, Long memberId){
 		photoMapper.restorePhotosByPrefixes(prefixList, memberId);
 	}
+
+	@Override
+	public void deletePhotosByIds(List<Long> photoIdList, Long memberId){
+		photoMapper.deletePhotosByIds(photoIdList, memberId);
+	}
+
+	@Override
+	public void deletePhotosByPrefixes(List<String> prefixList, Long memberId){
+		photoMapper.deletePhotosByPrefixes(prefixList, memberId);
+	}
 }
