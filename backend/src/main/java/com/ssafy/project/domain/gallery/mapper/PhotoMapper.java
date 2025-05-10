@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
 import com.ssafy.project.domain.gallery.dto.internal.FileDto;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.project.domain.gallery.dto.internal.PhotoDto;
 
@@ -18,4 +18,6 @@ public interface PhotoMapper {
 	List<DirectoryDto> findDirectoriesByPrefix(String prefix);
 	List<FileDto> findFilesByPrefix(String prefix);
 	void renamePhotos(String oldKey, String newKey);
+	S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId);
+	List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId);
 }
