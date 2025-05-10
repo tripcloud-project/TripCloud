@@ -2,7 +2,8 @@ package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
-import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.PhotoRenameRequestDto;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +46,16 @@ public class PhotoController {
 	}
 
 	// TODO: 사진/디렉토리 endpoint 분리 필요.
+	@PutMapping("/rename/{photoId}")
+	public ResponseEntity<?> renamePhoto(@PathVariable Long photoId, @RequestBody PhotoRenameRequestDto photoRenameRequestDto) {
+		photoService.renamePhoto(photoId, photoRenameRequestDto.getFilename());
+		return ResponseEntity.status(200)
+				.body(ApiResponse.createSuccessWithNoContent());
+	}
+
 	@PutMapping("/rename")
-	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
-		photoService.renameObjects(renameRequestDto);
+	public ResponseEntity<?> renameDirectory(@RequestBody DirectoryRenameRequestDto directoryRenameRequestDto) {
+		photoService.renameDirectory(directoryRenameRequestDto);
 		return ResponseEntity.status(200)
 				.body(ApiResponse.createSuccessWithNoContent());
 	}
