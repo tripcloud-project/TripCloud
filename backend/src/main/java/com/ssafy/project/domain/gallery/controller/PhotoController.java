@@ -6,7 +6,6 @@ import com.ssafy.project.domain.gallery.dto.request.*;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +18,6 @@ import java.util.List;
 @Slf4j
 public class PhotoController {
     private final PhotoService photoService;
-
-    @Value("${minio.bucket}")
-    private String buckName;
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,

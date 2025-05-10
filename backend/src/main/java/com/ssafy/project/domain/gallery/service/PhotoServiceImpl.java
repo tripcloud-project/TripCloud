@@ -208,7 +208,7 @@ public class PhotoServiceImpl implements PhotoService {
         // prefix 앞에 사용자 email 제거해서 반환
         String currentPrefix = prefix.contains("/") ? prefix.substring(prefix.indexOf('/') + 1) : "";
 
-        DirectoryResponseDto directoryResponseDto = DirectoryResponseDto.builder()
+        return DirectoryResponseDto.builder()
                 .prefix(currentPrefix)
                 .directories(directories)
                 .files(files)
@@ -217,7 +217,6 @@ public class PhotoServiceImpl implements PhotoService {
                                 files.stream().mapToLong(f -> f.getSize() != null ? f.getSize() : 0L).sum()
                 )
                 .build();
-        return directoryResponseDto;
     }
 
     // [/download]
