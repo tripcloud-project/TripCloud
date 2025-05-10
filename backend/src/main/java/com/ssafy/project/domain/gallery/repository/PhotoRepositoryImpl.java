@@ -50,6 +50,11 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	}
 
 	@Override
+	public boolean existsByPrefix(String prefix){
+		return photoMapper.existsByPrefix(prefix);
+	}
+
+	@Override
 	public S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId){
 		return photoMapper.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId);
 	}
