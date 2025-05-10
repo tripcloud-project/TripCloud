@@ -2,10 +2,7 @@ package com.ssafy.project.domain.gallery.service;
 
 import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
-import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.RestoreRequestDto;
-import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.*;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
@@ -208,7 +205,7 @@ public class PhotoServiceImpl implements PhotoService {
         // prefix 앞에 사용자 email 제거해서 반환
         String currentPrefix = prefix.contains("/") ? prefix.substring(prefix.indexOf('/') + 1) : "";
 
-        DirectoryResponseDto directoryResponseDto = DirectoryResponseDto.builder()
+        return DirectoryResponseDto.builder()
                 .prefix(currentPrefix)
                 .directories(directories)
                 .files(files)
@@ -217,7 +214,6 @@ public class PhotoServiceImpl implements PhotoService {
                                 files.stream().mapToLong(f -> f.getSize() != null ? f.getSize() : 0L).sum()
                 )
                 .build();
-        return directoryResponseDto;
     }
 
     // [/download]
@@ -264,6 +260,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     // [/trash]
+    @Override
     public void trashBulk(TrashRequestDto trashRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
         List<Long> photoIdList = trashRequestDto.getPhotoIdList();
@@ -279,6 +276,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     // [/restore]
+    @Override
     public void restore(RestoreRequestDto restoreRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
         List<Long> photoIdList = restoreRequestDto.getPhotoIdList();
@@ -290,6 +288,22 @@ public class PhotoServiceImpl implements PhotoService {
         }
         if(!prefixList.isEmpty()){
             photoRepository.restorePhotosByPrefixes(prefixList, memberId);
+        }
+    }
+
+    // [/trash/delete]
+    @Override
+    public void delete(DeleteRequestDto deleteRequestDto){
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<Long> photoIdList = deleteRequestDto.getPhotoIdList();
+        List<String> prefixList = deleteRequestDto.getPrefixList().stream()
+                .map(this::makeMemberPrefix)
+                .toList();
+        if(!photoIdList.isEmpty()){
+            photoRepository.deletePhotosByIds(photoIdList, memberId);
+        }
+        if(!prefixList.isEmpty()){
+            photoRepository.deletePhotosByPrefixes(prefixList, memberId);
         }
     }
 

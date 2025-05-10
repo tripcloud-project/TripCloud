@@ -1,17 +1,17 @@
 package com.ssafy.project.domain.gallery.controller;
 
-import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
 import com.ssafy.project.domain.gallery.dto.request.*;
 import com.ssafy.project.domain.gallery.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
+import static com.ssafy.project.common.response.ApiResponse.createSuccess;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,41 +20,38 @@ import java.util.List;
 public class PhotoController {
     private final PhotoService photoService;
 
-    @Value("${minio.bucket}")
-    private String buckName;
-
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
                                     @RequestParam("prefix") String prefix) {
         photoService.uploadPhotos(files, prefix);
         return ResponseEntity.status(201)
-        		.body(ApiResponse.createSuccessWithNoContent());
+        		.body(createSuccessWithNoContent());
     }
     
     @GetMapping("/list")
 	public ResponseEntity<?> list(@RequestParam String prefix) {
 	    return ResponseEntity.status(200)
-	    		.body(ApiResponse.createSuccess(photoService.listDirectory(prefix, false)));
+	    		.body(createSuccess(photoService.listDirectory(prefix, false)));
 	}
 
 	@PutMapping("/rename/{photoId}")
 	public ResponseEntity<?> renamePhoto(@PathVariable Long photoId, @RequestBody PhotoRenameRequestDto photoRenameRequestDto) {
 		photoService.renamePhoto(photoId, photoRenameRequestDto.getFilename());
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccessWithNoContent());
+				.body(createSuccessWithNoContent());
 	}
 
 	@PutMapping("/rename")
 	public ResponseEntity<?> renameDirectory(@RequestBody DirectoryRenameRequestDto directoryRenameRequestDto) {
 		photoService.renameDirectory(directoryRenameRequestDto);
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccessWithNoContent());
+				.body(createSuccessWithNoContent());
 	}
 
 	@GetMapping("/detail/{photoId}")
 	public ResponseEntity<?> viewMeta(@PathVariable Long photoId) {
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccess(photoService.getDetailPhoto(photoId)));
+				.body(createSuccess(photoService.getDetailPhoto(photoId)));
 	}
 
 	@PostMapping("/download")
@@ -70,24 +67,28 @@ public class PhotoController {
 	public ResponseEntity<?> trash(@RequestBody TrashRequestDto trashRequestDto) {
 		photoService.trashBulk(trashRequestDto);
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccessWithNoContent());
+				.body(createSuccessWithNoContent());
 	}
 
 	@GetMapping("/trash/list")
 	public ResponseEntity<?> trashList() {
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccess(photoService.listDirectory("/", true)));
+				.body(createSuccess(photoService.listDirectory("/", true)));
 	}
 
 	@PutMapping("/trash/restore")
 	public ResponseEntity<?> restore(@RequestBody RestoreRequestDto restoreRequestDto) {
 		photoService.restore(restoreRequestDto);
 		return ResponseEntity.status(200)
-				.body(ApiResponse.createSuccessWithNoContent());
+				.body(createSuccessWithNoContent());
 	}
-	// TODO: 영구삭제 endpoint 추가
 
-	// TODO: 휴지통 endpoint 추가
+	@DeleteMapping("/trash/delete")
+	public ResponseEntity<?> delete(@RequestBody DeleteRequestDto deleteRequestDto) {
+		photoService.delete(deleteRequestDto);
+		return ResponseEntity.status(200)
+				.body(createSuccessWithNoContent());
+	}
 
 	// TODO: 파일 이름 검색 endpoint 추가
 

@@ -25,4 +25,6 @@ public interface PhotoMapper {
 	void softDeletePhotosByPrefixes(List<String> prefixList, Long memberId);
 	void restorePhotosByIds(List<Long> photoIdList, Long memberId);
 	void restorePhotosByPrefixes(List<String> prefixList, Long memberId);
+	void deletePhotosByIds(List<Long> photoIdList, Long memberId);
+	void deletePhotosByPrefixes(List<String> prefixList, Long memberId);
 }
