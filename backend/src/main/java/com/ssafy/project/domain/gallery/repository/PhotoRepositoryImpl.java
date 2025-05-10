@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
 import com.ssafy.project.domain.gallery.dto.internal.FileDto;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
 import org.springframework.stereotype.Repository;
 
@@ -51,5 +52,15 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	@Override
 	public boolean existsByPrefix(String prefix){
 		return photoMapper.existsByPrefix(prefix);
+	}
+
+	@Override
+	public S3KeyOriginalFilenameDto findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(Long photoId, Long memberId){
+		return photoMapper.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId);
+	}
+
+	@Override
+	public List<S3KeyOriginalFilenameDto> findS3KeysAndOriginalFilenamesByPrefixAndMemberId(String prefix, Long memberId){
+		return photoMapper.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId);
 	}
 }
