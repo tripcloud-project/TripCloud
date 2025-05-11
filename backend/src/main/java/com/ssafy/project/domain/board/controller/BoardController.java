@@ -31,4 +31,12 @@ public class BoardController {
         return ResponseEntity.status(201)
                 .body(createSuccess(boardService.uploadImage(image)));
     }
+
+    // 게시글 삭제
+    @DeleteMapping("/{postId}")
+    private ResponseEntity<?> deletePost(@PathVariable("postId") Long postId) {
+        boardService.deletePost(postId);
+        return ResponseEntity.status(200)
+                .body(createSuccessWithNoContent());
+    }
 }
