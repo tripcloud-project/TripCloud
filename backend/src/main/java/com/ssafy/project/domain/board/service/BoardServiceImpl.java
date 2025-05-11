@@ -22,6 +22,25 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional
     @Override
+    public boolean togglePostLike(Long postId) {
+        Member member = SecurityUtil.getCurrentMember();
+
+        // 이미 좋아요가 눌러져 있는지 확인
+        boolean flag = postRepository.existsLikeByPostIdAndMemberId(postId, member.getMemberId());
+
+        if (!flag) {
+            // 눌러져 있지 않다면 좋아요 추가
+            postRepository.insertPostLike(postId, member.getMemberId());
+        } else {
+            // 눌러져 있다면 좋아요 삭제
+            postRepository.deletePostLike(postId, member.getMemberId());
+        }
+
+        return !flag;
+    }
+
+    @Transactional
+    @Override
     public void createPost(PostRequestDto postRequestDto) {
         Member member = SecurityUtil.getCurrentMember();
         postRequestDto.setMemberId(member.getMemberId());

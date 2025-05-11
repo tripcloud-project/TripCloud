@@ -7,4 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface BoardService {
     void createPost(PostRequestDto postRequestDto);
     String uploadImage(MultipartFile image);
+    boolean togglePostLike(Long postId);
 }
