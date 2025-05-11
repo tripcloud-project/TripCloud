@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.board.service;
 
 import com.ssafy.project.domain.board.dto.PostRequestDto;
+import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
 import com.ssafy.project.domain.board.repository.PostRepository;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.helper.UploadHelper;
@@ -39,5 +40,13 @@ public class BoardServiceImpl implements BoardService {
         } catch (IOException e) {
             throw new UploadFailException("잘못된 업로드 요청입니다.");
         }
+    }
+
+    @Override
+    public void deletePost(Long postId) {
+        Member member = SecurityUtil.getCurrentMember();
+
+        if(!postRepository.delete(member.getMemberId(), postId))
+            throw new PostDeletionNotAllowedException("게시글 삭제에 실패했습니다.");
     }
 }
