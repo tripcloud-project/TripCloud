@@ -8,4 +8,11 @@
         VALUES (#{memberId}, #{title}, #{content})
     </insert>
 
+    <update id="delete">
+        UPDATE post
+        SET
+            is_deleted = false
+        WHERE
+            post_id = #{postId} AND member_id = #{memberId}
+    </update>
 </mapper>
