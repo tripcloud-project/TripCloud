@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.project.common.response.PageResponse;
+import com.ssafy.project.common.response.CursorPageResponse;
 import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.dto.request.MemberUpdateRequestDto;
@@ -102,7 +102,7 @@ public class MemberServiceImpl implements MemberService {
 				.build();
     }
 
-	public PageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor,
+	public CursorPageResponse<?> getMyActivities(Authentication authentication, LocalDateTime cursor,
 			Integer size) {
         Member member = ((MemberDetails) authentication.getPrincipal()).member();
         
@@ -113,7 +113,7 @@ public class MemberServiceImpl implements MemberService {
         LocalDateTime nextCursor = activityList.get(size-1).getCreatedAt();
         Integer answerSize = hasNext ? size : activityList.size();
         
-        PageResponse<ActivityResponseDto> pageResponse = PageResponse.<ActivityResponseDto>builder()
+        CursorPageResponse<ActivityResponseDto> pageResponse = CursorPageResponse.<ActivityResponseDto>builder()
         		.content(content)
         		.hasNext(hasNext)
         		.size(answerSize)

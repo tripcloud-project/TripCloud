@@ -1,8 +1,11 @@
 package com.ssafy.project.domain.board.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+import com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto;
 
 import lombok.NonNull;
 
@@ -19,4 +22,6 @@ public interface PostMapper {
     void deletePostLike(Long postId, @NonNull Long memberId);
 
 	boolean existsByPostId(Long postId);
+
+	List<PostPreviewResponseDto> selectByOffsetAndSize(int offset, int size);
 }

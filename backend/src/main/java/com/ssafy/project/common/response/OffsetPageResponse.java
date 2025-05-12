@@ -1,6 +1,5 @@
 package com.ssafy.project.common.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -12,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PageResponse<T> {
+public class OffsetPageResponse<T> {
 	private List<T> content;
 	private boolean hasNext;
 	private Integer size;
-	private LocalDateTime nextCursor;
+	private Integer nextPage;
 }

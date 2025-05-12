@@ -1,6 +1,9 @@
 package com.ssafy.project.domain.board.repository;
 
+import java.util.List;
+
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+import com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto;
 
 import lombok.NonNull;
 
@@ -11,4 +14,5 @@ public interface PostRepository {
     void insertPostLike(Long postId, @NonNull Long memberId);
     void deletePostLike(Long postId, @NonNull Long memberId);
 	boolean existsByPostId(Long postId);
+	List<PostPreviewResponseDto> selectByPageAndSize(Integer page, int i);
 }
