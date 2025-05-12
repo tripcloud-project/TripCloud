@@ -7,6 +7,12 @@
         INSERT INTO post (member_id, title, content)
         VALUES (#{memberId}, #{title}, #{content})
     </insert>
+    
+    <select id="existsByPostId" resultType="boolean">
+    	SELECT COUNT(1) > 0
+    	from post
+    	WHERE post_id = #{postId}
+    </select>
 
     <delete id="delete">
         DELETE 

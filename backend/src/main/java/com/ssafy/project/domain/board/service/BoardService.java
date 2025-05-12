@@ -1,7 +1,9 @@
 package com.ssafy.project.domain.board.service;
 
-import com.ssafy.project.domain.board.dto.PostRequestDto;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
+import com.ssafy.project.domain.board.dto.request.PostRequestDto;
 
 
 public interface BoardService {
@@ -9,4 +11,5 @@ public interface BoardService {
     String uploadImage(MultipartFile image);
     void deletePost(Long postId);
     boolean togglePostLike(Long postId);
+	void createComment(Long postId, CommentRequestDto commentRequestDto);
 }

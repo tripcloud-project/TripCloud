@@ -26,7 +26,7 @@
                is_deleted,
                main_badge_id,
                max_stroage
-        FROM Member
+        FROM member
         WHERE member_id = #{id}
     </select>
     

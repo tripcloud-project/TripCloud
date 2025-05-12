@@ -1,15 +1,23 @@
 package com.ssafy.project.domain.board.controller;
 
-import com.ssafy.project.domain.board.dto.PostRequestDto;
-import com.ssafy.project.domain.board.service.BoardService;
-import lombok.RequiredArgsConstructor;
+import static com.ssafy.project.common.response.ApiResponse.createSuccess;
+import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
+import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+import com.ssafy.project.domain.board.service.BoardService;
 
-import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
-import static com.ssafy.project.common.response.ApiResponse.createSuccess;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -37,6 +45,15 @@ public class BoardController {
     private ResponseEntity<?> uploadImage(@RequestPart("image") MultipartFile image) {
         return ResponseEntity.status(201)
                 .body(createSuccess(boardService.uploadImage(image)));
+    }
+    
+    // 댓글 작성
+    @PostMapping("/{postId}/comments")
+    private ResponseEntity<?> createComment(@PathVariable Long postId,
+    		@RequestBody CommentRequestDto commentRequestDto){
+    	boardService.createComment(postId, commentRequestDto);
+    	return ResponseEntity.status(201)
+    			.body(createSuccessWithNoContent());
     }
 
     // 게시글 삭제
