@@ -1,13 +1,16 @@
 package com.ssafy.project.domain.board.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.project.common.response.OffsetPageResponse;
 import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+import com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto;
 import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
 import com.ssafy.project.domain.board.exception.NotFoundPostException;
 import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
@@ -88,5 +91,24 @@ public class BoardServiceImpl implements BoardService {
         if(!postRepository.delete(member.getMemberId(), postId))
             throw new PostDeletionNotAllowedException("게시글 삭제에 실패했습니다.");
     }
+
+	@Override
+	public OffsetPageResponse<?> getPagedPostList(Integer page, Integer size) {
+		List<PostPreviewResponseDto> postResponseList = postRepository.selectByPageAndSize(page, size);
+		
+		Boolean hasNext = postResponseList.size() == size + 1;
+        List<PostPreviewResponseDto> content = hasNext ? postResponseList.subList(0, size) : postResponseList;
+        Integer nextPage = page+1;
+        Integer answerSize = hasNext ? size : postResponseList.size();
+        
+        OffsetPageResponse<PostPreviewResponseDto> pageResponse = OffsetPageResponse.<PostPreviewResponseDto>builder()
+        		.content(content)
+        		.hasNext(hasNext)
+        		.size(answerSize)
+        		.nextPage(nextPage)
+        		.build();
+        
+        return pageResponse;
+	}
 
 }
