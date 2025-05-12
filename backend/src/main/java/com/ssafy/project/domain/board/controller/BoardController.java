@@ -17,6 +17,13 @@ import static com.ssafy.project.common.response.ApiResponse.createSuccess;
 public class BoardController {
     private final BoardService boardService;
 
+    // 게시글 좋아요
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> like(@PathVariable Long postId) {
+        return ResponseEntity.status(200)
+                .body(createSuccess(boardService.togglePostLike(postId)));
+    }
+
     // 게시글 작성
     @PostMapping
     private ResponseEntity<?> createPost(@RequestBody PostRequestDto postRequestDto) {
