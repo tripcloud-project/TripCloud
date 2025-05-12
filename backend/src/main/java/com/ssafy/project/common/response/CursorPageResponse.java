@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PageResponse<T> {
+public class CursorPageResponse<T> {
 	private List<T> content;
 	private boolean hasNext;
 	private Integer size;
