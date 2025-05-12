@@ -1,4 +1,4 @@
-package com.ssafy.project.domain.board.dto;
+package com.ssafy.project.domain.board.dto.request;
 
 import lombok.*;
 
