@@ -78,7 +78,8 @@
   <select id="findDirectoriesByPrefixAndIsDeleted">
     SELECT
     CONCAT(SUBSTRING_INDEX(TRIM(TRAILING '/' FROM d.dir_name), '/', -1),'/') AS name,
-    SUM(p.size) AS size
+    SUM(p.size) AS size,
+    COUNT(p.size) AS count
     FROM (
     SELECT DISTINCT
     CONCAT(
