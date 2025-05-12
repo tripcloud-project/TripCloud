@@ -1,8 +1,11 @@
 package com.ssafy.project.domain.board.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+import com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto;
 import com.ssafy.project.domain.board.mapper.PostMapper;
 
 import lombok.NonNull;
@@ -41,5 +44,10 @@ public class PostRepositoryImpl implements PostRepository {
 	@Override
 	public boolean existsByPostId(Long postId) {
 		return postMapper.existsByPostId(postId);
+	}
+
+	@Override
+	public List<PostPreviewResponseDto> selectByPageAndSize(Integer page, int size) {
+		return postMapper.selectByOffsetAndSize(page * size, size+1);
 	}
 }
