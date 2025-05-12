@@ -72,4 +72,11 @@ public class BoardController {
     	return ResponseEntity.status(200)
     			.body(createSuccess(boardService.getPagedPostList(page, size)));
     }
+
+    // 게시글 상세 조회
+    @GetMapping("/{postId}")
+    private ResponseEntity<?> getPost(@PathVariable Long postId) {
+        return ResponseEntity.status(200)
+                .body(createSuccess(boardService.getPost(postId)));
+    }
 }
