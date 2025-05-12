@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.exception.InvalidTokenException;
+import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
+import com.ssafy.project.domain.board.exception.NotFoundPostException;
 import com.ssafy.project.domain.gallery.exception.DownloadFailException;
 import com.ssafy.project.domain.gallery.exception.PhotoNotFoundException;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
@@ -77,5 +79,16 @@ public class ControllerExceptionHandler {
     	return errorResponse(ErrorCode.INVALID_TOKEN);
     }
     
-
+    // 댓글 등록 실패
+    @ExceptionHandler(CommentInsertNotAllowedException.class)
+    public ResponseEntity<?> commentInsertNotAllowedException(){
+    	return errorResponse(ErrorCode.COMMENT_CREATE_FAIL);
+    }
+    
+    // 게시글 조회 실패
+    @ExceptionHandler(NotFoundPostException.class)
+    public ResponseEntity<?> notFoundPostException(){
+    	return errorResponse(ErrorCode.POST_NOT_FOUND);
+    }
+    
 }
