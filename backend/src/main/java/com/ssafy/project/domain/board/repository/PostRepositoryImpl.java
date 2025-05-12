@@ -61,4 +61,9 @@ public class PostRepositoryImpl implements PostRepository {
     public int countLikeByPostId(@NonNull Long postId) {
         return postMapper.countLikeByPostId(postId);
     }
+
+    @Override
+    public boolean update(PostRequestDto postRequestDto) {
+        return postMapper.update(postRequestDto) == 1;
+    }
 }
