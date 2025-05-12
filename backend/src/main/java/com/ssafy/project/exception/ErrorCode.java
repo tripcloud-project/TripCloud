@@ -22,6 +22,7 @@ public enum ErrorCode {
     
     // [Board]
     COMMENT_CREATE_FAIL(HttpStatus.BAD_REQUEST, "COMMENT-01", "댓글 작성 중 오류가 발생했습니다."),
+    COMMENT_DELETE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "COMMENT-02", "해당 댓글은 삭제할 수 없습니다."),
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-01", "요청한 게시글을 찾을 수 없습니다."),
     POST_DELETE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "POST-002", "해당 게시글은 삭제할 수 없습니다."),
 
