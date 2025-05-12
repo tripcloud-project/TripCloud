@@ -19,7 +19,10 @@ public enum ErrorCode {
     RENAME_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "RENAME-001", "동일한 이름이 디렉토리가 존재합니다."),
     PHOTO_NOT_FOUND(HttpStatus.NOT_FOUND, "PHOTO-001", "요청한 파일을 찾을 수 없습니다."),
     DOWNLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "DOWNLOAD-001", "파일 다운로드 중 오류가 발생했습니다."),
-    
+
+    // [Board]
+    POST_DELETE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "BOARD-001", "해당 게시글은 삭제할 수 없습니다."),
+
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-001", "유효하지않은 토큰입니다.");
 
     private final HttpStatus httpStatus;
