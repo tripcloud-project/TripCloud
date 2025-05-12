@@ -38,4 +38,20 @@
         WHERE post_id = #{postId} AND member_id = #{memberId}
     </delete>
     
+    <select id="selectByOffsetAndSize" resultType="com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto">
+	  	SELECT
+		    p.post_id as postId,
+		    p.title,
+		    m.name AS author,
+		    p.created_at as createdAt,
+		    p.modified_at as modifiedAt
+	  	FROM
+	    	post p
+	  	INNER JOIN
+	    	member m ON p.member_id = m.member_id
+	  	ORDER BY
+	    	p.post_id DESC
+	  	LIMIT #{size} OFFSET #{offset}
+	</select>
+    
 </mapper>
