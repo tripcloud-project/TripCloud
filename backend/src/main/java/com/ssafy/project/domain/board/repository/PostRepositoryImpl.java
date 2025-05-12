@@ -1,10 +1,12 @@
 package com.ssafy.project.domain.board.repository;
 
+import org.springframework.stereotype.Repository;
+
 import com.ssafy.project.domain.board.dto.PostRequestDto;
 import com.ssafy.project.domain.board.mapper.PostMapper;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class PostRepositoryImpl implements PostRepository {
         return postMapper.delete(memberId, postId) == 1;
     }
 
+    @Override
     public boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId) {
         return postMapper.existsLikeByPostIdAndMemberId(postId, memberId);
     }
