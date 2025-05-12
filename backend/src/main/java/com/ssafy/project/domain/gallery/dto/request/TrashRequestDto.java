@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class TrashRequestDto {
     private List<String> prefixList;
-    private List<Long> photoIdList;
+    private List<Long> fileIdList;
 }

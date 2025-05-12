@@ -6,10 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class DirectoryDto {
+public class FileEntry {
+    private Long fileId;
+    private String s3Key;
     private String name;
     private Long size;
+    private String presignedUrl;
 }

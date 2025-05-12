@@ -4,10 +4,10 @@ import com.drew.lang.GeoLocation;
 import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.domain.gallery.dto.request.*;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
-import com.ssafy.project.domain.gallery.dto.response.PhotoDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
-import com.ssafy.project.domain.gallery.repository.PhotoRepository;
+import com.ssafy.project.domain.gallery.repository.FileRepository;
 import com.ssafy.project.domain.gallery.service.helper.DownloadHelper;
 import com.ssafy.project.domain.gallery.service.helper.UploadHelper;
 import com.ssafy.project.infra.kakao.KakaoGeocodingService;
@@ -29,14 +29,14 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PhotoServiceImpl implements PhotoService {
+public class FileServiceImpl implements FileService {
 	private final KakaoGeocodingService kakaoGeocodingService;
-	private final PhotoRepository photoRepository;
+	private final FileRepository fileRepository;
     private final S3Service s3Service;
 	
 	// [/upload]
 	@Override
-    public void uploadPhotos(List<MultipartFile> files, String prefix){
+    public void uploadFiles(List<MultipartFile> files, String prefix){
 		prefix = makeMemberPrefix(prefix);
 		if (files == null || files.isEmpty()) {
             throw new UploadFailException("빈 파일 업로드 에러");
@@ -48,24 +48,24 @@ public class PhotoServiceImpl implements PhotoService {
             String dirName = entry.getKey();
             List<MultipartFile> fileGroup = entry.getValue();
             if (dirName.isEmpty()) {
-                uploadList.addAll(uploadFiles(fileGroup, prefix)); // 디렉토리 없이, 파일들만 업로드
+                uploadList.addAll(uploadOnlyFiles(fileGroup, prefix)); // 디렉토리 없이, 파일들만 업로드
             } else {
                 uploadList.addAll(uploadDirectoryFiles(fileGroup, prefix)); // 디렉토리 단위로 업로드
             }
         }
 
         // S3에 업로드 성공한 파일들만 모아서 Photo 객체를 생성합니다.
-        List<PhotoDto> photos = new ArrayList<>();
+        List<FileDto> fileList = new ArrayList<>();
         for(UploadDto uploadDto : uploadList){
-            photos.add(makePhotoDto(uploadDto));
+            fileList.add(makeFile(uploadDto));
         }
         Long memberId = SecurityUtil.getCurrentMemberId();
-        photoRepository.insertPhotos(photos, memberId);
+        fileRepository.insertFiles(fileList, memberId);
     }
 
 
     // 파일들만 업로드합니다. 중복 이름 걱정은 없습니다.
-    private List<UploadDto> uploadFiles(List<MultipartFile> files, String prefix) {
+    private List<UploadDto> uploadOnlyFiles(List<MultipartFile> files, String prefix) {
         List<UploadDto> uploadList = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
@@ -124,49 +124,49 @@ public class PhotoServiceImpl implements PhotoService {
 
     // 동일한 directory가 이미 존재하는지 확인합니다.
     private boolean existsInS3(String prefix) {
-        return photoRepository.existsByPrefix(prefix);
+        return fileRepository.existsByPrefix(prefix);
     }
 
     // 사진 객체를 생성합니다.
-    private PhotoDto makePhotoDto(UploadDto uploadDto){
+    private FileDto makeFile(UploadDto uploadDto){
         MultipartFile file = uploadDto.getFile();
         String s3Key = uploadDto.getS3Key();
         String originalFileName = uploadDto.getOriginalFilename();
         // ✅ 사진 객체 생성
-        PhotoDto photo = new PhotoDto();
-        photo.setS3Key(s3Key);
-        photo.setOriginalFilename(originalFileName);
-        photo.setSize(file.getSize());
-        photo.setContentType(file.getContentType());
+        FileDto fileDto = new FileDto();
+        fileDto.setS3Key(s3Key);
+        fileDto.setOriginalFilename(originalFileName);
+        fileDto.setSize(file.getSize());
+        fileDto.setContentType(file.getContentType());
 
         // ✅ 위치 정보 로그
         GeoLocation location = ExifUtil.extractGps(file);
         if (location != null) {
-            photo.setLatitude(location.getLatitude());
-            photo.setLongitude(location.getLongitude());
+            fileDto.setLatitude(location.getLatitude());
+            fileDto.setLongitude(location.getLongitude());
 
             AddressDto address = kakaoGeocodingService.reverseGeocode(location.getLatitude(), location.getLongitude());
             if (address != null) {
-                photo.setSido(address.getSido());
-                photo.setSigungu(address.getSigungu());
-                photo.setEupmyeondong(address.getEupmyeondong());
+                fileDto.setSido(address.getSido());
+                fileDto.setSigungu(address.getSigungu());
+                fileDto.setEupmyeondong(address.getEupmyeondong());
             }
         }
 
         // ✅ 사진 촬영일 추가
         LocalDateTime takenAt = ExifUtil.extractDateTaken(file);
         if(takenAt != null){
-            photo.setTakenAt(takenAt);
+            fileDto.setTakenAt(takenAt);
         }
-        return photo;
+        return fileDto;
     }
 
     // 파일 이름 수정
-    // [/rename/{photoId}]
+    // [/rename/{fileId}]
     @Override
-    public void renamePhoto(Long photoId, String filename) {
+    public void renameFile(Long fileId, String filename) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        photoRepository.renamePhoto(photoId, filename, memberId);
+        fileRepository.renameFile(fileId, filename, memberId);
     }
 
     // 디렉토리 이름 수정
@@ -180,14 +180,14 @@ public class PhotoServiceImpl implements PhotoService {
         }
         s3Service.directoryKeyUpdate(oldPrefix, newPrefix);
         Long memberId = SecurityUtil.getCurrentMemberId();
-        photoRepository.renamePhotos(oldPrefix, newPrefix, memberId);
+        fileRepository.renameFiles(oldPrefix, newPrefix, memberId);
 	}
 
-    // [/detail/{photoId}]
+    // [/detail/{fileId}]
     @Override
-    public PhotoDetailResponseDto getDetailPhoto(Long photoId) {
+    public FileDetailResponseDto getDetailFile(Long fileId) {
     	Long memberId = SecurityUtil.getCurrentMemberId();
-        return photoRepository.findPhotoDetailByPhotoIdAndMemberId(photoId, memberId);
+        return fileRepository.findFileDetailByFileIdAndMemberId(fileId, memberId);
     }
 
 
@@ -195,9 +195,9 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public DirectoryResponseDto listDirectory(String prefix, Boolean isDeleted){
     	prefix = makeMemberPrefix(prefix);
-        List<DirectoryDto> directories = photoRepository.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
-        List<FileDto> files = photoRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
-        for(FileDto file : files){
+        List<DirectoryEntry> directories = fileRepository.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
+        List<FileEntry> files = fileRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
+        for(FileEntry file : files){
             file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
             file.setS3Key(null);
         }
@@ -220,22 +220,22 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto){
         List<String> prefixList = downloadRequestDto.getPrefixList();
-        List<Long> photoIdList = downloadRequestDto.getPhotoIdList();
+        List<Long> fileIdList = downloadRequestDto.getFileIdList();
         String currentPrefix = downloadRequestDto.getCurrentPrefix();
 
         // 단일 파일 다운로드. zip일 필요가 없는 경우
-        if(prefixList.isEmpty() && photoIdList.size()==1){
-            return downloadPhoto(photoIdList.get(0));
+        if(prefixList.isEmpty() && fileIdList.size()==1){
+            return downloadPhoto(fileIdList.get(0));
         }else{
             currentPrefix=makeMemberPrefix(currentPrefix);
             Long memberId = SecurityUtil.getCurrentMemberId();
             List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames = new ArrayList<>();
             for(String prefix : prefixList){
                 prefix = makeMemberPrefix(prefix);
-                s3KeyOriginalFilenames.addAll(photoRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId));
+                s3KeyOriginalFilenames.addAll(fileRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId));
             }
-            for(Long photoId : photoIdList){
-                s3KeyOriginalFilenames.add(photoRepository.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId));
+            for(Long fileId : fileIdList){
+                s3KeyOriginalFilenames.add(fileRepository.findS3KeyAndOriginalFilenameByFileIdAndMemberId(fileId, memberId));
             }
             Resource zipResource = s3Service.createZipResource(currentPrefix, s3KeyOriginalFilenames);
             String zipFilename = DownloadHelper.getZipFilenameFromKey(currentPrefix);
@@ -248,9 +248,9 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     // 단일 파일 zip 없이 다운로드
-    private DownloadDto downloadPhoto(Long photoId){
+    private DownloadDto downloadPhoto(Long fileId){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        S3KeyOriginalFilenameDto s3KeyOriginalFilenameDto = photoRepository.findS3KeyAndOriginalFilenameByPhotoIdAndMemberId(photoId, memberId);
+        S3KeyOriginalFilenameDto s3KeyOriginalFilenameDto = fileRepository.findS3KeyAndOriginalFilenameByFileIdAndMemberId(fileId, memberId);
         Resource resource = s3Service.createResource(s3KeyOriginalFilenameDto.getS3Key());
 
         return DownloadDto.builder()
@@ -263,15 +263,15 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public void trashBulk(TrashRequestDto trashRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        List<Long> photoIdList = trashRequestDto.getPhotoIdList();
+        List<Long> fileIdList = trashRequestDto.getFileIdList();
         List<String> prefixList = trashRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
-        if(!photoIdList.isEmpty()){
-            photoRepository.softDeletePhotosByIds(photoIdList, memberId);
+        if(!fileIdList.isEmpty()){
+            fileRepository.softDeleteFilesByIds(fileIdList, memberId);
         }
         if(!prefixList.isEmpty()){
-            photoRepository.softDeletePhotosByPrefixes(prefixList, memberId);
+            fileRepository.softDeleteFilesByPrefixes(prefixList, memberId);
         }
     }
 
@@ -279,15 +279,15 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public void restore(RestoreRequestDto restoreRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        List<Long> photoIdList = restoreRequestDto.getPhotoIdList();
+        List<Long> fileIdList = restoreRequestDto.getFileIdList();
         List<String> prefixList = restoreRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
-        if(!photoIdList.isEmpty()){
-            photoRepository.restorePhotosByIds(photoIdList, memberId);
+        if(!fileIdList.isEmpty()){
+            fileRepository.restoreFilesByIds(fileIdList, memberId);
         }
         if(!prefixList.isEmpty()){
-            photoRepository.restorePhotosByPrefixes(prefixList, memberId);
+            fileRepository.restoreFilesByPrefixes(prefixList, memberId);
         }
     }
 
@@ -295,15 +295,15 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public void delete(DeleteRequestDto deleteRequestDto){
         Long memberId = SecurityUtil.getCurrentMemberId();
-        List<Long> photoIdList = deleteRequestDto.getPhotoIdList();
+        List<Long> fileIdList = deleteRequestDto.getFileIdList();
         List<String> prefixList = deleteRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
-        if(!photoIdList.isEmpty()){
-            photoRepository.deletePhotosByIds(photoIdList, memberId);
+        if(!fileIdList.isEmpty()){
+            fileRepository.deleteFilesByIds(fileIdList, memberId);
         }
         if(!prefixList.isEmpty()){
-            photoRepository.deletePhotosByPrefixes(prefixList, memberId);
+            fileRepository.deleteFilesByPrefixes(prefixList, memberId);
         }
     }
 

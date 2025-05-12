@@ -3,10 +3,10 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.project.domain.gallery.mapper.PhotoMapper">
+<mapper namespace="com.ssafy.project.domain.gallery.mapper.FileMapper">
 
-  <insert id="insertPhotos">
-    INSERT INTO photo (
+  <insert id="insertFiles">
+    INSERT INTO file (
       s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude, taken_at,
@@ -14,7 +14,7 @@
       member_id
     )
     VALUES
-    <foreach collection="photos" item="p" separator=",">
+    <foreach collection="files" item="p" separator=",">
       (
       #{p.s3Key}, #{p.originalFilename}, #{p.size}, #{p.contentType},
       #{p.sido}, #{p.sigungu}, #{p.eupmyeondong},
@@ -25,8 +25,8 @@
     </foreach>
   </insert>
 
-  <insert id="insertPhoto">
-    INSERT INTO photo (
+  <insert id="insertFile">
+    INSERT INTO file (
       s3_key, original_filename, size, content_type,
       sido, sigungu, eupmyeondong,
       latitude, longitude, taken_at,
@@ -40,21 +40,21 @@
     )
   </insert>
  
-  <update id="renamePhoto">
-    UPDATE photo
+  <update id="renameFile">
+    UPDATE file
     SET original_filename = #{filename}
-    WHERE photo_id = #{photoId}
+    WHERE file_id = #{fileId}
     	AND member_id = #{memberId}
   </update>
   
-  <update id="renamePhotos">
-    UPDATE photo
+  <update id="renameFiles">
+    UPDATE file
     SET s3_key = REPLACE(s3_key, #{oldPrefix}, #{newPrefix})
     WHERE s3_key LIKE CONCAT(#{oldPrefix}, '%')
       AND member_id = #{memberId}
   </update>
 
-  <select id="findPhotoDetailByPhotoIdAndMemberId">
+  <select id="findFileDetailByFileIdAndMemberId">
     SELECT
     p.original_filename,
     p.size,
@@ -68,9 +68,9 @@
     p.created_at,
     p.taken_at,
     m.name AS member_name
-    FROM photo p
+    FROM file p
     JOIN member m ON p.member_id = m.member_id
-    WHERE p.photo_id = #{photoId}
+    WHERE p.file_id = #{fileId}
     AND p.member_id = #{memberId}
   </select>
 
@@ -87,20 +87,20 @@
     ),
     '/'
     ) AS dir_name
-    FROM photo
+    FROM file
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
     CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
     )
     ) AS d
-    JOIN photo p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
+    JOIN file p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
     WHERE p.is_deleted = #{isDeleted}
     GROUP BY d.dir_name
   </select>
 
   <select id="findFilesByPrefixAndIsDeleted">
-    SELECT photo_id, s3_key, original_filename as name, size
-    FROM photo
+    SELECT file_id, s3_key, original_filename as name, size
+    FROM file
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
     CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', ''))
@@ -110,7 +110,7 @@
 
   <select id="existsByPrefix" resultType="boolean">
     SELECT EXISTS (
-    SELECT 1 FROM photo
+    SELECT 1 FROM file
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND is_deleted = false
     LIMIT 1
@@ -118,33 +118,33 @@
   </select>
 
 
-  <select id="findS3KeyAndOriginalFilenameByPhotoIdAndMemberId">
+  <select id="findS3KeyAndOriginalFilenameByFileIdAndMemberId">
     SELECT s3_key, original_filename
-    FROM photo
-    WHERE photo_id=#{photoId}
+    FROM file
+    WHERE file_id=#{fileId}
       AND member_id=#{memberId}
   </select>
 
   <select id="findS3KeysAndOriginalFilenamesByPrefixAndMemberId">
     SELECT s3_key, original_filename
-    FROM photo
+    FROM file
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND is_deleted=false
     AND member_id=#{memberId};
   </select>
 
-  <update id="softDeletePhotosByIds">
-    UPDATE photo
+  <update id="softDeleteFilesByIds">
+    UPDATE file
     SET is_deleted = true, deleted_at = NOW()
     WHERE member_id = #{memberId}
-    AND photo_id IN
-    <foreach item="id" collection="photoIdList" open="(" separator="," close=")">
+    AND file_id IN
+    <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
       #{id}
     </foreach>
   </update>
 
-  <update id="softDeletePhotosByPrefixes">
-    UPDATE photo
+  <update id="softDeleteFilesByPrefixes">
+    UPDATE file
     SET is_deleted = true, deleted_at = NOW()
     WHERE member_id = #{memberId}
     AND
@@ -153,18 +153,18 @@
     </foreach>
   </update>
 
-  <update id="restorePhotosByIds">
-    UPDATE photo
+  <update id="restoreFilesByIds">
+    UPDATE file
     SET is_deleted = false, deleted_at = NULL
     WHERE member_id = #{memberId}
-    AND photo_id IN
-    <foreach item="id" collection="photoIdList" open="(" separator="," close=")">
+    AND file_id IN
+    <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
       #{id}
     </foreach>
   </update>
 
-  <update id="restorePhotosByPrefixes">
-    UPDATE photo
+  <update id="restoreFilesByPrefixes">
+    UPDATE file
     SET is_deleted = false, deleted_at = NULL
     WHERE member_id = #{memberId}
     AND
@@ -173,21 +173,23 @@
     </foreach>
   </update>
 
-  <update id="deletePhotosByIds">
-    DELETE FROM photo
+  <update id="deleteFilesByIds">
+    DELETE FROM file
     WHERE member_id = #{memberId}
-    AND photo_id IN
-    <foreach item="id" collection="photoIdList" open="(" separator="," close=")">
+    AND is_deleted = true
+    AND file_id IN
+    <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
       #{id}
     </foreach>
   </update>
 
-  <update id="deletePhotosByPrefixes">
-    DELETE FROM photo
+  <update id="deleteFilesByPrefixes">
+    DELETE FROM file
     WHERE member_id = #{memberId}
     AND
     <foreach item="prefix" collection="prefixList" separator="OR">
       s3_key LIKE CONCAT(#{prefix}, '%')
+      AND is_deleted = true
     </foreach>
   </update>
 </mapper>

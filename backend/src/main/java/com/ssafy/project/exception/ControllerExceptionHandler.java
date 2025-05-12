@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.exception.InvalidTokenException;
 import com.ssafy.project.domain.gallery.exception.DownloadFailException;
-import com.ssafy.project.domain.gallery.exception.PhotoNotFoundException;
+import com.ssafy.project.domain.gallery.exception.FileNotFoundException;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
@@ -60,8 +60,8 @@ public class ControllerExceptionHandler {
     }
     
     // 파일 조회 실패
-    @ExceptionHandler(PhotoNotFoundException.class)
-    public ResponseEntity<?> photoNotFoundException(PhotoNotFoundException e){
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<?> photoNotFoundException(FileNotFoundException e){
     	return errorResponse(ErrorCode.PHOTO_NOT_FOUND);    	
     }
     
