@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.board.repository;
 
-import com.ssafy.project.domain.board.dto.PostRequestDto;
+import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+
 import lombok.NonNull;
 
 public interface PostRepository {
@@ -8,4 +9,5 @@ public interface PostRepository {
     boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId);
     void insertPostLike(Long postId, @NonNull Long memberId);
     void deletePostLike(Long postId, @NonNull Long memberId);
+	boolean existsByPostId(Long postId);
 }
