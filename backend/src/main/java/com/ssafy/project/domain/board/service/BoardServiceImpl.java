@@ -10,6 +10,7 @@ import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
 import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
 import com.ssafy.project.domain.board.exception.NotFoundPostException;
+import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
 import com.ssafy.project.domain.board.repository.CommentRepository;
 import com.ssafy.project.domain.board.repository.PostRepository;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
@@ -79,4 +80,13 @@ public class BoardServiceImpl implements BoardService {
 		if(!commentRepository.insert(commentRequestDto))
 			throw new CommentInsertNotAllowedException("댓글 작성에 실패하였습니다.");
 	}
+
+    @Override
+    public void deletePost(Long postId) {
+        Member member = SecurityUtil.getCurrentMember();
+
+        if(!postRepository.delete(member.getMemberId(), postId))
+            throw new PostDeletionNotAllowedException("게시글 삭제에 실패했습니다.");
+    }
+
 }

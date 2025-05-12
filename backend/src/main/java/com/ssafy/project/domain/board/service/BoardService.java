@@ -9,6 +9,7 @@ import com.ssafy.project.domain.board.dto.request.PostRequestDto;
 public interface BoardService {
     void createPost(PostRequestDto postRequestDto);
     String uploadImage(MultipartFile image);
+    void deletePost(Long postId);
     boolean togglePostLike(Long postId);
 	void createComment(Long postId, CommentRequestDto commentRequestDto);
 }

@@ -4,6 +4,7 @@ import static com.ssafy.project.common.response.ApiResponse.createSuccess;
 import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,5 +54,13 @@ public class BoardController {
     	boardService.createComment(postId, commentRequestDto);
     	return ResponseEntity.status(201)
     			.body(createSuccessWithNoContent());
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{postId}")
+    private ResponseEntity<?> deletePost(@PathVariable("postId") Long postId) {
+        boardService.deletePost(postId);
+        return ResponseEntity.status(200)
+                .body(createSuccessWithNoContent());
     }
 }
