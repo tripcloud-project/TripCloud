@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PostRequestDto {
+    private Long postId;
     private Long memberId;
     private @NonNull String title;
     private @NonNull String content;
