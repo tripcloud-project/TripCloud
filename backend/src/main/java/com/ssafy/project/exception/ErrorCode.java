@@ -20,6 +20,10 @@ public enum ErrorCode {
     PHOTO_NOT_FOUND(HttpStatus.NOT_FOUND, "PHOTO-001", "요청한 파일을 찾을 수 없습니다."),
     DOWNLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "DOWNLOAD-001", "파일 다운로드 중 오류가 발생했습니다."),
     
+    // [Board]
+    COMMENT_CREATE_FAIL(HttpStatus.BAD_REQUEST, "COMMENT-01", "댓글 작성 중 오류가 발생했습니다."),
+	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-01", "요청한 게시글을 찾을 수 없습니다."),
+    
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-001", "유효하지않은 토큰입니다.");
 
     private final HttpStatus httpStatus;
