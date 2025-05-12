@@ -1,23 +1,30 @@
 package com.ssafy.project.domain.board.service;
 
-import com.ssafy.project.domain.board.dto.PostRequestDto;
+import java.io.IOException;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
+import com.ssafy.project.domain.board.dto.request.PostRequestDto;
+import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
+import com.ssafy.project.domain.board.exception.NotFoundPostException;
+import com.ssafy.project.domain.board.repository.CommentRepository;
 import com.ssafy.project.domain.board.repository.PostRepository;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.service.helper.UploadHelper;
 import com.ssafy.project.domain.member.entity.Member;
 import com.ssafy.project.infra.s3.S3Service;
 import com.ssafy.project.util.SecurityUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -59,4 +66,17 @@ public class BoardServiceImpl implements BoardService {
             throw new UploadFailException("잘못된 업로드 요청입니다.");
         }
     }
+
+	@Override
+	public void createComment(Long postId, CommentRequestDto commentRequestDto) {
+		Member member = SecurityUtil.getCurrentMember();
+		commentRequestDto.setMemberId(member.getMemberId());
+		commentRequestDto.setPostId(postId);
+		
+		if(!postRepository.existsByPostId(postId))
+			throw new NotFoundPostException("게시글이 존재하지 않습니다.");
+		
+		if(!commentRepository.insert(commentRequestDto))
+			throw new CommentInsertNotAllowedException("댓글 작성에 실패하였습니다.");
+	}
 }
