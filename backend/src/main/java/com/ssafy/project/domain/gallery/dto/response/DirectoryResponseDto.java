@@ -2,9 +2,9 @@ package com.ssafy.project.domain.gallery.dto.response;
 
 import java.util.List;
 
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryDto;
+import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
+import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 
-import com.ssafy.project.domain.gallery.dto.internal.FileDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class DirectoryResponseDto {
     private String prefix;
     private Long totalSize; // 현재 디렉토리 내 총 파일 크기
-    private List<DirectoryDto> directories;
-    private List<FileDto> files; // 파일만
+    private List<DirectoryEntry> directories;
+    private List<FileEntry> files; // 파일만
 }
 

@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class DownloadRequestDto {
     private List<String> prefixList;
-    private List<Long> photoIdList;
+    private List<Long> fileIdList;
     private String currentPrefix;
 }

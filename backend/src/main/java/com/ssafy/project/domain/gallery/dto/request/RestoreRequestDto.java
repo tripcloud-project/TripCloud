@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class RestoreRequestDto {
     private List<String> prefixList;
-    private List<Long> photoIdList;
+    private List<Long> fileIdList;
 }

@@ -2,7 +2,7 @@ package com.ssafy.project.domain.gallery.controller;
 
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
 import com.ssafy.project.domain.gallery.dto.request.*;
-import com.ssafy.project.domain.gallery.service.PhotoService;
+import com.ssafy.project.domain.gallery.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -17,13 +17,13 @@ import static com.ssafy.project.common.response.ApiResponse.createSuccess;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/gallery")
 @Slf4j
-public class PhotoController {
-    private final PhotoService photoService;
+public class FileController {
+    private final FileService fileService;
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
                                     @RequestParam("prefix") String prefix) {
-        photoService.uploadPhotos(files, prefix);
+        fileService.uploadFiles(files, prefix);
         return ResponseEntity.status(201)
         		.body(createSuccessWithNoContent());
     }
@@ -31,32 +31,32 @@ public class PhotoController {
     @GetMapping("/list")
 	public ResponseEntity<?> list(@RequestParam String prefix) {
 	    return ResponseEntity.status(200)
-	    		.body(createSuccess(photoService.listDirectory(prefix, false)));
+	    		.body(createSuccess(fileService.listDirectory(prefix, false)));
 	}
 
-	@PutMapping("/rename/{photoId}")
-	public ResponseEntity<?> renamePhoto(@PathVariable Long photoId, @RequestBody PhotoRenameRequestDto photoRenameRequestDto) {
-		photoService.renamePhoto(photoId, photoRenameRequestDto.getFilename());
+	@PutMapping("/rename/{fileId}")
+	public ResponseEntity<?> renameFile(@PathVariable Long fileId, @RequestBody FileRenameRequestDto fileRenameRequestDto) {
+		fileService.renameFile(fileId, fileRenameRequestDto.getFilename());
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}
 
 	@PutMapping("/rename")
 	public ResponseEntity<?> renameDirectory(@RequestBody DirectoryRenameRequestDto directoryRenameRequestDto) {
-		photoService.renameDirectory(directoryRenameRequestDto);
+		fileService.renameDirectory(directoryRenameRequestDto);
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}
 
-	@GetMapping("/detail/{photoId}")
-	public ResponseEntity<?> viewMeta(@PathVariable Long photoId) {
+	@GetMapping("/detail/{fileId}")
+	public ResponseEntity<?> viewMeta(@PathVariable Long fileId) {
 		return ResponseEntity.status(200)
-				.body(createSuccess(photoService.getDetailPhoto(photoId)));
+				.body(createSuccess(fileService.getDetailFile(fileId)));
 	}
 
 	@PostMapping("/download")
 	public ResponseEntity<?> download(@RequestBody DownloadRequestDto downloadRequestDto) {
-		DownloadDto downloadDto = photoService.downloadBulk(downloadRequestDto);
+		DownloadDto downloadDto = fileService.downloadBulk(downloadRequestDto);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, downloadDto.getContentDisposition())
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -65,7 +65,7 @@ public class PhotoController {
 
 	@DeleteMapping("/trash")
 	public ResponseEntity<?> trash(@RequestBody TrashRequestDto trashRequestDto) {
-		photoService.trashBulk(trashRequestDto);
+		fileService.trashBulk(trashRequestDto);
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}
@@ -73,19 +73,19 @@ public class PhotoController {
 	@GetMapping("/trash/list")
 	public ResponseEntity<?> trashList() {
 		return ResponseEntity.status(200)
-				.body(createSuccess(photoService.listDirectory("/", true)));
+				.body(createSuccess(fileService.listDirectory("/", true)));
 	}
 
 	@PutMapping("/trash/restore")
 	public ResponseEntity<?> restore(@RequestBody RestoreRequestDto restoreRequestDto) {
-		photoService.restore(restoreRequestDto);
+		fileService.restore(restoreRequestDto);
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}
 
 	@DeleteMapping("/trash/delete")
 	public ResponseEntity<?> delete(@RequestBody DeleteRequestDto deleteRequestDto) {
-		photoService.delete(deleteRequestDto);
+		fileService.delete(deleteRequestDto);
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}

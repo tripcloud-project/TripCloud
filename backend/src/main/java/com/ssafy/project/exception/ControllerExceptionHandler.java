@@ -11,7 +11,7 @@ import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException
 import com.ssafy.project.domain.board.exception.NotFoundPostException;
 import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.DownloadFailException;
-import com.ssafy.project.domain.gallery.exception.PhotoNotFoundException;
+import com.ssafy.project.domain.gallery.exception.FileNotFoundException;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
@@ -63,9 +63,9 @@ public class ControllerExceptionHandler {
     }
 
     // 파일 조회 실패
-    @ExceptionHandler(PhotoNotFoundException.class)
-    public ResponseEntity<?> photoNotFoundException(PhotoNotFoundException e) {
-        return errorResponse(ErrorCode.PHOTO_NOT_FOUND);
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<?> photoNotFoundException(FileNotFoundException e){
+    	return errorResponse(ErrorCode.PHOTO_NOT_FOUND);    	
     }
 
     // 파일 다운로드 실패
