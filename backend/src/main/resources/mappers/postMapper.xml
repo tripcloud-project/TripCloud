@@ -8,6 +8,14 @@
         VALUES (#{memberId}, #{title}, #{content})
     </insert>
 
+    <delete id="delete">
+        DELETE 
+        FROM
+        	post
+        WHERE
+            post_id = #{postId} AND member_id = #{memberId}
+    </delete>
+
     <select id="existsLikeByPostIdAndMemberId" resultType="boolean">
         SELECT COUNT(1) > 0
         FROM post_like
@@ -23,6 +31,5 @@
         DELETE FROM post_like
         WHERE post_id = #{postId} AND member_id = #{memberId}
     </delete>
-
-
+    
 </mapper>
