@@ -3,6 +3,8 @@ package com.ssafy.project.domain.board.service;
 import java.io.IOException;
 import java.util.List;
 
+import com.ssafy.project.domain.board.dto.response.CommentResponseDto;
+import com.ssafy.project.domain.board.dto.response.PostDetailResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,44 +73,61 @@ public class BoardServiceImpl implements BoardService {
         }
     }
 
-	@Override
-	public void createComment(Long postId, CommentRequestDto commentRequestDto) {
-		Member member = SecurityUtil.getCurrentMember();
-		commentRequestDto.setMemberId(member.getMemberId());
-		commentRequestDto.setPostId(postId);
-		
-		if(!postRepository.existsByPostId(postId))
-			throw new NotFoundPostException("게시글이 존재하지 않습니다.");
-		
-		if(!commentRepository.insert(commentRequestDto))
-			throw new CommentInsertNotAllowedException("댓글 작성에 실패하였습니다.");
-	}
+    @Override
+    public void createComment(Long postId, CommentRequestDto commentRequestDto) {
+        Member member = SecurityUtil.getCurrentMember();
+        commentRequestDto.setMemberId(member.getMemberId());
+        commentRequestDto.setPostId(postId);
+
+        if (!postRepository.existsByPostId(postId))
+            throw new NotFoundPostException("게시글이 존재하지 않습니다.");
+
+        if (!commentRepository.insert(commentRequestDto))
+            throw new CommentInsertNotAllowedException("댓글 작성에 실패하였습니다.");
+    }
 
     @Override
     public void deletePost(Long postId) {
         Member member = SecurityUtil.getCurrentMember();
 
-        if(!postRepository.delete(member.getMemberId(), postId))
+        if (!postRepository.delete(member.getMemberId(), postId))
             throw new PostDeletionNotAllowedException("게시글 삭제에 실패했습니다.");
     }
 
-	@Override
-	public OffsetPageResponse<?> getPagedPostList(Integer page, Integer size) {
-		List<PostPreviewResponseDto> postResponseList = postRepository.selectByPageAndSize(page, size);
-		
-		Boolean hasNext = postResponseList.size() == size + 1;
+    @Override
+    public OffsetPageResponse<?> getPagedPostList(Integer page, Integer size) {
+        List<PostPreviewResponseDto> postResponseList = postRepository.selectByPageAndSize(page, size);
+
+        Boolean hasNext = postResponseList.size() == size + 1;
         List<PostPreviewResponseDto> content = hasNext ? postResponseList.subList(0, size) : postResponseList;
-        Integer nextPage = page+1;
+        Integer nextPage = page + 1;
         Integer answerSize = hasNext ? size : postResponseList.size();
-        
+
         OffsetPageResponse<PostPreviewResponseDto> pageResponse = OffsetPageResponse.<PostPreviewResponseDto>builder()
-        		.content(content)
-        		.hasNext(hasNext)
-        		.size(answerSize)
-        		.nextPage(nextPage)
-        		.build();
-        
+                .content(content)
+                .hasNext(hasNext)
+                .size(answerSize)
+                .nextPage(nextPage)
+                .build();
+
         return pageResponse;
-	}
+    }
+
+    @Override
+    public PostDetailResponseDto getPost(Long postId) {
+        Member member = SecurityUtil.getCurrentMember();
+        PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, member.getMemberId());
+
+        // 게시글 조회 실패 시
+        if (postDetailResponseDto == null)
+            throw new NotFoundPostException("게시글 조회에 실패했습니다.");
+
+        List<CommentResponseDto> comments = commentRepository.selectByPostId(postId, member.getMemberId());
+
+        postDetailResponseDto.setLikeCount(postRepository.countLikeByPostId(postId));
+        postDetailResponseDto.setComments(comments);
+
+        return postDetailResponseDto;
+    }
 
 }
