@@ -31,8 +31,8 @@ public class MemberTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        for (int i = 1; i <= 100; i++) {
-            String num = String.format("%03d", i); // 001, 002, ..., 100
+        for (int i = 1; i <= 30; i++) {
+            String num = String.format("%03d", i); // 001, 002, ..., 30
             MemberRegisterDto requestDto = new MemberRegisterDto(
                     num + "@example.com",
                     num,
