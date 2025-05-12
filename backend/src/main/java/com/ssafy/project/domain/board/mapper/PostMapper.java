@@ -29,4 +29,6 @@ public interface PostMapper {
     PostDetailResponseDto selectByPostId(Long postId, Long memberId);
 
     int countLikeByPostId(@NonNull Long postId);
+
+    int update(PostRequestDto postRequestDto);
 }
