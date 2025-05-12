@@ -20,4 +20,18 @@ public class PostRepositoryImpl implements PostRepository {
     public boolean delete(@NonNull Long memberId, Long postId) {
         return postMapper.delete(memberId, postId) == 1;
     }
+
+    public boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId) {
+        return postMapper.existsLikeByPostIdAndMemberId(postId, memberId);
+    }
+
+    @Override
+    public void insertPostLike(Long postId, @NonNull Long memberId) {
+        postMapper.insertPostLike(postId, memberId);
+    }
+
+    @Override
+    public void deletePostLike(Long postId, @NonNull Long memberId) {
+        postMapper.deletePostLike(postId, memberId);
+    }
 }

@@ -8,4 +8,9 @@ import org.apache.ibatis.annotations.Mapper;
 public interface PostMapper {
     int insert(PostRequestDto postRequestDto);
     int delete(@NonNull Long memberId, Long postId);
+    boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId);
+
+    void insertPostLike(Long postId, @NonNull Long memberId);
+
+    void deletePostLike(Long postId, @NonNull Long memberId);
 }

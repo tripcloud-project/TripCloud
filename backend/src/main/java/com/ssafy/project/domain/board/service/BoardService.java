@@ -8,4 +8,5 @@ public interface BoardService {
     void createPost(PostRequestDto postRequestDto);
     String uploadImage(MultipartFile image);
     void deletePost(Long postId);
+    boolean togglePostLike(Long postId);
 }

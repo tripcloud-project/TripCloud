@@ -15,4 +15,21 @@
         WHERE
             post_id = #{postId} AND member_id = #{memberId}
     </update>
+
+    <select id="existsLikeByPostIdAndMemberId" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM post_like
+        WHERE post_id = #{postId} AND member_id = #{memberId}
+    </select>
+
+    <insert id="insertPostLike">
+        INSERT INTO post_like (post_id, member_id)
+        VALUES (#{postId}, #{memberId})
+    </insert>
+    
+    <delete id="deletePostLike">
+        DELETE FROM post_like
+        WHERE post_id = #{postId} AND member_id = #{memberId}
+    </delete>
+    
 </mapper>
