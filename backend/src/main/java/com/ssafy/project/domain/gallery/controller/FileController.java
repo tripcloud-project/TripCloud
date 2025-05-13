@@ -119,11 +119,11 @@ public class FileController {
 			@RequestParam(required = false) String description){
 		SearchResultResponseDto searchResult = null;
 		
-		if(!keyword.isEmpty())
+		if(keyword != null)
 			searchResult = fileService.searchByKeyWord(keyword);
-//		else if(!hashtag.isEmpty())
-//			searchResult = fileService.searchByHashtag(hashtag);
-//		else if(!description.isEmpty())
+		else if(hashtag != null)
+			searchResult = fileService.searchByHashtag(hashtag);
+//		else if(description != null)
 //			searchResult = fileService.searchByDescription(description);
 		
 		return ResponseEntity.status(200)
