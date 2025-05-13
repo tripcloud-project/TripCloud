@@ -2,14 +2,15 @@ package com.ssafy.project.domain.gallery.mapper;
 
 import java.util.List;
 
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
-import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
-
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileDto;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
 
 @Mapper
 public interface FileMapper {
@@ -29,4 +30,7 @@ public interface FileMapper {
 	void deleteFilesByIds(List<Long> fileIdList, Long memberId);
 	void deleteFilesByPrefixes(List<String> prefixList, Long memberId);
 	List<String> findDirectoriesByPrefixAndMemberId(String prefix, Long memberId);
+	List<DirectoryPreviewResponseDto> selectAllDirectoriesByMemberIdAndKeyword(Long memberId, String keyword);
+	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndKeyword(Long memberId, String keyword);
+	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndHashtag(Long memberId, String hashtag);
 }

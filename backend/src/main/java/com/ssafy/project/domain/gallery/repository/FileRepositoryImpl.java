@@ -2,14 +2,15 @@ package com.ssafy.project.domain.gallery.repository;
 
 import java.util.List;
 
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
-import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
-
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileDto;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
 import com.ssafy.project.domain.gallery.mapper.FileMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -97,5 +98,20 @@ public class FileRepositoryImpl implements FileRepository{
 	@Override
 	public List<String> findDirectoriesByPrefixAndMemberId(String prefix, Long memberId){
 		return fileMapper.findDirectoriesByPrefixAndMemberId(prefix, memberId);
+	}
+
+	@Override
+	public List<DirectoryPreviewResponseDto> searchDirectoriesWithKeyword(Long memberId, String keyword) {
+		return fileMapper.selectAllDirectoriesByMemberIdAndKeyword(memberId, keyword);
+	}
+
+	@Override
+	public List<FilePreviewResponseDto> searchFilesWithKeyword(Long memberId, String keyword) {
+		return fileMapper.selectAllFilesByMemberIdAndKeyword(memberId, keyword);
+	}
+
+	@Override
+	public List<FilePreviewResponseDto> findFilesWithHashtag(Long memberId, String hashtag) {
+		return fileMapper.selectAllFilesByMemberIdAndHashtag(memberId, hashtag);
 	}
 }
