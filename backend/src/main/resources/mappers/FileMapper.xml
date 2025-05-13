@@ -224,4 +224,17 @@
 			member_id = #{memberId}
 			AND original_filename LIKE CONCAT('%', #{keyword}, '%')
 	</select>
+	
+	<select id="selectAllFilesByMemberIdAndHashtag" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
+		SELECT
+			f.file_id as fileId,
+			f.original_filename as name
+		FROM
+			file f, file_hashtag fh, hashtag h
+		WHERE
+			f.member_id = #{memberId}
+			AND f.file_id = fh.file_id
+			AND fh.hashtag_id = h.hashtag_id
+			AND h.word = #{hashtag}
+	</select>
 </mapper>

@@ -31,4 +31,5 @@ public interface FileMapper {
 	void deleteFilesByPrefixes(List<String> prefixList, Long memberId);
 	List<DirectoryPreviewResponseDto> selectAllDirectoriesByMemberIdAndKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndKeyword(Long memberId, String keyword);
+	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndHashtag(Long memberId, String hashtag);
 }

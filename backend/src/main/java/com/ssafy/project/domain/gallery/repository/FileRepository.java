@@ -28,4 +28,5 @@ public interface FileRepository {
 	void deleteFilesByPrefixes(List<String> prefixList, Long memberId);
 	List<DirectoryPreviewResponseDto> searchDirectoriesWithKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> searchFilesWithKeyword(Long memberId, String keyword);
+	List<FilePreviewResponseDto> findFilesWithHashtag(Long memberId, String hashtag);
 }
