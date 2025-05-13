@@ -25,4 +25,5 @@ public interface FileService {
 	void restore(RestoreRequestDto restoreRequestDto);
 	void delete(DeleteRequestDto deleteRequestDto);
 	SearchResultResponseDto searchByKeyWord(String keyword);
+	SearchResultResponseDto searchByHashtag(String hashtag);
 }

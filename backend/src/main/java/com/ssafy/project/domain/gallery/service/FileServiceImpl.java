@@ -344,4 +344,17 @@ public class FileServiceImpl implements FileService {
 				.files(files)
 				.build();
 	}
+
+
+	@Override
+	public SearchResultResponseDto searchByHashtag(String hashtag) {
+		Long memberId = SecurityUtil.getCurrentMemberId();
+		
+		// 해당 해시태그를 갖는 파일 검색
+		List<FilePreviewResponseDto> files = fileRepository.findFilesWithHashtag(memberId, hashtag);
+		
+		return SearchResultResponseDto.builder()
+				.files(files)
+				.build();
+	}
 }
