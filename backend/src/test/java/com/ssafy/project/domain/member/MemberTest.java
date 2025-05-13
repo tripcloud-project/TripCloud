@@ -22,6 +22,46 @@ public class MemberTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+    
+    // 테스트용 계정 추가
+    @Test
+    void 싸피계정회원가입() {
+        String baseUrl = "http://localhost:" + port + "/api/v1/members";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+            MemberRegisterDto requestDto = new MemberRegisterDto(
+                    "ssafy@ssafy.com",
+                    "1234",
+                    "ssafy"
+                    );
+
+            HttpEntity<MemberRegisterDto> request = new HttpEntity<>(requestDto, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, request, String.class);
+        
+    }
+    
+    // 테스트용 계정 추가
+    @Test
+    void _123계정회원가입() {
+        String baseUrl = "http://localhost:" + port + "/api/v1/members";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+            MemberRegisterDto requestDto = new MemberRegisterDto(
+                    "123@123.com",
+                    "123",
+                    "123"
+                    );
+
+            HttpEntity<MemberRegisterDto> request = new HttpEntity<>(requestDto, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, request, String.class);
+        
+    }
 
     // 테스트용 계정 추가
     @Test
@@ -30,7 +70,7 @@ public class MemberTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
+        
         for (int i = 1; i <= 30; i++) {
             String num = String.format("%03d", i); // 001, 002, ..., 30
             MemberRegisterDto requestDto = new MemberRegisterDto(
