@@ -2,6 +2,7 @@ package com.ssafy.project.domain.board.repository;
 
 import java.util.List;
 
+import com.ssafy.project.domain.board.dto.response.PostDetailResponseDto;
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
@@ -41,13 +42,23 @@ public class PostRepositoryImpl implements PostRepository {
         postMapper.deletePostLike(postId, memberId);
     }
 
-	@Override
-	public boolean existsByPostId(Long postId) {
-		return postMapper.existsByPostId(postId);
-	}
+    @Override
+    public boolean existsByPostId(Long postId) {
+        return postMapper.existsByPostId(postId);
+    }
 
-	@Override
-	public List<PostPreviewResponseDto> selectByPageAndSize(Integer page, int size) {
-		return postMapper.selectByOffsetAndSize(page * size, size+1);
-	}
+    @Override
+    public List<PostPreviewResponseDto> selectByPageAndSize(Integer page, int size) {
+        return postMapper.selectByOffsetAndSize(page * size, size + 1);
+    }
+
+    @Override
+    public PostDetailResponseDto selectByPostId(Long postId, Long memberId) {
+        return postMapper.selectByPostId(postId, memberId);
+    }
+
+    @Override
+    public int countLikeByPostId(@NonNull Long postId) {
+        return postMapper.countLikeByPostId(postId);
+    }
 }

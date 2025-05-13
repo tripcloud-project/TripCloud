@@ -4,8 +4,23 @@
 <mapper namespace="com.ssafy.project.domain.board.mapper.CommentMapper">
 
     <insert id="insert">
-        INSERT INTO Post_Comment (member_id, post_id, content)
+        INSERT INTO post_comment (member_id, post_id, content)
         VALUES (#{memberId}, #{postId}, #{content})
     </insert>
 
+    <select id="selectByPostId" resultType="com.ssafy.project.domain.board.dto.response.CommentResponseDto">
+        SELECT
+            pc.post_comment_id as commentId,
+            pc.content,
+            m.name as author,
+            pc.created_at as createdAt,
+            CASE
+                WHEN m.member_id = #{memberId} THEN TRUE
+                ELSE FALSE
+            END as isMyComment
+        FROM
+            post_comment pc, member m
+        WHERE pc.post_id = #{postId} AND pc.member_id = m.member_id
+        ORDER BY pc.created_at
+    </select>
 </mapper>

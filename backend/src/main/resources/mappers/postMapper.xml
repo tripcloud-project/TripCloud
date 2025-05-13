@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.project.domain.board.mapper.PostMapper">
-
+ 
     <insert id="insert">
         INSERT INTO post (member_id, title, content)
         VALUES (#{memberId}, #{title}, #{content})
@@ -53,5 +53,32 @@
 	    	p.post_id DESC
 	  	LIMIT #{size} OFFSET #{offset}
 	</select>
-    
+
+    <select id="selectByPostId" resultType="com.ssafy.project.domain.board.dto.response.PostDetailResponseDto">
+        SELECT
+            p.post_id as postId,
+            p.title,
+            p.content,
+            m.name as author,
+            p.created_at as createdAt,
+            p.modified_at as modifiedAt,
+            CASE
+                WHEN m.member_id = #{memberId} THEN TRUE
+                ELSE false
+            END
+            as isMyPost
+        FROM
+            post p, member m
+        WHERE p.post_id = #{postId} AND p.member_id = m.member_id
+    </select>
+
+    <select id="countLikeByPostId">
+        SELECT
+            COUNT(1)
+        FROM
+            post_like
+        WHERE
+            post_id = #{postId}
+    </select>
+
 </mapper>

@@ -1,5 +1,6 @@
 package com.ssafy.project.domain.board.service;
 
+import com.ssafy.project.domain.board.dto.response.PostDetailResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.project.common.response.OffsetPageResponse;
@@ -14,4 +15,5 @@ public interface BoardService {
     boolean togglePostLike(Long postId);
 	void createComment(Long postId, CommentRequestDto commentRequestDto);
 	OffsetPageResponse<?> getPagedPostList(Integer page, Integer size);
+    PostDetailResponseDto getPost(Long postId);
 }
