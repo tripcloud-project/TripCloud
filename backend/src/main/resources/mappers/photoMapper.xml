@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.domain.gallery.mapper.PhotoMapper">
+  <select id="findAllSidoByMemberId">
+    SELECT CONCAT(sido, '/') AS name, count(sido) count, sum(size) size
+    FROM file
+    WHERE member_id=#{memberId}
+    AND is_deleted=false
+    GROUP BY sido
+  </select>
+
+  <select id="findSigunguBySidoAndMemberId">
+    SELECT CONCAT(sigungu, '/') AS name, count(*) count, sum(size) size
+    FROM file
+    WHERE member_id=#{memberId}
+    AND sido=#{sido}
+    AND is_deleted=false
+    GROUP BY sigungu
+  </select>
+
+  <select id="findPhotosBySidoAndSigunguAndMemberId">
+    SELECT file_id, s3_key, original_filename AS name, size
+    FROM file
+    WHERE member_id=#{memberId}
+    AND sido=#{sido}
+    AND sigungu=#{sigungu}
+    AND is_deleted=false
+  </select>
+
+</mapper>

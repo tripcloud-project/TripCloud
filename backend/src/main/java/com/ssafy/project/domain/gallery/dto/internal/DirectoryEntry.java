@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class DirectoryEntry {
     private String name;
     private Long size;
+    private Integer count;
 }
