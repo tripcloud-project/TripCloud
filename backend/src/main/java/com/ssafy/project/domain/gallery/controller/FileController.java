@@ -1,17 +1,36 @@
 package com.ssafy.project.domain.gallery.controller;
 
-import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
-import com.ssafy.project.domain.gallery.dto.request.*;
-import com.ssafy.project.domain.gallery.service.FileService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import static com.ssafy.project.common.response.ApiResponse.createSuccess;
+import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
 
 import java.util.List;
-import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
-import static com.ssafy.project.common.response.ApiResponse.createSuccess;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
+import com.ssafy.project.domain.gallery.dto.request.DeleteRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.FileRenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.RestoreRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
+import com.ssafy.project.domain.gallery.dto.response.SearchResultResponseDto;
+import com.ssafy.project.domain.gallery.service.FileService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
@@ -93,4 +112,21 @@ public class FileController {
 	// TODO: 파일 이름 검색 endpoint 추가
 
 	// TODO: 해시태그 검색 endpoint 추가
+	// 검색 API
+	@GetMapping("/search")
+	public ResponseEntity<?> search(@RequestParam(required = false) String keyword, 
+			@RequestParam(required = false) String hashtag, 
+			@RequestParam(required = false) String description){
+		SearchResultResponseDto searchResult = null;
+		
+		if(!keyword.isEmpty())
+			searchResult = fileService.searchByKeyWord(keyword);
+//		else if(!hashtag.isEmpty())
+//			searchResult = fileService.searchByHashtag(hashtag);
+//		else if(!description.isEmpty())
+//			searchResult = fileService.searchByDescription(description);
+		
+		return ResponseEntity.status(200)
+				.body(createSuccess(searchResult));
+	}
 }
