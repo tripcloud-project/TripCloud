@@ -326,7 +326,6 @@ public class FileServiceImpl implements FileService {
 	public Map<String, Object> getDirectoryStructure() {
 		String prefix = makeMemberPrefix("");
 		Long memberId = SecurityUtil.getCurrentMemberId();
-		System.out.println(prefix);
 
 		List<String> directories = fileRepository.findDirectoriesByPrefixAndMemberId(prefix, memberId);
 
