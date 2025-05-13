@@ -17,4 +17,5 @@ public interface BoardService {
 	OffsetPageResponse<?> getPagedPostList(Integer page, Integer size);
     PostDetailResponseDto getPost(Long postId);
     void deleteComment(Long postId, Long commentId);
+    void updatePost(Long postId, PostRequestDto postRequestDto);
 }

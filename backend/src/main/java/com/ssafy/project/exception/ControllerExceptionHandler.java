@@ -1,6 +1,6 @@
 package com.ssafy.project.exception;
 
-import com.ssafy.project.domain.board.exception.CommentDeletionNotAllowedException;
+import com.ssafy.project.domain.board.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.exception.InvalidTokenException;
-import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
-import com.ssafy.project.domain.board.exception.NotFoundPostException;
-import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.DownloadFailException;
 import com.ssafy.project.domain.gallery.exception.FileNotFoundException;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
@@ -105,4 +102,9 @@ public class ControllerExceptionHandler {
         return errorResponse(ErrorCode.COMMENT_DELETE_NOT_ALLOWED);
     }
 
+    // 게시글 수정 실패
+    @ExceptionHandler(PostUpdateNotAllowedException.class)
+    public ResponseEntity<?> postUpdateNotAllowedException(){
+        return errorResponse(ErrorCode.POST_UPDATE_NOT_ALLOWED);
+    }
 }

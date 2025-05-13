@@ -25,6 +25,7 @@ public enum ErrorCode {
     COMMENT_DELETE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "COMMENT-02", "해당 댓글은 삭제할 수 없습니다."),
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-01", "요청한 게시글을 찾을 수 없습니다."),
     POST_DELETE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "POST-002", "해당 게시글은 삭제할 수 없습니다."),
+    POST_UPDATE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "POST-003", "해당 게시글은 수정할 수 없습니다."),
 
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN-001", "유효하지않은 토큰입니다.");
 

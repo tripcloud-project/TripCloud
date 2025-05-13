@@ -26,4 +26,6 @@ public interface PostRepository {
     PostDetailResponseDto selectByPostId(Long postId, Long memberId);
 
     int countLikeByPostId(@NonNull Long postId);
+
+    boolean update(PostRequestDto postRequestDto);
 }

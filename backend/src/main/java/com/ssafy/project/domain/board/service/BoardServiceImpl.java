@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.ssafy.project.domain.board.dto.response.CommentResponseDto;
 import com.ssafy.project.domain.board.dto.response.PostDetailResponseDto;
-import com.ssafy.project.domain.board.exception.CommentDeletionNotAllowedException;
+import com.ssafy.project.domain.board.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +14,6 @@ import com.ssafy.project.common.response.OffsetPageResponse;
 import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
 import com.ssafy.project.domain.board.dto.request.PostRequestDto;
 import com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto;
-import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
-import com.ssafy.project.domain.board.exception.NotFoundPostException;
-import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
 import com.ssafy.project.domain.board.repository.CommentRepository;
 import com.ssafy.project.domain.board.repository.PostRepository;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
@@ -140,4 +137,13 @@ public class BoardServiceImpl implements BoardService {
 
     }
 
+    @Override
+    public void updatePost(Long postId, PostRequestDto postRequestDto) {
+        Member member = SecurityUtil.getCurrentMember();
+        postRequestDto.setMemberId(member.getMemberId());
+        postRequestDto.setPostId(postId);
+
+        if(!postRepository.update(postRequestDto))
+            throw new PostUpdateNotAllowedException("게시글 수정에 실패했습니다.");
+    }
 }

@@ -81,4 +81,14 @@
             post_id = #{postId}
     </select>
 
+    <update id="update">
+        UPDATE
+            post
+        SET
+            title = #{title},
+            content = #{content}
+        WHERE
+            post_id = #{postId}
+            AND member_id = #{memberId}
+    </update>
 </mapper>
