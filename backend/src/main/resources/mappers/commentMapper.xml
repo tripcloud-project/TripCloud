@@ -23,4 +23,14 @@
         WHERE pc.post_id = #{postId} AND pc.member_id = m.member_id
         ORDER BY pc.created_at
     </select>
+    
+    <delete id="delete">
+        DELETE
+        FROM
+            post_comment
+        WHERE
+            post_id = #{postId}
+            AND post_comment_id = #{commentId}
+            AND member_id = #{memberId}
+    </delete>
 </mapper>

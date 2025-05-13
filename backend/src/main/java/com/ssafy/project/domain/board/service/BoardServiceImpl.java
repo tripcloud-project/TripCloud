@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ssafy.project.domain.board.dto.response.CommentResponseDto;
 import com.ssafy.project.domain.board.dto.response.PostDetailResponseDto;
+import com.ssafy.project.domain.board.exception.CommentDeletionNotAllowedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -128,6 +129,15 @@ public class BoardServiceImpl implements BoardService {
         postDetailResponseDto.setComments(comments);
 
         return postDetailResponseDto;
+    }
+
+    @Override
+    public void deleteComment(Long postId, Long commentId) {
+        Member member = SecurityUtil.getCurrentMember();
+
+        if (!commentRepository.delete(member.getMemberId(), postId, commentId))
+            throw new CommentDeletionNotAllowedException("댓글 삭제에 실패했습니다.");
+
     }
 
 }

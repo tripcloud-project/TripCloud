@@ -79,4 +79,12 @@ public class BoardController {
         return ResponseEntity.status(200)
                 .body(createSuccess(boardService.getPost(postId)));
     }
+
+    // 댓글 삭제
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    private ResponseEntity<?> deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
+        boardService.deleteComment(postId, commentId);
+        return ResponseEntity.status(200)
+                .body(createSuccessWithNoContent());
+    }
 }

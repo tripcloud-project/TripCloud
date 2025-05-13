@@ -1,5 +1,6 @@
 package com.ssafy.project.exception;
 
+import com.ssafy.project.domain.board.exception.CommentDeletionNotAllowedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -97,6 +98,11 @@ public class ControllerExceptionHandler {
     public ResponseEntity<?> notFoundPostException(){
     	return errorResponse(ErrorCode.POST_NOT_FOUND);
     }
-    
+
+    // 댓글 삭제 실패
+    @ExceptionHandler(CommentDeletionNotAllowedException.class)
+    public ResponseEntity<?> commentDeletionNotAllowedException(){
+        return errorResponse(ErrorCode.COMMENT_DELETE_NOT_ALLOWED);
+    }
 
 }

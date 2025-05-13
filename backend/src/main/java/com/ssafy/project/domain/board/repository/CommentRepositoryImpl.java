@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.board.repository;
 
 import com.ssafy.project.domain.board.dto.response.CommentResponseDto;
+import lombok.NonNull;
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.project.domain.board.dto.request.CommentRequestDto;
@@ -26,6 +27,11 @@ public class CommentRepositoryImpl implements CommentRepository{
 	@Override
 	public List<CommentResponseDto> selectByPostId(Long postId, Long memberId) {
 		return commentMapper.selectByPostId(postId, memberId);
+	}
+
+	@Override
+	public boolean delete(@NonNull Long memberId, Long postId, Long commentId) {
+		return commentMapper.delete(memberId, postId, commentId) == 1;
 	}
 
 }
