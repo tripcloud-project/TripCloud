@@ -306,6 +306,39 @@ public class FileServiceImpl implements FileService {
             fileRepository.deleteFilesByPrefixes(prefixList, memberId);
         }
     }
+    
+	public Map<String, Object> getDirectoryStructure() {
+		String prefix = makeMemberPrefix("");
+		Long memberId = SecurityUtil.getCurrentMemberId();
+		System.out.println(prefix);
+
+		List<String> directories = fileRepository.findDirectoriesByPrefixAndMemberId(prefix, memberId);
+
+		Map<String, Object> root = new LinkedHashMap<>();
+
+		for (String path : directories) {
+			if(path.isEmpty()) continue;
+	        String[] parts = path.split("/");
+	        Map<String, Object> current = root;
+	        StringBuilder currentPrefix = new StringBuilder();
+
+	        for (String part : parts) {
+	            currentPrefix.append(part).append("/");
+
+	            if (!current.containsKey(part)) {
+	                Map<String, Object> newNode = new LinkedHashMap<>();
+	                newNode.put("prefix", currentPrefix.toString());
+	                newNode.put("children", new LinkedHashMap<String, Object>());
+	                current.put(part, newNode);
+	            }
+
+	            Map<String, Object> node = (Map<String, Object>) current.get(part);
+	            current = (Map<String, Object>) node.get("children");
+	        }
+	    }
+
+	    return root;
+	}
 
     // prefix 앞에 member의 email을 추가합니다.
 	private String makeMemberPrefix(String prefix) {

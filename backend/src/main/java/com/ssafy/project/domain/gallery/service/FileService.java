@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.gallery.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
 import com.ssafy.project.domain.gallery.dto.request.*;
@@ -19,4 +20,5 @@ public interface FileService {
 	void trashBulk(TrashRequestDto trashRequestDto);
 	void restore(RestoreRequestDto restoreRequestDto);
 	void delete(DeleteRequestDto deleteRequestDto);
+	Map<String, Object> getDirectoryStructure();
 }
