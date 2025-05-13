@@ -193,4 +193,35 @@
       AND is_deleted = true
     </foreach>
   </update>
+  
+  
+  
+  	<select id="selectAllDirectoriesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto">
+	  SELECT
+		t.prefix,
+		SUBSTRING_INDEX(TRIM(TRAILING '/' FROM t.prefix), '/', -1) AS name
+	  FROM (
+	    SELECT
+	      DISTINCT SUBSTRING(
+	        	SUBSTRING_INDEX(s3_key, '/', CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', ''))),
+	        	LOCATE('/', s3_key) + 1
+	      	) AS prefix,
+	      		member_id
+	    	FROM file
+	  	) t
+	  WHERE
+	  	t.member_id = #{memberId}
+     	AND t.prefix LIKE CONCAT('%', #{keyword}, '%')
+  	</select>
+  
+  	<select id="selectAllFilesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">	
+		SELECT
+			file_id as fileId,
+			original_filename as name
+		FROM
+			file
+		WHERE
+			member_id = #{memberId}
+			AND original_filename LIKE CONCAT('%', #{keyword}, '%')
+	</select>
 </mapper>

@@ -6,7 +6,9 @@ import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileDto;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
 
 public interface FileRepository {
 	void insertFiles(List<FileDto> files, Long memberId);
@@ -24,4 +26,6 @@ public interface FileRepository {
 	void restoreFilesByPrefixes(List<String> prefixList, Long memberId);
 	void deleteFilesByIds(List<Long> fileIdList, Long memberId);
 	void deleteFilesByPrefixes(List<String> prefixList, Long memberId);
+	List<DirectoryPreviewResponseDto> searchDirectoriesWithKeyword(Long memberId, String keyword);
+	List<FilePreviewResponseDto> searchFilesWithKeyword(Long memberId, String keyword);
 }

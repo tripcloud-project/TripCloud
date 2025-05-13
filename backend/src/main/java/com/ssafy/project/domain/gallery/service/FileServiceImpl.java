@@ -1,10 +1,34 @@
 package com.ssafy.project.domain.gallery.service;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.drew.lang.GeoLocation;
-import com.ssafy.project.domain.gallery.dto.internal.*;
-import com.ssafy.project.domain.gallery.dto.request.*;
+import com.ssafy.project.domain.gallery.dto.internal.AddressDto;
+import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
+import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
+import com.ssafy.project.domain.gallery.dto.internal.FileDto;
+import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
+import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
+import com.ssafy.project.domain.gallery.dto.request.DeleteRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.RestoreRequestDto;
+import com.ssafy.project.domain.gallery.dto.request.TrashRequestDto;
+import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.SearchResultResponseDto;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.gallery.repository.FileRepository;
@@ -17,14 +41,6 @@ import com.ssafy.project.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -311,5 +327,21 @@ public class FileServiceImpl implements FileService {
 	private String makeMemberPrefix(String prefix) {
 		String email = SecurityUtil.getCurrentMemberEmail();
         return String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
+	}
+
+
+	@Override
+	public SearchResultResponseDto searchByKeyWord(String keyword) {
+		Long memberId = SecurityUtil.getCurrentMemberId();
+		// 해당 키워드를 갖는 디렉토리 검색
+		List<DirectoryPreviewResponseDto> directories = fileRepository.searchDirectoriesWithKeyword(memberId, keyword);
+		
+		// 해당 키워드를 갖는 파일 검색
+		List<FilePreviewResponseDto> files = fileRepository.searchFilesWithKeyword(memberId, keyword);
+		
+		return SearchResultResponseDto.builder()
+				.directories(directories)
+				.files(files)
+				.build();
 	}
 }
