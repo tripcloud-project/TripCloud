@@ -1,6 +1,7 @@
 package com.ssafy.project.domain.gallery.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,7 @@ public interface FileService {
 	void trashBulk(TrashRequestDto trashRequestDto);
 	void restore(RestoreRequestDto restoreRequestDto);
 	void delete(DeleteRequestDto deleteRequestDto);
+	Map<String, Object> getDirectoryStructure();
 	SearchResultResponseDto searchByKeyWord(String keyword);
 	SearchResultResponseDto searchByHashtag(String hashtag);
 }

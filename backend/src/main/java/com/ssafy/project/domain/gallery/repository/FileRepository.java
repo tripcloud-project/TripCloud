@@ -26,6 +26,7 @@ public interface FileRepository {
 	void restoreFilesByPrefixes(List<String> prefixList, Long memberId);
 	void deleteFilesByIds(List<Long> fileIdList, Long memberId);
 	void deleteFilesByPrefixes(List<String> prefixList, Long memberId);
+	List<String> findDirectoriesByPrefixAndMemberId(String prefix, Long memberId);
 	List<DirectoryPreviewResponseDto> searchDirectoriesWithKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> searchFilesWithKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> findFilesWithHashtag(Long memberId, String hashtag);

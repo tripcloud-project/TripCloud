@@ -194,6 +194,17 @@
     </foreach>
   </update>
   
+	<select id="findDirectoriesByPrefixAndMemberId">
+		SELECT DISTINCT
+		LEFT(
+		    SUBSTRING_INDEX(s3_key, '/', - (CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')))),
+		    CHAR_LENGTH(SUBSTRING_INDEX(s3_key, '/', - (CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', ''))))) -
+		    CHAR_LENGTH(SUBSTRING_INDEX(s3_key, '/', -1)) - 1
+		  ) AS prefix
+		FROM file
+		WHERE member_id=#{memberId};
+	</select>
+
   
   
   	<select id="selectAllDirectoriesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto">

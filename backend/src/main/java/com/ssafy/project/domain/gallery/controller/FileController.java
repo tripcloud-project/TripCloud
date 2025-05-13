@@ -108,10 +108,17 @@ public class FileController {
 		return ResponseEntity.status(200)
 				.body(createSuccessWithNoContent());
 	}
-
+	
+    @GetMapping
+    public ResponseEntity<?> getDirectoryStructure(){
+    	return ResponseEntity.status(200)
+    			.body(createSuccess(fileService.getDirectoryStructure()));
+    }
+    
 	// TODO: 파일 이름 검색 endpoint 추가
 
 	// TODO: 해시태그 검색 endpoint 추가
+
 	// 검색 API
 	@GetMapping("/search")
 	public ResponseEntity<?> search(@RequestParam(required = false) String keyword, 

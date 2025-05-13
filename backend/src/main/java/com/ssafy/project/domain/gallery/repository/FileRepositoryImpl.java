@@ -94,6 +94,11 @@ public class FileRepositoryImpl implements FileRepository{
 	public void deleteFilesByPrefixes(List<String> prefixList, Long memberId){
 		fileMapper.deleteFilesByPrefixes(prefixList, memberId);
 	}
+	
+	@Override
+	public List<String> findDirectoriesByPrefixAndMemberId(String prefix, Long memberId){
+		return fileMapper.findDirectoriesByPrefixAndMemberId(prefix, memberId);
+	}
 
 	@Override
 	public List<DirectoryPreviewResponseDto> searchDirectoriesWithKeyword(Long memberId, String keyword) {
