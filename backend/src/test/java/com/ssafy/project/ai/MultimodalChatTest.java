@@ -13,16 +13,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -31,16 +24,11 @@ import java.util.List;
 public class MultimodalChatTest {
     @Autowired
     AiChatService aiService;
-    // 이미지 리사이즈 메서드
 
     @Test
     public void multiModalTest() {
         try {
-//            Resource res = new ClassPathResource("/static/img/multimodal.test.jpg");
             BufferedImage image = ImageIO.read(new ClassPathResource("/static/img/multimodal.test.jpg").getInputStream());
-
-            // 이미지 리사이즈 + 압축 (예: 너비 600px, 품질 0.6)
-
 
             String prompt = """
                     이 그림을 보고 연관 키워드 5개를 추출해서, 아래 형식의 JSON으로만 응답해줘.
@@ -52,12 +40,10 @@ public class MultimodalChatTest {
                     """;
             MimeType mimeType = MimeTypeUtils.parseMimeType("image/jpeg");
             ByteArrayResource resource = ImageUtil.resizeAndCompress(image, 600, 0.6f);
-//            String result = aiService.multiModal(prompt, MimeTypeUtils.IMAGE_PNG, res);
 
             long startTime = System.currentTimeMillis(); // 시작 시간 측정
 
             String result = aiService.multiModal(prompt, mimeType, resource);
-//            log.debug("result: {}", result);
 
             long endTime = System.currentTimeMillis(); // 종료 시간 측정
             long duration = endTime - startTime;
@@ -76,10 +62,9 @@ public class MultimodalChatTest {
                 log.debug("Keyword: {}", keyword);
             }
 
-
             log.debug("Parsed keywords: {}", keywords);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("실패 로그: {}", e.getMessage());
         }
     }
 }
