@@ -8,18 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ssafy.project.domain.gallery.dto.internal.*;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.drew.lang.GeoLocation;
-import com.ssafy.project.domain.gallery.dto.internal.AddressDto;
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
-import com.ssafy.project.domain.gallery.dto.internal.DownloadDto;
-import com.ssafy.project.domain.gallery.dto.internal.FileDto;
-import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
-import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
 import com.ssafy.project.domain.gallery.dto.request.DeleteRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.DirectoryRenameRequestDto;
 import com.ssafy.project.domain.gallery.dto.request.DownloadRequestDto;
@@ -50,6 +44,7 @@ public class FileServiceImpl implements FileService {
 	private final KakaoGeocodingService kakaoGeocodingService;
 	private final FileRepository fileRepository;
     private final S3Service s3Service;
+    private final HashtagService hashtagService;
 	
 	// [/upload]
 	@Override
@@ -78,6 +73,26 @@ public class FileServiceImpl implements FileService {
         }
         Long memberId = SecurityUtil.getCurrentMemberId();
         fileRepository.insertFiles(fileList, memberId);
+
+
+        // 비동기 AI 호출을 위한 코드
+        // upload 응답 이후에 사라질 file을 byte로 저장해 둡니다.
+        List<ByteFileDto> byteFileList = new ArrayList<>();
+        for(UploadDto uploadDto : uploadList){
+            try{
+                byteFileList.add(
+                        ByteFileDto.builder()
+                                .s3Key(uploadDto.getS3Key())
+                                .contentType(uploadDto.getFile().getContentType())
+                                .content(uploadDto.getFile().getBytes())
+                                .build()
+                );
+            } catch (IOException e){
+                log.error("byte 파싱 실패는 skip합니다.");
+            }
+        }
+        // 요청 응답 이후, 비동기 호출로 AI를 활용하여 해시태그를 파싱합니다.
+        hashtagService.parseHashtag(byteFileList);
     }
 
 
