@@ -1,282 +1,450 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <title>📁 내 파일 탐색기</title>
-    <style>
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 16px;
-        padding: 20px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>📁 내 파일 탐색기</title>
+  <style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
 
-      .item {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 14px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
+    .item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-      .item img {
-        max-width: 80%;
-        max-height: 80%;
-        margin: 0 auto;
-        object-fit: cover;
-      }
+    .item img {
+      max-width: 80%;
+      max-height: 80%;
+      margin: 0 auto;
+      object-fit: cover;
+    }
 
-      .item .name {
-        margin-top: 6px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-      body {
-        font-family: sans-serif;
-      }
+    .item .name {
+      margin-top: 6px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    body {
+      font-family: sans-serif;
+    }
 
-      #fileList li {
-        margin-bottom: 4px;
-      }
+    #fileList li {
+      margin-bottom: 4px;
+    }
 
-      #fileList a {
-        margin-right: 8px;
-        cursor: pointer;
-      }
+    #fileList a {
+      margin-right: 8px;
+      cursor: pointer;
+    }
 
-      #imagePreview {
-        max-width: 300px;
-        display: block;
-        margin-top: 10px;
-      }
+    #imagePreview {
+      max-width: 300px;
+      display: block;
+      margin-top: 10px;
+    }
 
-      table {
-        border-collapse: collapse;
-        margin-top: 10px;
-      }
+    table {
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
 
-      td {
-        padding: 4px 8px;
-        border: 1px solid #ccc;
-      }
+    td {
+      padding: 4px 8px;
+      border: 1px solid #ccc;
+    }
 
-      button {
-        margin-left: 6px;
-      }
+    button {
+      margin-left: 6px;
+    }
 
-      #breadcrumb a {
-        text-decoration: underline;
-        margin-right: 4px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="loginform">
-      <h2 id="formTitle">Login</h2>
-      <form id="authForm">
-        <label>Email: <input type="email" id="email" required /></label><br />
-        <div id="nameField" style="display: none">
-          <label>Name: <input type="text" id="name" /></label><br />
-        </div>
-        <label>Password: <input type="password" id="password" required /></label
-        ><br />
-        <div id="confirmPasswordField" style="display: none">
-          <label
-            >Confirm Password:
-            <input type="password" id="confirmPassword" /></label
-          ><br />
-        </div>
-        <button type="submit" id="submitBtn">Login</button>
-      </form>
-      <p id="toggleText">
-        Don't have an account?
-        <a href="#" id="toggleLink">Sign Up</a>
-      </p>
-      <p id="message"></p>
+    #breadcrumb a {
+      text-decoration: underline;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+<div id="loginform">
+  <h2 id="formTitle">Login</h2>
+  <form id="authForm">
+    <label>Email: <input type="email" id="email" required /></label><br />
+    <div id="nameField" style="display: none">
+      <label>Name: <input type="text" id="name" /></label><br />
     </div>
-
-    <h2>📤 파일 또는 폴더 업로드</h2>
-
-    <h1>사진 검색</h1>
-
-    <form id="searchForm">
-      <input
-        type="text"
-        id="keyword"
-        name="keyword"
-        placeholder="검색어 입력"
-        required
-      />
-      <button type="submit">검색</button>
-    </form>
-    <div id="results"></div>
-    <!-- 🔹 개별 파일 업로드 -->
-    <form
-      id="uploadForm"
-      enctype="multipart/form-data"
-      method="post"
-      action="/upload"
-    >
-      <label>파일 선택: <input type="file" name="files" multiple /> </label
-      ><br />
-
-      <!-- 🔹 디렉토리 업로드 -->
+    <label>Password: <input type="password" id="password" required /></label
+    ><br />
+    <div id="confirmPasswordField" style="display: none">
       <label
-        >폴더 선택:
-        <input
-          type="file"
-          name="files"
-          webkitdirectory
-          directory
-          multiple
-        /> </label
+      >Confirm Password:
+        <input type="password" id="confirmPassword" /></label
       ><br />
-
-      <input type="hidden" name="prefix" id="uploadPrefix" value="uploads/" />
-      <button type="submit">업로드</button>
-    </form>
-
-    <button id="toggleTrashBtn">🗑️ 휴지통 보기</button>
-    <h1>📂 파일 탐색기</h1>
-    <p><strong>📌 현재 경로:</strong> <span id="breadcrumb"></span></p>
-    <p id="dirSize"></p>
-    <div>
-      <button id="downloadSelectedBtn">📥 선택 다운로드</button>
-      <button id="softDeleteSelectedBtn">🗑️ 선택 삭제</button>
     </div>
-    <div id="trashActions" style="display: none">
-      <button id="restoreSelectedBtn">♻️ 선택 복원</button>
-      <button id="hardDeleteSelectedBtn">🗑️ 선택 영구삭제</button>
-    </div>
+    <button type="submit" id="submitBtn">Login</button>
+  </form>
+  <p id="toggleText">
+    Don't have an account?
+    <a href="#" id="toggleLink">Sign Up</a>
+  </p>
+  <p id="message"></p>
+</div>
 
-    <ul id="fileList"></ul>
-    <div id="fileGrid" class="grid"></div>
-    <h2>🖼️ 미리보기</h2>
-    <img id="imagePreview" />
+<h2>📤 파일 또는 폴더 업로드</h2>
 
-    <h2>🧾 메타데이터</h2>
-    <div id="metaInfo"></div>
+<h1>사진 검색</h1>
 
-    <script>
-      // 사진 검색
-      const form = document.getElementById("searchForm");
-      const resultsDiv = document.getElementById("results");
+<form id="searchForm">
+  <input
+          type="text"
+          id="keyword"
+          name="keyword"
+          placeholder="검색어 입력"
+          required
+  />
+  <button type="submit">검색</button>
+</form>
+<div id="results"></div>
+<!-- 🔹 개별 파일 업로드 -->
+<form
+        id="uploadForm"
+        enctype="multipart/form-data"
+        method="post"
+        action="/upload"
+>
+  <label>파일 선택: <input type="file" name="files" multiple /> </label
+  ><br />
 
-      form.addEventListener("submit", async function (e) {
+  <!-- 🔹 디렉토리 업로드 -->
+  <label
+  >폴더 선택:
+    <input
+            type="file"
+            name="files"
+            webkitdirectory
+            directory
+            multiple
+    /> </label
+  ><br />
+
+  <input type="hidden" name="prefix" id="uploadPrefix" value="uploads/" />
+  <button type="submit">업로드</button>
+</form>
+
+<button id="toggleTrashBtn">🗑️ 휴지통 보기</button>
+<h1>📂 파일 탐색기</h1>
+<p><strong>📌 현재 경로:</strong> <span id="breadcrumb"></span></p>
+<p id="dirSize"></p>
+<div>
+  <button id="downloadSelectedBtn">📥 선택 다운로드</button>
+  <button id="softDeleteSelectedBtn">🗑️ 선택 삭제</button>
+</div>
+<div id="trashActions" style="display: none">
+  <button id="restoreSelectedBtn">♻️ 선택 복원</button>
+  <button id="hardDeleteSelectedBtn">🗑️ 선택 영구삭제</button>
+</div>
+<button onclick="loadFlatView(currentPrefix)">📋 지역 리스트 보기</button>
+
+<ul id="fileList"></ul>
+<div id="fileGrid" class="grid"></div>
+<h2>🖼️ 미리보기</h2>
+<img id="imagePreview" />
+
+<h2>🧾 메타데이터</h2>
+<div id="metaInfo"></div>
+
+<script>
+  // 사진 검색
+  const form = document.getElementById("searchForm");
+  const resultsDiv = document.getElementById("results");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const keyword = document.getElementById("keyword").value;
+
+    try {
+      const response = await fetch(
+        `/api/v1/gallery/search?keyword=${encodeURIComponent(keyword)}`
+      );
+      if (!response.ok) throw new Error("검색 실패");
+
+      const fileList = await response.json();
+
+      // 결과 표시
+      resultsDiv.innerHTML =
+        fileList.result.length > 0
+          ? fileList.result
+              .map(
+                (p) =>
+                  `<div><strong>${p.filename}</strong> (${p.s3Key})</div>`
+              )
+              .join("")
+          : "<p>검색 결과가 없습니다.</p>";
+    } catch (error) {
+      resultsDiv.innerHTML = `<p style="color:red;">오류: ${error.message}</p>`;
+    }
+  });
+
+  // 디렉토리
+  let userPrefix = "/";
+  let currentPrefix = userPrefix;
+
+  function formatBytes(bytes) {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  }
+
+  function renderBreadcrumb(prefix) {
+    const container = document.getElementById("breadcrumb");
+    container.innerHTML = "";
+
+    // ✅ 1. "/" 루트 추가
+    const rootLink = document.createElement("a");
+    rootLink.textContent = "/";
+    rootLink.href = "#";
+    rootLink.onclick = (e) => {
+      e.preventDefault();
+      loadDirectory(""); // 최상위 경로로 이동
+    };
+    container.appendChild(rootLink);
+
+    const parts = prefix.split("/").filter((p) => p); // ["uploads", "여행", "2024"]
+    let cumulative = "";
+
+    parts.forEach((part, index) => {
+      container.append(" > ");
+
+      cumulative += part + "/";
+
+      const link = document.createElement("a");
+      link.textContent = part;
+      link.href = "#";
+
+      const localPrefix = cumulative; // ✅ 각 루프마다 고정된 복사본
+      link.onclick = (e) => {
         e.preventDefault();
+        loadDirectory(localPrefix);
+      };
 
-        const keyword = document.getElementById("keyword").value;
+      container.appendChild(link);
+    });
+  }
 
-        try {
-          const response = await fetch(
-            `/api/v1/gallery/search?keyword=${encodeURIComponent(keyword)}`
-          );
-          if (!response.ok) throw new Error("검색 실패");
-
-          const photos = await response.json();
-
-          // 결과 표시
-          resultsDiv.innerHTML =
-            photos.result.length > 0
-              ? photos.result
-                  .map(
-                    (p) =>
-                      `<div><strong>${p.filename}</strong> (${p.s3Key})</div>`
-                  )
-                  .join("")
-              : "<p>검색 결과가 없습니다.</p>";
-        } catch (error) {
-          resultsDiv.innerHTML = `<p style="color:red;">오류: ${error.message}</p>`;
+  // 업로드 폼 제출 시 현재 경로에 업로드
+  document
+    .getElementById("uploadForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      formData.set("prefix", currentPrefix);
+      fetch(`/api/v1/gallery/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: formData,
+      }).then((res) => {
+        if (res.ok) {
+          alert("업로드 성공!");
+          document.querySelector('input[type="file"]').value = null;
+          document.querySelector('input[type="file"]').value = null;
+          loadDirectory(currentPrefix);
+        } else {
+          alert("업로드 실패");
         }
       });
+    });
 
-      // 디렉토리
-      let userPrefix = "/";
-      let currentPrefix = userPrefix;
+  // 초기 로딩
+  loadDirectory(currentPrefix);
 
-      function formatBytes(bytes) {
-        if (bytes === 0) return "0 Bytes";
-        const k = 1024;
-        const sizes = ["Bytes", "KB", "MB", "GB"];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-      }
-
-      function renderBreadcrumb(prefix) {
-        const container = document.getElementById("breadcrumb");
+  function loadDirectory(prefix) {
+    currentPrefix = prefix;
+    document.getElementById("uploadPrefix").value = prefix;
+    renderBreadcrumb(prefix);
+    fetch(`/api/v1/gallery/list?prefix=${encodeURIComponent(prefix)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const container = document.getElementById("fileList");
         container.innerHTML = "";
 
-        // ✅ 1. "/" 루트 추가
-        const rootLink = document.createElement("a");
-        rootLink.textContent = "/";
-        rootLink.href = "#";
-        rootLink.onclick = (e) => {
-          e.preventDefault();
-          loadDirectory(""); // 최상위 경로로 이동
-        };
-        container.appendChild(rootLink);
+        const grid = document.getElementById("fileGrid");
+        grid.innerHTML = "";
 
-        const parts = prefix.split("/").filter((p) => p); // ["uploads", "여행", "2024"]
-        let cumulative = "";
+        // 1. 디렉토리 먼저
+        data.result.directories.forEach((entry) => {
+          const fullKey = data.result.prefix + entry.name;
 
-        parts.forEach((part, index) => {
-          container.append(" > ");
+          // grid UI
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+<img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="folder" />
+<div class="name">${entry.name.slice(0, -1)}</div>
+`;
+          div.onclick = () => loadDirectory(fullKey);
+          grid.appendChild(div);
 
-          cumulative += part + "/";
-
-          const link = document.createElement("a");
-          link.textContent = part;
-          link.href = "#";
-
-          const localPrefix = cumulative; // ✅ 각 루프마다 고정된 복사본
-          link.onclick = (e) => {
+          // list UI
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.textContent = `${entry.name.slice(0, -1)} (${formatBytes(
+            entry.size
+          )})`;
+          a.href = "#";
+          a.onclick = (e) => {
             e.preventDefault();
-            loadDirectory(localPrefix);
+            loadDirectory(fullKey);
           };
 
-          container.appendChild(link);
-        });
-      }
-
-      // 업로드 폼 제출 시 현재 경로에 업로드
-      document
-        .getElementById("uploadForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          const formData = new FormData(this);
-          formData.set("prefix", currentPrefix);
-          fetch(`http://localhost:8080/api/v1/gallery/upload`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-            body: formData,
-          }).then((res) => {
-            if (res.ok) {
-              alert("업로드 성공!");
-              document.querySelector('input[type="file"]').value = null;
-              document.querySelector('input[type="file"]').value = null;
-              loadDirectory(currentPrefix);
-            } else {
-              alert("업로드 실패");
+          // 디렉토리 이름 변경
+          const renameBtn = document.createElement("button");
+          renameBtn.textContent = "✏️ 이름 변경";
+          renameBtn.onclick = (e) => {
+            e.stopPropagation();
+            const originalName = entry.name.replace(/\/$/, "");
+            const newName = prompt("새 이름을 입력하세요", originalName);
+            if (newName && newName !== originalName) {
+              const newPrefix = data.result.prefix + newName + "/";
+              fetch("/api/v1/gallery/rename", {
+                method: "PUT",
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "accessToken"
+                  )}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  oldPrefix: fullKey,
+                  newPrefix: newPrefix,
+                }),
+              }).then((res) => {
+                if (res.ok) {
+                  alert("이름 변경 성공!");
+                  loadDirectory(currentPrefix);
+                } else {
+                  alert("이름 변경 실패");
+                }
+              });
             }
-          });
+          };
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "entryCheckbox";
+          checkbox.dataset.key = fullKey;
+          checkbox.dataset.type = "directory";
+
+          li.prepend(checkbox);
+          li.appendChild(a);
+          li.appendChild(renameBtn);
+
+          container.appendChild(li);
         });
 
-      // 초기 로딩
-      loadDirectory(currentPrefix);
+        // 2. 파일들
+        data.result.files.forEach((entry) => {
+          const fullKey = data.result.prefix + entry.name;
 
-      function loadDirectory(prefix) {
-        currentPrefix = prefix;
-        document.getElementById("uploadPrefix").value = prefix;
-        renderBreadcrumb(prefix);
-        fetch(`/api/v1/gallery/list?prefix=${encodeURIComponent(prefix)}`, {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+<img src="${entry.presignedUrl}" alt="image" />
+<div class="name">${entry.name}</div>
+`;
+          div.onclick = () => fetchMetadata(entry.fileId);
+          grid.appendChild(div);
+
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.textContent = `${entry.name} (${formatBytes(entry.size)})`;
+          a.href = "#";
+          a.onclick = (e) => {
+            e.preventDefault();
+            fetchMetadata(entry.fileId);
+          };
+
+          // 파일 이름 변경
+          const renameBtn = document.createElement("button");
+          renameBtn.textContent = "✏️ 이름 변경";
+          renameBtn.onclick = (e) => {
+            e.stopPropagation();
+            const originalName = entry.name;
+            const dotIndex = originalName.lastIndexOf(".");
+            const baseName = originalName.substring(0, dotIndex);
+            const extension = originalName.substring(dotIndex);
+            const newName = prompt("새 이름을 입력하세요", baseName);
+            if (newName && newName !== baseName) {
+              const filename = newName + extension;
+              fetch(`/api/v1/gallery/rename/${entry.fileId}`, {
+                method: "PUT",
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "accessToken"
+                  )}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  filename: filename,
+                }),
+              }).then((res) => {
+                if (res.ok) {
+                  alert("이름 변경 성공!");
+                  loadDirectory(currentPrefix);
+                } else {
+                  alert("이름 변경 실패");
+                }
+              });
+            }
+          };
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "entryCheckbox";
+          checkbox.dataset.key = fullKey;
+          checkbox.dataset.type = "file";
+          checkbox.dataset.fileId = entry.fileId;
+
+          li.prepend(checkbox);
+          li.appendChild(a);
+          li.appendChild(renameBtn);
+          container.appendChild(li);
+        });
+
+        // 디렉토리 크기 표시
+        document.getElementById("dirSize").innerText =
+          "총 용량: " + formatBytes(data.result.totalSize);
+      });
+  }
+  let isTrashView = false;
+
+  document
+    .getElementById("toggleTrashBtn")
+    .addEventListener("click", () => {
+      if (!isTrashView) {
+        // const userPrefix = userPrefix; // 예: "user1/"
+        fetch(`/api/v1/gallery/trash/list`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -285,273 +453,465 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            const container = document.getElementById("fileList");
-            container.innerHTML = "";
-
-            const grid = document.getElementById("fileGrid");
-            grid.innerHTML = "";
-
-            // 1. 디렉토리 먼저
-            data.result.directories.forEach((entry) => {
-              const fullKey = data.result.prefix + entry.name;
-
-              // grid UI
-              const div = document.createElement("div");
-              div.className = "item";
-              div.innerHTML = `
-    <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="folder" />
-    <div class="name">${entry.name.slice(0, -1)}</div>
-  `;
-              div.onclick = () => loadDirectory(fullKey);
-              grid.appendChild(div);
-
-              // list UI
-              const li = document.createElement("li");
-              const a = document.createElement("a");
-              a.textContent = `${entry.name.slice(0, -1)} (${formatBytes(
-                entry.size
-              )})`;
-              a.href = "#";
-              a.onclick = (e) => {
-                e.preventDefault();
-                loadDirectory(fullKey);
-              };
-
-              // 디렉토리 이름 변경
-              const renameBtn = document.createElement("button");
-              renameBtn.textContent = "✏️ 이름 변경";
-              renameBtn.onclick = (e) => {
-                e.stopPropagation();
-                const originalName = entry.name.replace(/\/$/, "");
-                const newName = prompt("새 이름을 입력하세요", originalName);
-                if (newName && newName !== originalName) {
-                  const newPrefix = data.result.prefix + newName + "/";
-                  fetch("/api/v1/gallery/rename", {
-                    method: "PUT",
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem(
-                        "accessToken"
-                      )}`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      oldPrefix: fullKey,
-                      newPrefix: newPrefix,
-                    }),
-                  }).then((res) => {
-                    if (res.ok) {
-                      alert("이름 변경 성공!");
-                      loadDirectory(currentPrefix);
-                    } else {
-                      alert("이름 변경 실패");
-                    }
-                  });
-                }
-              };
-
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.className = "entryCheckbox";
-              checkbox.dataset.key = fullKey;
-              checkbox.dataset.type = "directory";
-
-              li.prepend(checkbox);
-              li.appendChild(a);
-              li.appendChild(renameBtn);
-
-              container.appendChild(li);
-            });
-
-            // 2. 파일들
-            data.result.files.forEach((entry) => {
-              const fullKey = data.result.prefix + entry.name;
-
-              const div = document.createElement("div");
-              div.className = "item";
-              div.innerHTML = `
-    <img src="${entry.presignedUrl}" alt="image" />
-    <div class="name">${entry.name}</div>
-  `;
-              div.onclick = () => fetchMetadata(entry.photoId);
-              grid.appendChild(div);
-
-              const li = document.createElement("li");
-              const a = document.createElement("a");
-              a.textContent = `${entry.name} (${formatBytes(entry.size)})`;
-              a.href = "#";
-              a.onclick = (e) => {
-                e.preventDefault();
-                fetchMetadata(entry.photoId);
-              };
-
-              // 파일 이름 변경
-              const renameBtn = document.createElement("button");
-              renameBtn.textContent = "✏️ 이름 변경";
-              renameBtn.onclick = (e) => {
-                e.stopPropagation();
-                const originalName = entry.name;
-                const dotIndex = originalName.lastIndexOf(".");
-                const baseName = originalName.substring(0, dotIndex);
-                const extension = originalName.substring(dotIndex);
-                const newName = prompt("새 이름을 입력하세요", baseName);
-                if (newName && newName !== baseName) {
-                  const filename = newName + extension;
-                  fetch(`/api/v1/gallery/rename/${entry.photoId}`, {
-                    method: "PUT",
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem(
-                        "accessToken"
-                      )}`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      filename: filename,
-                    }),
-                  }).then((res) => {
-                    if (res.ok) {
-                      alert("이름 변경 성공!");
-                      loadDirectory(currentPrefix);
-                    } else {
-                      alert("이름 변경 실패");
-                    }
-                  });
-                }
-              };
-
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.className = "entryCheckbox";
-              checkbox.dataset.key = fullKey;
-              checkbox.dataset.type = "file";
-              checkbox.dataset.photoId = entry.photoId;
-
-              li.prepend(checkbox);
-              li.appendChild(a);
-              li.appendChild(renameBtn);
-              container.appendChild(li);
-            });
-
-            // 디렉토리 크기 표시
-            document.getElementById("dirSize").innerText =
-              "총 용량: " + formatBytes(data.result.totalSize);
-          });
-      }
-      let isTrashView = false;
-
-      document
-        .getElementById("toggleTrashBtn")
-        .addEventListener("click", () => {
-          if (!isTrashView) {
-            // const userPrefix = userPrefix; // 예: "user1/"
-            fetch(`/api/v1/gallery/trash/list`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                "Content-Type": "application/json",
-              },
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                isTrashView = true;
-                document.getElementById("toggleTrashBtn").textContent =
-                  "📁 일반 보기";
-                renderFileList(data, true); // 휴지통 표시 모드
-              });
-          } else {
-            isTrashView = false;
+            isTrashView = true;
             document.getElementById("toggleTrashBtn").textContent =
-              "🗑️ 휴지통 보기";
-            loadDirectory(currentPrefix); // 일반 보기로 복원
-          }
-        });
+              "📁 일반 보기";
+            renderFileList(data, true); // 휴지통 표시 모드
+          });
+      } else {
+        isTrashView = false;
+        document.getElementById("toggleTrashBtn").textContent =
+          "🗑️ 휴지통 보기";
+        loadDirectory(currentPrefix); // 일반 보기로 복원
+      }
+    });
 
-      // 휴지통 보기
-      function renderFileList(data, isTrash = false) {
-        const container = document.getElementById("fileList");
-        container.innerHTML = "";
+  // 휴지통 보기
+  function renderFileList(data, isTrash = false) {
+    const container = document.getElementById("fileList");
+    container.innerHTML = "";
 
-        // 휴지통 모드일 때만 복원/삭제 버튼 보여줌
-        document.getElementById("trashActions").style.display = isTrash
-          ? "block"
-          : "none";
+    // 휴지통 모드일 때만 복원/삭제 버튼 보여줌
+    document.getElementById("trashActions").style.display = isTrash
+      ? "block"
+      : "none";
 
-        [...data.result.directories, ...data.result.files].forEach((entry) => {
-          const li = document.createElement("li");
-          const a = document.createElement("a");
-          const fullKey = data.result.prefix + entry.name;
+    [...data.result.directories, ...data.result.files].forEach((entry) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      const fullKey = data.result.prefix + entry.name;
 
-          a.textContent = `${entry.name} (${formatBytes(entry.size)})`;
-          a.href = "#";
-          a.onclick = (e) => {
-            e.preventDefault();
-            if (!entry.photoId) {
-              if (isTrash) {
-                alert("📁 디렉토리는 복원 후 접근할 수 있습니다.");
-              } else {
-                loadDirectory(fullKey);
-              }
-            } else {
-              if (isTrash) {
-                alert("🖼️ 삭제된 파일입니다. 복원 후 열람할 수 있습니다.");
-              } else {
-                fetchMetadata(entry.photoId);
-              }
-            }
-          };
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.className = "entryCheckbox";
-          checkbox.dataset.key = fullKey;
-
-          if (entry.photoId) {
-            checkbox.dataset.type = "file";
-            checkbox.dataset.photoId = entry.photoId;
+      a.textContent = `${entry.name} (${formatBytes(entry.size)})`;
+      a.href = "#";
+      a.onclick = (e) => {
+        e.preventDefault();
+        if (!entry.fileId) {
+          if (isTrash) {
+            alert("📁 디렉토리는 복원 후 접근할 수 있습니다.");
           } else {
-            checkbox.dataset.type = "directory";
+            loadDirectory(fullKey);
+          }
+        } else {
+          if (isTrash) {
+            alert("🖼️ 삭제된 파일입니다. 복원 후 열람할 수 있습니다.");
+          } else {
+            fetchMetadata(entry.fileId);
+          }
+        }
+      };
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "entryCheckbox";
+      checkbox.dataset.key = fullKey;
+
+      if (entry.fileId) {
+        checkbox.dataset.type = "file";
+        checkbox.dataset.fileId = entry.fileId;
+      } else {
+        checkbox.dataset.type = "directory";
+      }
+
+      li.prepend(checkbox);
+      li.appendChild(a);
+      container.appendChild(li);
+    });
+
+    const grid = document.getElementById("fileGrid");
+    grid.innerHTML = ""; // grid 초기화
+
+    [...data.result.directories, ...data.result.files].forEach((entry) => {
+      // ... 기존 리스트 UI 구성 코드
+
+      // ✅ grid에도 추가
+      const div = document.createElement("div");
+      div.className = "item";
+      div.onclick = (e) => {
+        e.preventDefault();
+        if (!entry.fileId) {
+          if (isTrash) {
+            alert("📁 디렉토리는 복원 후 접근할 수 있습니다.");
+          } else {
+            loadDirectory(fullKey);
+          }
+        } else {
+          if (isTrash) {
+            alert("🖼️ 삭제된 파일입니다. 복원 후 열람할 수 있습니다.");
+          } else {
+            fetchMetadata(entry.fileId);
+          }
+        }
+      };
+
+      if (entry.fileId) {
+        div.innerHTML = `
+  <img src="${entry.presignedUrl}" alt="image" />
+  <div class="name">${entry.name}</div>
+`;
+      } else {
+        div.innerHTML = `
+  <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="folder" />
+  <div class="name">${entry.name.slice(0, -1)}</div>
+`;
+      }
+
+      grid.appendChild(div);
+    });
+
+    document.getElementById("dirSize").innerText =
+      "총 용량: " + formatBytes(data.result.totalSize);
+  }
+
+  function fetchMetadata(fileId) {
+    fetch(`/api/v1/gallery/detail/${fileId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((meta) => {
+        const labels = {
+          key: "파일 경로",
+          size: "파일 크기",
+          contentType: "파일 유형",
+          lastModified: "최종 수정일",
+          etag: "ETag",
+          storageClass: "저장 클래스",
+        };
+
+        const html = Object.entries(meta.result)
+          .map(([k, v]) => {
+            const label = labels[k] || k;
+            const value = k === "size" ? formatBytes(v) : v;
+            return `<tr><td><strong>${label}</strong></td><td>${value}</td></tr>`;
+          })
+          .join("");
+
+        document.getElementById(
+          "metaInfo"
+        ).innerHTML = `<table>${html}</table>`;
+      })
+      .catch((err) => {
+        document.getElementById("metaInfo").innerHTML =
+          "📛 메타데이터 불러오기 실패: " + err.message;
+      });
+  }
+
+  // 로그인
+  let isLogin = true;
+
+  const formTitle = document.getElementById("formTitle");
+  const nameField = document.getElementById("nameField");
+  const confirmPasswordField = document.getElementById(
+    "confirmPasswordField"
+  );
+  const submitBtn = document.getElementById("submitBtn");
+  const toggleLink = document.getElementById("toggleLink");
+  const message = document.getElementById("message");
+
+  toggleLink.addEventListener("click", function (e) {
+    e.preventDefault();
+    isLogin = !isLogin;
+
+    formTitle.textContent = isLogin ? "Login" : "Sign Up";
+    submitBtn.textContent = isLogin ? "Login" : "Sign Up";
+    toggleLink.textContent = isLogin ? "Sign Up" : "Login";
+    document.getElementById("toggleText").childNodes[0].textContent =
+      isLogin ? "Don't have an account? " : "Already have an account? ";
+    nameField.style.display = isLogin ? "none" : "block";
+    confirmPasswordField.style.display = isLogin ? "none" : "block";
+    message.textContent = "";
+  });
+
+  document
+    .getElementById("authForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!isLogin) {
+        const name = document.getElementById("name").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+          message.textContent = "❌ Passwords do not match";
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/v1/members", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, name }), // 👈 이름 포함
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Sign up failed");
+
+          message.textContent = "✅ Sign up successful! Please log in.";
+          toggleLink.click(); // 자동 로그인 화면 전환
+        } catch (err) {
+          message.textContent = `❌ ${err.message}`;
+        }
+      } else {
+        try {
+          const res = await fetch("/api/v1/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const authHeader = res.headers.get("Authorization"); // "Bearer eyJ..."
+          if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new Error("토큰이 응답에 없습니다");
           }
 
-          li.prepend(checkbox);
-          li.appendChild(a);
-          container.appendChild(li);
+          const accessToken = authHeader.split(" ")[1]; // Bearer 제거
+          console.log("로그인: " + accessToken);
+          localStorage.setItem("accessToken", accessToken);
+          message.textContent = "✅ Login successful!";
+        } catch (err) {
+          message.textContent = `❌ ${err.message}`;
+        }
+      }
+    });
+
+  // 다운로드
+  document
+    .getElementById("downloadSelectedBtn")
+    .addEventListener("click", async () => {
+      const { prefixList, fileIdList } = collectSelectedEntries();
+      if (prefixList.length === 0 && fileIdList.length === 0)
+        return alert("선택된 항목이 없습니다.");
+
+      try {
+        const res = await fetch("/api/v1/gallery/download", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prefixList,
+            fileIdList,
+            currentPrefix,
+          }),
         });
 
+        if (!res.ok) throw new Error("다운로드 실패");
+
+        const blob = await res.blob();
+        const contentDisposition = res.headers.get("Content-Disposition");
+        let filename = "downloaded_file"; // 기본값을 zip이 아닌 일반 이름으로
+        if (contentDisposition) {
+          const match = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+          if (match && match[1]) {
+            filename = decodeURIComponent(match[1]);
+          } else {
+            // fallback: filename="..."
+            const fallback = contentDisposition.match(/filename="([^"]+)"/);
+            if (fallback && fallback[1]) {
+              filename = fallback[1];
+            }
+          }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert("❌ 다운로드 실패: " + err.message);
+      }
+    });
+
+  document
+    .getElementById("softDeleteSelectedBtn")
+    .addEventListener("click", () => {
+      const { prefixList, fileIdList } = collectSelectedEntries();
+      if (prefixList.length === 0 && fileIdList.length === 0)
+        return alert("선택된 항목이 없습니다.");
+      if (!confirm("선택한 항목을 휴지통으로 보내시겠습니까?")) return;
+
+      fetch(`/api/v1/gallery/trash`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prefixList,
+          fileIdList,
+        }),
+      }).then((res) => {
+        if (!res.ok) {
+          alert("삭제 실패");
+        } else {
+          alert("삭제 성공");
+          loadDirectory(currentPrefix);
+        }
+      });
+    });
+
+  document
+    .getElementById("restoreSelectedBtn")
+    .addEventListener("click", () => {
+      const { prefixList, fileIdList } = collectSelectedEntries();
+      if (prefixList.length === 0 && fileIdList.length === 0)
+        return alert("선택된 항목이 없습니다.");
+
+      fetch("/api/v1/gallery/trash/restore", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({ prefixList, fileIdList }),
+      }).then((res) => {
+        if (res.ok) {
+          alert("복원 완료!");
+          document.getElementById("toggleTrashBtn").click();
+        } else {
+          alert("복원 실패");
+        }
+      });
+    });
+
+  document
+    .getElementById("hardDeleteSelectedBtn")
+    .addEventListener("click", () => {
+      const { prefixList, fileIdList } = collectSelectedEntries();
+      if (prefixList.length === 0 && fileIdList.length === 0)
+        return alert("선택된 항목이 없습니다.");
+      if (!confirm("정말로 영구 삭제하시겠습니까?")) return;
+
+      fetch("/api/v1/gallery/trash/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({ prefixList, fileIdList }),
+      }).then((res) => {
+        if (res.ok) {
+          alert("삭제 완료!");
+          // ✅ 휴지통 목록 새로고침
+          fetch("/api/v1/gallery/trash/list", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem(
+                "accessToken"
+              )}`,
+            },
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              isTrashView = true;
+              document.getElementById("toggleTrashBtn").textContent =
+                "📁 일반 보기";
+              renderFileList(data, true);
+            });
+        } else {
+          alert("삭제 실패");
+        }
+      });
+    });
+
+  function collectSelectedEntries() {
+    const checkboxes = document.querySelectorAll(".entryCheckbox:checked");
+    const prefixList = [];
+    const fileIdList = [];
+
+    checkboxes.forEach((checkbox) => {
+      const type = checkbox.dataset.type;
+      if (type === "directory") prefixList.push(checkbox.dataset.key);
+      else fileIdList.push(checkbox.dataset.fileId);
+    });
+
+    return { prefixList, fileIdList };
+  }
+
+  function loadFlatView(prefix) {
+    currentPrefix = prefix;
+    console.log(prefix);
+    document.getElementById("uploadPrefix").value = prefix;
+    renderBreadcrumb(prefix); // 기존대로 경로 표시
+
+    fetch(`/api/v1/gallery/photo?prefix=${encodeURIComponent(prefix)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
         const grid = document.getElementById("fileGrid");
-        grid.innerHTML = ""; // grid 초기화
+        grid.innerHTML = "";
 
-        [...data.result.directories, ...data.result.files].forEach((entry) => {
-          // ... 기존 리스트 UI 구성 코드
+        const allEntries = [];
 
-          // ✅ grid에도 추가
+        // 디렉토리를 일단 항목으로 표현
+        data.result.directories.forEach((dir) => {
+          allEntries.push({
+            type: "directory",
+            name: dir.name,
+            size: dir.size,
+            count: dir.count,
+          });
+        });
+
+        // 파일도 동일 리스트에 포함
+        data.result.files.forEach((file) => {
+          allEntries.push({
+            type: "file",
+            name: file.name,
+            size: file.size,
+            fileId: file.fileId,
+            presignedUrl: file.presignedUrl,
+          });
+        });
+
+        // 원하는 기준 정렬 (예: 이름순)
+        allEntries.sort((a, b) => a.name.localeCompare(b.name));
+
+        allEntries.forEach((entry) => {
           const div = document.createElement("div");
           div.className = "item";
-          div.onclick = (e) => {
-            e.preventDefault();
-            if (!entry.photoId) {
-              if (isTrash) {
-                alert("📁 디렉토리는 복원 후 접근할 수 있습니다.");
-              } else {
-                loadDirectory(fullKey);
-              }
-            } else {
-              if (isTrash) {
-                alert("🖼️ 삭제된 파일입니다. 복원 후 열람할 수 있습니다.");
-              } else {
-                fetchMetadata(entry.photoId);
-              }
-            }
-          };
 
-          if (entry.photoId) {
+          if (entry.type === "directory") {
             div.innerHTML = `
-      <img src="${entry.presignedUrl}" alt="image" />
-      <div class="name">${entry.name}</div>
-    `;
+        <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="folder" />
+        <div class="name">${entry.name.slice(0,-1)} (${entry.count}개)</div>
+      `;
+            // div.onclick = () => loadFlatView(prefix + entry.name); // 하위 디렉토리 탐색
+            div.onclick = () => {
+              const cleanPrefix = prefix.endsWith("/")
+                ? prefix
+                : prefix + "/";
+              const nextPrefix = cleanPrefix + entry.name;
+
+              // 앞에 "/" 제거 (예: "/경북/상주/" → "경북/상주/")
+              const normalized = nextPrefix.startsWith("/")
+                ? nextPrefix.slice(1)
+                : nextPrefix;
+
+              loadFlatView(normalized);
+            };
           } else {
             div.innerHTML = `
-      <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="folder" />
-      <div class="name">${entry.name.slice(0, -1)}</div>
-    `;
+        <img src="${entry.presignedUrl}" alt="image" />
+        <div class="name">${entry.name}</div>
+      `;
+            div.onclick = () => fetchMetadata(entry.fileId);
           }
 
           grid.appendChild(div);
@@ -559,287 +919,8 @@
 
         document.getElementById("dirSize").innerText =
           "총 용량: " + formatBytes(data.result.totalSize);
-      }
-
-      function fetchMetadata(photoId) {
-        fetch(`/api/v1/gallery/detail/${photoId}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((meta) => {
-            const labels = {
-              key: "파일 경로",
-              size: "파일 크기",
-              contentType: "파일 유형",
-              lastModified: "최종 수정일",
-              etag: "ETag",
-              storageClass: "저장 클래스",
-            };
-
-            const html = Object.entries(meta.result)
-              .map(([k, v]) => {
-                const label = labels[k] || k;
-                const value = k === "size" ? formatBytes(v) : v;
-                return `<tr><td><strong>${label}</strong></td><td>${value}</td></tr>`;
-              })
-              .join("");
-
-            document.getElementById(
-              "metaInfo"
-            ).innerHTML = `<table>${html}</table>`;
-          })
-          .catch((err) => {
-            document.getElementById("metaInfo").innerHTML =
-              "📛 메타데이터 불러오기 실패: " + err.message;
-          });
-      }
-
-      // 로그인
-      let isLogin = true;
-
-      const formTitle = document.getElementById("formTitle");
-      const nameField = document.getElementById("nameField");
-      const confirmPasswordField = document.getElementById(
-        "confirmPasswordField"
-      );
-      const submitBtn = document.getElementById("submitBtn");
-      const toggleLink = document.getElementById("toggleLink");
-      const message = document.getElementById("message");
-
-      toggleLink.addEventListener("click", function (e) {
-        e.preventDefault();
-        isLogin = !isLogin;
-
-        formTitle.textContent = isLogin ? "Login" : "Sign Up";
-        submitBtn.textContent = isLogin ? "Login" : "Sign Up";
-        toggleLink.textContent = isLogin ? "Sign Up" : "Login";
-        document.getElementById("toggleText").childNodes[0].textContent =
-          isLogin ? "Don't have an account? " : "Already have an account? ";
-        nameField.style.display = isLogin ? "none" : "block";
-        confirmPasswordField.style.display = isLogin ? "none" : "block";
-        message.textContent = "";
       });
-
-      document
-        .getElementById("authForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-
-          const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
-
-          if (!isLogin) {
-            const name = document.getElementById("name").value;
-            const confirmPassword =
-              document.getElementById("confirmPassword").value;
-
-            if (password !== confirmPassword) {
-              message.textContent = "❌ Passwords do not match";
-              return;
-            }
-
-            try {
-              const res = await fetch("http://localhost:8080/api/v1/members", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password, name }), // 👈 이름 포함
-              });
-
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.message || "Sign up failed");
-
-              message.textContent = "✅ Sign up successful! Please log in.";
-              toggleLink.click(); // 자동 로그인 화면 전환
-            } catch (err) {
-              message.textContent = `❌ ${err.message}`;
-            }
-          } else {
-            try {
-              const res = await fetch(
-                "http://localhost:8080/api/v1/auth/login",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ email, password }),
-                }
-              );
-
-              const authHeader = res.headers.get("Authorization"); // "Bearer eyJ..."
-              if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                throw new Error("토큰이 응답에 없습니다");
-              }
-
-              const accessToken = authHeader.split(" ")[1]; // Bearer 제거
-              console.log("로그인: " + accessToken);
-              localStorage.setItem("accessToken", accessToken);
-              message.textContent = "✅ Login successful!";
-            } catch (err) {
-              message.textContent = `❌ ${err.message}`;
-            }
-          }
-        });
-
-      // 다운로드
-      document
-        .getElementById("downloadSelectedBtn")
-        .addEventListener("click", async () => {
-          const { prefixList, photoIdList } = collectSelectedEntries();
-          if (prefixList.length === 0 && photoIdList.length === 0)
-            return alert("선택된 항목이 없습니다.");
-
-          try {
-            const res = await fetch("/api/v1/gallery/download", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                prefixList,
-                photoIdList,
-                currentPrefix,
-              }),
-            });
-
-            if (!res.ok) throw new Error("다운로드 실패");
-
-            const blob = await res.blob();
-            const contentDisposition = res.headers.get("Content-Disposition");
-            let filename = "downloaded_file"; // 기본값을 zip이 아닌 일반 이름으로
-            if (contentDisposition) {
-              const match = contentDisposition.match(/filename\*=UTF-8''(.+)/);
-              if (match && match[1]) {
-                filename = decodeURIComponent(match[1]);
-              } else {
-                // fallback: filename="..."
-                const fallback = contentDisposition.match(/filename="([^"]+)"/);
-                if (fallback && fallback[1]) {
-                  filename = fallback[1];
-                }
-              }
-            }
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-          } catch (err) {
-            alert("❌ 다운로드 실패: " + err.message);
-          }
-        });
-
-      document
-        .getElementById("softDeleteSelectedBtn")
-        .addEventListener("click", () => {
-          const { prefixList, photoIdList } = collectSelectedEntries();
-          if (prefixList.length === 0 && photoIdList.length === 0)
-            return alert("선택된 항목이 없습니다.");
-          if (!confirm("선택한 항목을 휴지통으로 보내시겠습니까?")) return;
-
-          fetch(`/api/v1/gallery/trash`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              prefixList,
-              photoIdList,
-            }),
-          }).then((res) => {
-            if (!res.ok) {
-              alert("삭제 실패");
-            } else {
-              alert("삭제 성공");
-              loadDirectory(currentPrefix);
-            }
-          });
-        });
-
-      document
-        .getElementById("restoreSelectedBtn")
-        .addEventListener("click", () => {
-          const { prefixList, photoIdList } = collectSelectedEntries();
-          if (prefixList.length === 0 && photoIdList.length === 0)
-            return alert("선택된 항목이 없습니다.");
-
-          fetch("/api/v1/gallery/trash/restore", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-            body: JSON.stringify({ prefixList, photoIdList }),
-          }).then((res) => {
-            if (res.ok) {
-              alert("복원 완료!");
-              document.getElementById("toggleTrashBtn").click();
-            } else {
-              alert("복원 실패");
-            }
-          });
-        });
-
-      document
-        .getElementById("hardDeleteSelectedBtn")
-        .addEventListener("click", () => {
-          const { prefixList, photoIdList } = collectSelectedEntries();
-          if (prefixList.length === 0 && photoIdList.length === 0)
-            return alert("선택된 항목이 없습니다.");
-          if (!confirm("정말로 영구 삭제하시겠습니까?")) return;
-
-          fetch("/api/v1/gallery/trash/delete", {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-            body: JSON.stringify({ prefixList, photoIdList }),
-          }).then((res) => {
-            if (res.ok) {
-              alert("삭제 완료!");
-              // ✅ 휴지통 목록 새로고침
-              fetch("/api/v1/gallery/trash/list", {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${localStorage.getItem(
-                    "accessToken"
-                  )}`,
-                },
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  isTrashView = true;
-                  document.getElementById("toggleTrashBtn").textContent =
-                    "📁 일반 보기";
-                  renderFileList(data, true);
-                });
-            } else {
-              alert("삭제 실패");
-            }
-          });
-        });
-
-      function collectSelectedEntries() {
-        const checkboxes = document.querySelectorAll(".entryCheckbox:checked");
-        const prefixList = [];
-        const photoIdList = [];
-
-        checkboxes.forEach((checkbox) => {
-          const type = checkbox.dataset.type;
-          if (type === "directory") prefixList.push(checkbox.dataset.key);
-          else photoIdList.push(checkbox.dataset.photoId);
-        });
-
-        return { prefixList, photoIdList };
-      }
-    </script>
-  </body>
+  }
+</script>
+</body>
 </html>
