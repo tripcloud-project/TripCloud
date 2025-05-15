@@ -76,27 +76,29 @@
 
 
   <select id="findDirectoriesByPrefixAndIsDeleted">
-    SELECT
-    CONCAT(SUBSTRING_INDEX(TRIM(TRAILING '/' FROM d.dir_name), '/', -1),'/') AS name,
-    SUM(p.size) AS size,
-    COUNT(p.size) AS count
-    FROM (
-    SELECT DISTINCT
-    CONCAT(
-    SUBSTRING_INDEX(s3_key, '/',
-    CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
-    ),
-    '/'
-    ) AS dir_name
-    FROM file
-    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
-    AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
-    CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
-    )
-    ) AS d
-    JOIN file p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
-    WHERE p.is_deleted = #{isDeleted}
-    GROUP BY d.dir_name
+	SELECT
+	CONCAT(SUBSTRING_INDEX(TRIM(TRAILING '/' FROM d.dir_name), '/', -1),'/') AS name,
+	SUM(p.size) AS size,
+	COUNT(p.size) AS count
+	FROM (
+	SELECT *
+	FROM (
+	  SELECT DISTINCT
+	    CONCAT(
+	      SUBSTRING_INDEX(s3_key, '/',
+	        CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
+	      ),
+	      '/'
+	    ) AS dir_name
+	  FROM file
+	  WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+	  AND is_deleted = #{isDeleted}
+	) AS temp
+	WHERE CHAR_LENGTH(dir_name) - CHAR_LENGTH(REPLACE(dir_name, '/', '')) = 
+	      CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
+	) AS d
+	JOIN file p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
+	GROUP BY d.dir_name;
   </select>
 
   <select id="findFilesByPrefixAndIsDeleted">
