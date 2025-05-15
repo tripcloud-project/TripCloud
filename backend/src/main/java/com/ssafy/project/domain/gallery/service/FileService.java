@@ -28,4 +28,5 @@ public interface FileService {
 	Map<String, Object> getDirectoryStructure();
 	SearchResultResponseDto searchByKeyWord(String keyword);
 	SearchResultResponseDto searchByHashtag(String hashtag);
+    SearchResultResponseDto searchByDescription(String description);
 }
