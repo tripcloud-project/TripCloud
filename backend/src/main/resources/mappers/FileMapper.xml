@@ -250,4 +250,15 @@
 			AND fh.hashtag_id = h.hashtag_id
 			AND h.word = #{hashtag}
 	</select>
+
+    <select id="selectAllFilesByMemberIdAndDescription" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
+        SELECT
+            file_id as fileId,
+            original_filename as name
+        FROM
+            file
+        WHERE
+            member_id = #{memberId}
+          AND description LIKE CONCAT('%', #{description}, '%')
+    </select>
 </mapper>

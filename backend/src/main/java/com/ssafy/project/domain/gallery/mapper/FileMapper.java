@@ -33,4 +33,5 @@ public interface FileMapper {
 	List<DirectoryPreviewResponseDto> selectAllDirectoriesByMemberIdAndKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndHashtag(Long memberId, String hashtag);
+    List<FilePreviewResponseDto> selectAllFilesByMemberIdAndDescription(Long memberId, String description);
 }
