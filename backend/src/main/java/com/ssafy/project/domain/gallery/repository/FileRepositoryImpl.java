@@ -114,4 +114,9 @@ public class FileRepositoryImpl implements FileRepository{
 	public List<FilePreviewResponseDto> findFilesWithHashtag(Long memberId, String hashtag) {
 		return fileMapper.selectAllFilesByMemberIdAndHashtag(memberId, hashtag);
 	}
+
+	@Override
+	public List<FilePreviewResponseDto> findFilesWithDescription(Long memberId, String description) {
+		return fileMapper.selectAllFilesByMemberIdAndDescription(memberId, description);
+	}
 }
