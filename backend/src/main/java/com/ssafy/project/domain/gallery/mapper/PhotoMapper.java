@@ -9,6 +9,7 @@ import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto;
 
 @Mapper
 public interface PhotoMapper {
@@ -18,4 +19,6 @@ public interface PhotoMapper {
 	int updateDescription(PhotoDescriptionRequestDto requestDto);
 	FileDetailResponseDto selectByMemberIdAndPhotoId(Long memberId, Long photoId);
 	int updateThumbnail(ThumbnailRequestDto requestDto);
+	List<ThumbnailResponseDto> selectSidoThumbnailsByMemberId(Long memberId);
+	List<ThumbnailResponseDto> selectSidoThumbnailsByMemberIdAndSido(Long memberId, String sido);
 }

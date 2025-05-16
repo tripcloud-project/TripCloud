@@ -9,6 +9,7 @@ import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto;
 import com.ssafy.project.domain.gallery.mapper.PhotoMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,11 @@ public class PhotoRepositoryImpl implements PhotoRepository{
     public List<DirectoryEntry> findAllSidoByMemberId(Long memberId){
         return photoMapper.findAllSidoByMemberId(memberId);
     }
+    
     public List<DirectoryEntry> findSigunguBySidoAndMemberId(String province, Long memberId){
         return photoMapper.findSigunguBySidoAndMemberId( province, memberId);
     }
+    
     public List<FileEntry> findPhotosBySidoAndSigunguAndMemberId(String province, String city, Long memberId){
         return photoMapper.findPhotosBySidoAndSigunguAndMemberId(province, city, memberId);
     }
@@ -41,5 +44,15 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	@Override
 	public boolean setThumbnail(ThumbnailRequestDto requestDto) {
 		return photoMapper.updateThumbnail(requestDto) >= 1;
+	}
+	
+	@Override
+	public List<ThumbnailResponseDto> findSidoThumbnails(Long memberId) {
+		return photoMapper.selectSidoThumbnailsByMemberId(memberId);
+	}
+
+	@Override
+	public List<ThumbnailResponseDto> findSigunguThumbnails(Long memberId, String sido) {
+		return photoMapper.selectSidoThumbnailsByMemberIdAndSido(memberId, sido);
 	}
 }
