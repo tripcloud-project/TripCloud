@@ -20,4 +20,5 @@ public interface PhotoMapper {
 	FileDetailResponseDto selectByMemberIdAndPhotoId(Long memberId, Long photoId);
 	int updateThumbnail(ThumbnailRequestDto requestDto);
 	List<ThumbnailResponseDto> selectSidoThumbnailsByMemberId(Long memberId);
+	List<ThumbnailResponseDto> selectSidoThumbnailsByMemberIdAndSido(Long memberId, String sido);
 }

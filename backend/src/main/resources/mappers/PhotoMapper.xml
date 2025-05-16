@@ -78,7 +78,20 @@
   	t.member_id = #{memberId}
   	AND t.sigungu = ""
   	AND t.photo_id = f.file_id
-  	
+  </select>
+  
+  <select id="selectSidoThumbnailsByMemberIdAndSido" resultType="com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto">
+    SELECT
+  	t.sido,
+  	t.sigungu,
+  	f.s3_key as presignedURL
+  FROM
+  	thumbnail t, file f
+  WHERE
+  	t.member_id = #{memberId}
+  	AND t.sido = #{sido}
+  	AND t.sigungu != ""
+  	AND t.photo_id = f.file_id
   </select>
 
 </mapper>
