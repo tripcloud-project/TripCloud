@@ -1,16 +1,21 @@
 package com.ssafy.project.domain.gallery.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
+import com.ssafy.project.domain.gallery.exception.UpdateDescriptionNotAllowedException;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
 import com.ssafy.project.infra.s3.S3Service;
 import com.ssafy.project.util.SecurityUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -59,4 +64,18 @@ public class PhotoServiceImpl implements PhotoService{
                 )
                 .build();
     }
+
+    @Transactional
+	@Override
+	public void updateDescription(Long photoId, PhotoDescriptionRequestDto requestDto) {
+    	Long memberId = SecurityUtil.getCurrentMemberId();
+    	requestDto.setMemberId(memberId);
+    	requestDto.setFileId(photoId);
+    	
+    	System.out.println(requestDto);
+    	
+    	if(!photoRepository.updateDescription(requestDto))
+    		throw new UpdateDescriptionNotAllowedException("사진 설명 변경에 실패했습니다.");
+	}
+
 }
