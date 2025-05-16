@@ -17,6 +17,7 @@ import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.PhotoStructureResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto;
 import com.ssafy.project.domain.gallery.exception.InvalidRegionException;
 import com.ssafy.project.domain.gallery.exception.SetThumbnailNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.UpdateDescriptionNotAllowedException;
@@ -135,5 +136,22 @@ public class PhotoServiceImpl implements PhotoService{
     			.build();
     	
     }
+
+	@Override
+	public List<ThumbnailResponseDto> getThumbnails(String sido) {
+		Long memberId = SecurityUtil.getCurrentMemberId();
+		
+		List<ThumbnailResponseDto> thumbnailList = null;
+		if(sido == null)
+			thumbnailList = photoRepository.findSidoThumbnails(memberId);
+		else
+			thumbnailList = photoRepository.findSigunguThumbnails(memberId, sido);
+		
+		for(ThumbnailResponseDto thumbnail : thumbnailList) {
+			thumbnail.setPresignedURL(s3Service.generatePresignedUrl(thumbnail.getPresignedURL()));
+		}
+		
+		return thumbnailList;	
+	}
 
 }

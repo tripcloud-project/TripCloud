@@ -2,14 +2,10 @@ package com.ssafy.project.domain.gallery.dto.internal;
 
 import java.time.LocalDateTime;
 
-import com.ssafy.project.domain.common.entity.BaseEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Data
 @NoArgsConstructor

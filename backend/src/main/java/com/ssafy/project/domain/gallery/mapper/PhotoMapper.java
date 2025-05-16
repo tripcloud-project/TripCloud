@@ -10,6 +10,7 @@ import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 import com.ssafy.project.domain.gallery.dto.internal.RegionDto;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto;
 
 @Mapper
 public interface PhotoMapper {
@@ -21,4 +22,6 @@ public interface PhotoMapper {
 	int updateThumbnail(ThumbnailRequestDto requestDto);
 	List<String> findDistinctSidoByMemberId(Long memberId);
 	List<String> findDistinctSigunguBySidoAndMemberId(String sido, Long memberId);
+	List<ThumbnailResponseDto> selectSidoThumbnailsByMemberId(Long memberId);
+	List<ThumbnailResponseDto> selectSidoThumbnailsByMemberIdAndSido(Long memberId, String sido);
 }
