@@ -29,5 +29,15 @@
     AND sigungu=#{sigungu}
     AND is_deleted=false
   </select>
+  
+  <update id="updateDescription">
+  	UPDATE
+  		file
+  	SET
+  		description = #{description}
+  	WHERE
+  		member_id = #{memberId}
+  		AND file_id = #{fileId}
+  </update>
 
 </mapper>
