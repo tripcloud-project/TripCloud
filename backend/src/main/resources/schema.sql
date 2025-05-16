@@ -186,12 +186,12 @@ MODIFY COLUMN attraction_id BIGINT AUTO_INCREMENT;
 ALTER TABLE thumbnail
 MODIFY COLUMN thumbnail_id BIGINT AUTO_INCREMENT;
 
+ALTER TABLE thumbnail 
+ADD CONSTRAINT unique_photo_region UNIQUE(member_id, sido, sigungu);
+
 -- UNIQUE 추가
 ALTER TABLE member
 ADD CONSTRAINT uq_member_email UNIQUE (email);
 
 ALTER TABLE file
 ADD CONSTRAINT uq_file_s3key UNIQUE (s3_key);
-
-ALTER TABLE thumbnail 
-ADD CONSTRAINT unique_photo_region UNIQUE(member_id, sido, sigungu);
