@@ -2,16 +2,21 @@ package com.ssafy.project.domain.gallery.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.project.domain.board.dto.request.ThumbnailRequestDto;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.internal.RegionDto;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.PhotoStructureResponseDto;
 import com.ssafy.project.domain.gallery.exception.InvalidRegionException;
 import com.ssafy.project.domain.gallery.exception.SetThumbnailNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.UpdateDescriptionNotAllowedException;
@@ -110,5 +115,25 @@ public class PhotoServiceImpl implements PhotoService{
 			throw new SetThumbnailNotAllowedException("대표사진 설정에 실패했습니다.");
 		
 	}
+    
+    public PhotoStructureResponseDto getDirectoryStructure() {
+    	Long memberId = SecurityUtil.getCurrentMemberId();
+    	
+    	List<RegionDto> directories = new ArrayList<>();
+    	List<String> sidoList = photoRepository.findDistinctSidoByMemberId(memberId);
+    	for(String sido : sidoList) {
+    		RegionDto regionDto = RegionDto.builder()
+    				.sido(sido)
+    				.sigungu(photoRepository.findDistinctSigunguBySidoAndMemberId(sido, memberId))
+    				.build();
+    		directories.add(regionDto);
+    	}
+
+    	
+    	return PhotoStructureResponseDto.builder()
+    			.directories(directories)
+    			.build();
+    	
+    }
 
 }

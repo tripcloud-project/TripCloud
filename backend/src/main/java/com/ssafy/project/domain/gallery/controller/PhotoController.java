@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PhotoController {
     private final PhotoService photoService;
 
-    @GetMapping("/photo")
+    @GetMapping(value = "/photo", params = "prefix")
     public ResponseEntity<?> select(@RequestParam("prefix") String prefix){
         return ResponseEntity.status(200)
                 .body(createSuccess(photoService.select(prefix)));
@@ -47,5 +47,12 @@ public class PhotoController {
     	photoService.setThumbnail(photoId, region);
     	return ResponseEntity.status(200)
     			.body(createSuccessWithNoContent());
+    }
+    
+    // 사진의 디렉토리 구조 조회
+    @GetMapping(value = "/photo", params = "!prefix")
+    public ResponseEntity<?> getDirectoryStructure() {
+    	return ResponseEntity.status(200)
+    			.body(createSuccess(photoService.getDirectoryStructure()));
     }
 }
