@@ -18,6 +18,7 @@ public enum ErrorCode {
     UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "UPLOAD-003", "파일 업로드 중 오류가 발생했습니다."),
     RENAME_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "RENAME-001", "동일한 이름이 디렉토리가 존재합니다."),
     PHOTO_NOT_FOUND(HttpStatus.NOT_FOUND, "PHOTO-001", "요청한 파일을 찾을 수 없습니다."),
+    PHOTO_UPDATE_DESCRIPTION_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "PHOTO-002", "해당 사진의 설명을 수정할 수 없습니다."),
     DOWNLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "DOWNLOAD-001", "파일 다운로드 중 오류가 발생했습니다."),
     
     // [Board]
