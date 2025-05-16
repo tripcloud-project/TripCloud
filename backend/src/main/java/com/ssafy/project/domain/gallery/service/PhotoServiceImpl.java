@@ -119,8 +119,8 @@ public class PhotoServiceImpl implements PhotoService{
 		List<ThumbnailResponseDto> thumbnailList = null;
 		if(sido == null)
 			thumbnailList = photoRepository.findSidoThumbnails(memberId);
-//		else
-//			thumbnailList = photoRepository.findSigunguThumbnails(memberId, sido);
+		else
+			thumbnailList = photoRepository.findSigunguThumbnails(memberId, sido);
 		
 		for(ThumbnailResponseDto thumbnail : thumbnailList) {
 			thumbnail.setPresignedURL(s3Service.generatePresignedUrl(thumbnail.getPresignedURL()));
