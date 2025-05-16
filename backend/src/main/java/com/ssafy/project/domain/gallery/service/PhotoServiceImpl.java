@@ -72,8 +72,6 @@ public class PhotoServiceImpl implements PhotoService{
     	requestDto.setMemberId(memberId);
     	requestDto.setFileId(photoId);
     	
-    	System.out.println(requestDto);
-    	
     	if(!photoRepository.updateDescription(requestDto))
     		throw new UpdateDescriptionNotAllowedException("사진 설명 변경에 실패했습니다.");
 	}
