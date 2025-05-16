@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class ThumbnailResponseDto {
 	private String sido;
 	private String sigungu;
-	private String s3Key;
+	private String presignedURL;
 }
