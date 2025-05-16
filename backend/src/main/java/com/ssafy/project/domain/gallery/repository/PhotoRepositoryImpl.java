@@ -50,4 +50,9 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	public List<ThumbnailResponseDto> findSidoThumbnails(Long memberId) {
 		return photoMapper.selectSidoThumbnailsByMemberId(memberId);
 	}
+
+	@Override
+	public List<ThumbnailResponseDto> findSigunguThumbnails(Long memberId, String sido) {
+		return photoMapper.selectSidoThumbnailsByMemberIdAndSido(memberId, sido);
+	}
 }

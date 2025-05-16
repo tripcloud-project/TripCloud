@@ -17,4 +17,5 @@ public interface PhotoRepository {
 	FileDetailResponseDto findPhotoByPhotoId(Long memberId, Long photoId);
 	boolean setThumbnail(ThumbnailRequestDto requestDto);
 	List<ThumbnailResponseDto> findSidoThumbnails(Long memberId);
+	List<ThumbnailResponseDto> findSigunguThumbnails(Long memberId, String sido);
 }
