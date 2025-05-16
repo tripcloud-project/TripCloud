@@ -72,7 +72,7 @@ CREATE TABLE `thumbnail` (
 	`member_id`	BIGINT	NOT NULL	COMMENT 'FK',
 	`photo_id`	BIGINT	NOT NULL,
 	`sido`	VARCHAR(255)	NOT NULL	DEFAULT "",
-	`sigungu`	VARCHAR(255)	NOT NULL	DEFAULT ""
+	`sigungu`	VARCHAR(255)	DEFAULT ""
 );
 
 CREATE TABLE `post` (
@@ -192,3 +192,6 @@ ADD CONSTRAINT uq_member_email UNIQUE (email);
 
 ALTER TABLE file
 ADD CONSTRAINT uq_file_s3key UNIQUE (s3_key);
+
+ALTER TABLE thumbnail 
+ADD CONSTRAINT unique_photo_region UNIQUE(member_id, sido, sigungu);
