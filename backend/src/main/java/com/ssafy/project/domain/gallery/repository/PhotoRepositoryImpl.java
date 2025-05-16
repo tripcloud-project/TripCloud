@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.project.domain.board.dto.request.ThumbnailRequestDto;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
+import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.mapper.PhotoMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -29,5 +31,15 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	@Override
 	public boolean updateDescription(PhotoDescriptionRequestDto requestDto) {
 		return photoMapper.updateDescription(requestDto) == 1;
+	}
+	
+	@Override
+	public FileDetailResponseDto findPhotoByPhotoId(Long memberId, Long photoId) {
+		return photoMapper.selectByMemberIdAndPhotoId(memberId, photoId);
+	}
+	
+	@Override
+	public boolean setThumbnail(ThumbnailRequestDto requestDto) {
+		return photoMapper.updateThumbnail(requestDto) >= 1;
 	}
 }

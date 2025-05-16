@@ -14,7 +14,9 @@ import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
 import com.ssafy.project.domain.board.exception.PostUpdateNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.DownloadFailException;
 import com.ssafy.project.domain.gallery.exception.FileNotFoundException;
+import com.ssafy.project.domain.gallery.exception.InvalidRegionException;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
+import com.ssafy.project.domain.gallery.exception.SetThumbnailNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.UpdateDescriptionNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
@@ -118,4 +120,17 @@ public class ControllerExceptionHandler {
 	public ResponseEntity<?> updateDescriptionNotAllowedException(){
 		return errorResponse(ErrorCode.PHOTO_UPDATE_DESCRIPTION_NOT_ALLOWED);
 	}
+    
+    // 지역 선택 오류
+    @ExceptionHandler(InvalidRegionException.class)
+    public ResponseEntity<?> invalidRegionException(){
+    	return errorResponse(ErrorCode.INVALID_REGION);
+    }
+    
+    // 대표 사진 수정 실패
+
+    @ExceptionHandler(SetThumbnailNotAllowedException.class)
+    public ResponseEntity<?> setThumbnailNotAllowedException(){
+    	return errorResponse(ErrorCode.THUMBNAIL_SET_NOT_ALLOWED);
+    }
 }

@@ -6,10 +6,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.project.domain.board.dto.request.ThumbnailRequestDto;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
+import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
+import com.ssafy.project.domain.gallery.exception.InvalidRegionException;
+import com.ssafy.project.domain.gallery.exception.SetThumbnailNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.UpdateDescriptionNotAllowedException;
 import com.ssafy.project.domain.gallery.repository.PhotoRepository;
 import com.ssafy.project.infra.s3.S3Service;
@@ -74,6 +78,37 @@ public class PhotoServiceImpl implements PhotoService{
     	
     	if(!photoRepository.updateDescription(requestDto))
     		throw new UpdateDescriptionNotAllowedException("사진 설명 변경에 실패했습니다.");
+	}
+
+    @Transactional
+	@Override
+	public void setThumbnail(Long photoId, String region) {
+		// 잘못된 범위 설정
+		if(!region.equals("sido") && !region.equals("sigungu"))
+			throw new InvalidRegionException("유효하지 않은 시도/시군구 입니다.");
+		
+		Long memberId = SecurityUtil.getCurrentMemberId();
+		FileDetailResponseDto fileDetail = photoRepository.findPhotoByPhotoId(memberId, photoId);
+				
+		if(fileDetail.getSido() == null) 
+			throw new InvalidRegionException("유효하지 않은 시도/시군구 입니다.");
+		
+		ThumbnailRequestDto.ThumbnailRequestDtoBuilder builder = ThumbnailRequestDto.builder()
+		        .memberId(memberId)
+		        .photoId(photoId)
+		        .sido(fileDetail.getSido());
+
+		if (region.equals("sigungu")) {
+		    builder.sigungu(fileDetail.getSigungu());
+		} else {
+			builder.sigungu("");
+		}
+
+		ThumbnailRequestDto requestDto = builder.build();
+		
+		if(!photoRepository.setThumbnail(requestDto))
+			throw new SetThumbnailNotAllowedException("대표사진 설정에 실패했습니다.");
+		
 	}
 
 }

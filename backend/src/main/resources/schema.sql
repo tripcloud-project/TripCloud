@@ -72,7 +72,7 @@ CREATE TABLE `thumbnail` (
 	`member_id`	BIGINT	NOT NULL	COMMENT 'FK',
 	`photo_id`	BIGINT	NOT NULL,
 	`sido`	VARCHAR(255)	NOT NULL	DEFAULT "",
-	`sigungu`	VARCHAR(255)	NOT NULL	DEFAULT ""
+	`sigungu`	VARCHAR(255)	DEFAULT ""
 );
 
 CREATE TABLE `post` (
@@ -185,6 +185,9 @@ MODIFY COLUMN attraction_id BIGINT AUTO_INCREMENT;
 
 ALTER TABLE thumbnail
 MODIFY COLUMN thumbnail_id BIGINT AUTO_INCREMENT;
+
+ALTER TABLE thumbnail 
+ADD CONSTRAINT unique_photo_region UNIQUE(member_id, sido, sigungu);
 
 -- UNIQUE 추가
 ALTER TABLE member
