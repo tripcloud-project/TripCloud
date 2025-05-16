@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.ssafy.project.domain.gallery.dto.internal.HashtagDto;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,4 +26,5 @@ public class FileDetailResponseDto {
     private Boolean isDeleted;
     private LocalDateTime createdAt;
     private LocalDateTime takenAt;
+    private List<HashtagDto> hashtags;
 }

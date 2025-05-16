@@ -24,5 +24,13 @@
         INSERT IGNORE INTO file_hashtag (file_id, hashtag_id)
         VALUES (#{fileId}, #{hashtagId})
     </insert>
+    
+    <!-- hashtag keyword 선택 -->
+    <select id="findHashtagByFileId">
+    	SELECT keyword
+		FROM file_hashtag
+		JOIN hashtag USING (hashtag_id)
+		WHERE file_id=#{fileId};
+    </select>
 
 </mapper>

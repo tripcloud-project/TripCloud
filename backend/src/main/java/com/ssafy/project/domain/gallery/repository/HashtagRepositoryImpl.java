@@ -1,5 +1,6 @@
 package com.ssafy.project.domain.gallery.repository;
 
+import com.ssafy.project.domain.gallery.dto.internal.HashtagDto;
 import com.ssafy.project.domain.gallery.mapper.HashtagMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,5 +23,8 @@ public class HashtagRepositoryImpl implements HashtagRepository{
     }
     public void insertHashtagFile(Long fileId, Long hashtagId){
         hashtagMapper.insertHashtagFile(fileId, hashtagId);
+    }
+    public List<HashtagDto> findHashtagByFildId(Long fileId){
+    	return hashtagMapper.findHashtagByFildId(fileId);
     }
 }

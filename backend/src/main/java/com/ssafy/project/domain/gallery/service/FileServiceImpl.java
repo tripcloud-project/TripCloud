@@ -218,8 +218,10 @@ public class FileServiceImpl implements FileService {
     // [/detail/{fileId}]
     @Override
     public FileDetailResponseDto getDetailFile(Long fileId) {
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        return fileRepository.findFileDetailByFileIdAndMemberId(fileId, memberId);
+    	Long memberId = SecurityUtil.getCurrentMemberId();
+    	FileDetailResponseDto detailResponseDto = fileRepository.findFileDetailByFileIdAndMemberId(fileId, memberId);
+    	detailResponseDto.setHashtags(hashtagService.getHashtags(fileId));
+        return detailResponseDto;
     }
 
 
