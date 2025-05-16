@@ -52,7 +52,7 @@ public class MemberTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         
             MemberRegisterDto requestDto = new MemberRegisterDto(
-                    "123@123.com",
+                    "123@123",
                     "123",
                     "123"
                     );
