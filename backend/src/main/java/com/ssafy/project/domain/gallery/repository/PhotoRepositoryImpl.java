@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.project.domain.board.dto.request.ThumbnailRequestDto;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.internal.RegionDto;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto;
@@ -19,14 +20,18 @@ import lombok.RequiredArgsConstructor;
 public class PhotoRepositoryImpl implements PhotoRepository{
     private final PhotoMapper photoMapper;
 
+    @Override
     public List<DirectoryEntry> findAllSidoByMemberId(Long memberId){
         return photoMapper.findAllSidoByMemberId(memberId);
     }
     
+
+    @Override
     public List<DirectoryEntry> findSigunguBySidoAndMemberId(String province, Long memberId){
         return photoMapper.findSigunguBySidoAndMemberId( province, memberId);
     }
     
+    @Override
     public List<FileEntry> findPhotosBySidoAndSigunguAndMemberId(String province, String city, Long memberId){
         return photoMapper.findPhotosBySidoAndSigunguAndMemberId(province, city, memberId);
     }
@@ -47,6 +52,15 @@ public class PhotoRepositoryImpl implements PhotoRepository{
 	}
 	
 	@Override
+	public List<String> findDistinctSidoByMemberId(Long memberId){
+		return photoMapper.findDistinctSidoByMemberId(memberId);
+	}
+	
+	@Override
+	public List<String> findDistinctSigunguBySidoAndMemberId(String sido, Long memberId){
+		return photoMapper.findDistinctSigunguBySidoAndMemberId(sido, memberId);
+	}
+	
 	public List<ThumbnailResponseDto> findSidoThumbnails(Long memberId) {
 		return photoMapper.selectSidoThumbnailsByMemberId(memberId);
 	}
