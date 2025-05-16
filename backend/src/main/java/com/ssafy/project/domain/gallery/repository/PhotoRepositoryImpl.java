@@ -1,12 +1,15 @@
 package com.ssafy.project.domain.gallery.repository;
 
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
-import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
-import com.ssafy.project.domain.gallery.mapper.PhotoMapper;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
+import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
+import com.ssafy.project.domain.gallery.mapper.PhotoMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,4 +25,9 @@ public class PhotoRepositoryImpl implements PhotoRepository{
     public List<FileEntry> findPhotosBySidoAndSigunguAndMemberId(String province, String city, Long memberId){
         return photoMapper.findPhotosBySidoAndSigunguAndMemberId(province, city, memberId);
     }
+    
+	@Override
+	public boolean updateDescription(PhotoDescriptionRequestDto requestDto) {
+		return photoMapper.updateDescription(requestDto) == 1;
+	}
 }
