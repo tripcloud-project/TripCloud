@@ -39,5 +39,32 @@
   		member_id = #{memberId}
   		AND file_id = #{fileId}
   </update>
+  
+  <select id="selectByMemberIdAndPhotoId">
+    SELECT
+    p.original_filename,
+    p.size,
+    p.content_type,
+    p.sido,
+    p.sigungu,
+    p.eupmyeondong,
+    p.latitude,
+    p.longitude,
+    p.is_deleted,
+    p.created_at,
+    p.taken_at,
+    m.name AS member_name
+    FROM file p
+    JOIN member m ON p.member_id = m.member_id
+    WHERE p.file_id = #{photoId}
+    AND p.member_id = #{memberId}
+  </select>
+  
+  <insert id="updateThumbnail">
+  	INSERT INTO thumbnail(member_id, photo_id, sido, sigungu)
+  	VALUES (#{memberId}, #{photoId}, #{sido}, #{sigungu})
+  	ON DUPLICATE KEY UPDATE
+  		photo_id = #{photoId}
+  </insert>
 
 </mapper>
