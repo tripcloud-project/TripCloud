@@ -3,6 +3,7 @@ package com.ssafy.project.domain.gallery.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.project.domain.gallery.dto.internal.ByteFileDto;
+import com.ssafy.project.domain.gallery.dto.internal.HashtagDto;
 import com.ssafy.project.domain.gallery.repository.HashtagRepository;
 import com.ssafy.project.infra.ai.service.AiChatService;
 import com.ssafy.project.util.ImageUtil;
@@ -97,5 +98,10 @@ public class HashtagServiceImpl implements HashtagService{
             }
         }
 
+    }
+    
+    @Override
+    public List<HashtagDto> getHashtags(Long fileId){
+    	return hashtagRepository.findHashtagByFildId(fileId);
     }
 }
