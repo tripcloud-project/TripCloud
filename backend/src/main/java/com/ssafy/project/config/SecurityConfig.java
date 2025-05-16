@@ -4,8 +4,6 @@ package com.ssafy.project.config;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.ssafy.project.domain.auth.filter.JWTFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +16,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.ssafy.project.domain.auth.filter.JWTFilter;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration // 이 클래스는 설정 파일용 명시
@@ -64,6 +66,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With")); // 허용할 헤더
         configuration.setAllowCredentials(true); // 자격 증명 허용 (쿠키 등)
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setMaxAge(3600L); // Preflight 요청 결과를 캐시하는 시간 (초)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
