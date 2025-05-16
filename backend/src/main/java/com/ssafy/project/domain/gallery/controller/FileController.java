@@ -130,8 +130,8 @@ public class FileController {
 			searchResult = fileService.searchByKeyWord(keyword);
 		else if(hashtag != null)
 			searchResult = fileService.searchByHashtag(hashtag);
-//		else if(description != null)
-//			searchResult = fileService.searchByDescription(description);
+		else if(description != null)
+			searchResult = fileService.searchByDescription(description);
 		
 		return ResponseEntity.status(200)
 				.body(createSuccess(searchResult));

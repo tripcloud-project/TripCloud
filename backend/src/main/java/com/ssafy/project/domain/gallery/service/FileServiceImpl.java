@@ -41,16 +41,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class FileServiceImpl implements FileService {
-	private final KakaoGeocodingService kakaoGeocodingService;
-	private final FileRepository fileRepository;
+    private final KakaoGeocodingService kakaoGeocodingService;
+    private final FileRepository fileRepository;
     private final S3Service s3Service;
     private final HashtagService hashtagService;
-	
-	// [/upload]
-	@Override
-    public void uploadFiles(List<MultipartFile> files, String prefix){
-		prefix = makeMemberPrefix(prefix);
-		if (files == null || files.isEmpty()) {
+
+    // [/upload]
+    @Override
+    public void uploadFiles(List<MultipartFile> files, String prefix) {
+        prefix = makeMemberPrefix(prefix);
+        if (files == null || files.isEmpty()) {
             throw new UploadFailException("빈 파일 업로드 에러");
         }
         List<UploadDto> uploadList = new ArrayList<>();
@@ -68,7 +68,7 @@ public class FileServiceImpl implements FileService {
 
         // S3에 업로드 성공한 파일들만 모아서 Photo 객체를 생성합니다.
         List<FileDto> fileList = new ArrayList<>();
-        for(UploadDto uploadDto : uploadList){
+        for (UploadDto uploadDto : uploadList) {
             fileList.add(makeFile(uploadDto));
         }
         Long memberId = SecurityUtil.getCurrentMemberId();
@@ -78,8 +78,8 @@ public class FileServiceImpl implements FileService {
         // 비동기 AI 호출을 위한 코드
         // upload 응답 이후에 사라질 file을 byte로 저장해 둡니다.
         List<ByteFileDto> byteFileList = new ArrayList<>();
-        for(UploadDto uploadDto : uploadList){
-            try{
+        for (UploadDto uploadDto : uploadList) {
+            try {
                 byteFileList.add(
                         ByteFileDto.builder()
                                 .s3Key(uploadDto.getS3Key())
@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
                                 .content(uploadDto.getFile().getBytes())
                                 .build()
                 );
-            } catch (IOException e){
+            } catch (IOException e) {
                 log.error("byte 파싱 실패는 skip합니다.");
             }
         }
@@ -101,7 +101,7 @@ public class FileServiceImpl implements FileService {
         List<UploadDto> uploadList = new ArrayList<>();
         for (MultipartFile file : files) {
             try {
-                if(file.isEmpty()) continue;
+                if (file.isEmpty()) continue;
                 String originalFilename = file.getOriginalFilename();
                 String s3Key = UploadHelper.generateUuidS3Key(prefix + originalFilename);
                 s3Service.uploadObject(file, s3Key);
@@ -120,7 +120,7 @@ public class FileServiceImpl implements FileService {
 
         for (MultipartFile file : files) {
             try {
-                if(file.isEmpty()) continue;
+                if (file.isEmpty()) continue;
                 String originalPath = file.getOriginalFilename();
                 String originalFilename = Paths.get(originalPath).getFileName().toString();
                 String relativePath = originalPath.substring(originalPath.indexOf("/") + 1);
@@ -160,7 +160,7 @@ public class FileServiceImpl implements FileService {
     }
 
     // 사진 객체를 생성합니다.
-    private FileDto makeFile(UploadDto uploadDto){
+    private FileDto makeFile(UploadDto uploadDto) {
         MultipartFile file = uploadDto.getFile();
         String s3Key = uploadDto.getS3Key();
         String originalFileName = uploadDto.getOriginalFilename();
@@ -187,7 +187,7 @@ public class FileServiceImpl implements FileService {
 
         // ✅ 사진 촬영일 추가
         LocalDateTime takenAt = ExifUtil.extractDateTaken(file);
-        if(takenAt != null){
+        if (takenAt != null) {
             fileDto.setTakenAt(takenAt);
         }
         return fileDto;
@@ -203,33 +203,33 @@ public class FileServiceImpl implements FileService {
 
     // 디렉토리 이름 수정
     // [/rename]
-	@Override
-	public void renameDirectory(DirectoryRenameRequestDto directoryRenameRequestDto) {
+    @Override
+    public void renameDirectory(DirectoryRenameRequestDto directoryRenameRequestDto) {
         String oldPrefix = makeMemberPrefix(directoryRenameRequestDto.getOldPrefix());
         String newPrefix = makeMemberPrefix(directoryRenameRequestDto.getNewPrefix());
-        if(existsInS3(newPrefix)){
+        if (existsInS3(newPrefix)) {
             throw new RenameFailException("동일한 이름이 디렉토리가 존재합니다.");
         }
         s3Service.directoryKeyUpdate(oldPrefix, newPrefix);
         Long memberId = SecurityUtil.getCurrentMemberId();
         fileRepository.renameFiles(oldPrefix, newPrefix, memberId);
-	}
+    }
 
     // [/detail/{fileId}]
     @Override
     public FileDetailResponseDto getDetailFile(Long fileId) {
-    	Long memberId = SecurityUtil.getCurrentMemberId();
+        Long memberId = SecurityUtil.getCurrentMemberId();
         return fileRepository.findFileDetailByFileIdAndMemberId(fileId, memberId);
     }
 
 
     // [/list]
     @Override
-    public DirectoryResponseDto listDirectory(String prefix, Boolean isDeleted){
-    	prefix = makeMemberPrefix(prefix);
+    public DirectoryResponseDto listDirectory(String prefix, Boolean isDeleted) {
+        prefix = makeMemberPrefix(prefix);
         List<DirectoryEntry> directories = fileRepository.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
         List<FileEntry> files = fileRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
-        for(FileEntry file : files){
+        for (FileEntry file : files) {
             file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
             file.setS3Key(null);
         }
@@ -250,23 +250,23 @@ public class FileServiceImpl implements FileService {
 
     // [/download]
     @Override
-    public DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto){
+    public DownloadDto downloadBulk(DownloadRequestDto downloadRequestDto) {
         List<String> prefixList = downloadRequestDto.getPrefixList();
         List<Long> fileIdList = downloadRequestDto.getFileIdList();
         String currentPrefix = downloadRequestDto.getCurrentPrefix();
 
         // 단일 파일 다운로드. zip일 필요가 없는 경우
-        if(prefixList.isEmpty() && fileIdList.size()==1){
+        if (prefixList.isEmpty() && fileIdList.size() == 1) {
             return downloadPhoto(fileIdList.get(0));
-        }else{
-            currentPrefix=makeMemberPrefix(currentPrefix);
+        } else {
+            currentPrefix = makeMemberPrefix(currentPrefix);
             Long memberId = SecurityUtil.getCurrentMemberId();
             List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames = new ArrayList<>();
-            for(String prefix : prefixList){
+            for (String prefix : prefixList) {
                 prefix = makeMemberPrefix(prefix);
                 s3KeyOriginalFilenames.addAll(fileRepository.findS3KeysAndOriginalFilenamesByPrefixAndMemberId(prefix, memberId));
             }
-            for(Long fileId : fileIdList){
+            for (Long fileId : fileIdList) {
                 s3KeyOriginalFilenames.add(fileRepository.findS3KeyAndOriginalFilenameByFileIdAndMemberId(fileId, memberId));
             }
             Resource zipResource = s3Service.createZipResource(currentPrefix, s3KeyOriginalFilenames);
@@ -280,7 +280,7 @@ public class FileServiceImpl implements FileService {
     }
 
     // 단일 파일 zip 없이 다운로드
-    private DownloadDto downloadPhoto(Long fileId){
+    private DownloadDto downloadPhoto(Long fileId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         S3KeyOriginalFilenameDto s3KeyOriginalFilenameDto = fileRepository.findS3KeyAndOriginalFilenameByFileIdAndMemberId(fileId, memberId);
         Resource resource = s3Service.createResource(s3KeyOriginalFilenameDto.getS3Key());
@@ -293,116 +293,128 @@ public class FileServiceImpl implements FileService {
 
     // [/trash]
     @Override
-    public void trashBulk(TrashRequestDto trashRequestDto){
+    public void trashBulk(TrashRequestDto trashRequestDto) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         List<Long> fileIdList = trashRequestDto.getFileIdList();
         List<String> prefixList = trashRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
-        if(!fileIdList.isEmpty()){
+        if (!fileIdList.isEmpty()) {
             fileRepository.softDeleteFilesByIds(fileIdList, memberId);
         }
-        if(!prefixList.isEmpty()){
+        if (!prefixList.isEmpty()) {
             fileRepository.softDeleteFilesByPrefixes(prefixList, memberId);
         }
     }
 
     // [/restore]
     @Override
-    public void restore(RestoreRequestDto restoreRequestDto){
+    public void restore(RestoreRequestDto restoreRequestDto) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         List<Long> fileIdList = restoreRequestDto.getFileIdList();
         List<String> prefixList = restoreRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
-        if(!fileIdList.isEmpty()){
+        if (!fileIdList.isEmpty()) {
             fileRepository.restoreFilesByIds(fileIdList, memberId);
         }
-        if(!prefixList.isEmpty()){
+        if (!prefixList.isEmpty()) {
             fileRepository.restoreFilesByPrefixes(prefixList, memberId);
         }
     }
 
     // [/trash/delete]
     @Override
-    public void delete(DeleteRequestDto deleteRequestDto){
+    public void delete(DeleteRequestDto deleteRequestDto) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         List<Long> fileIdList = deleteRequestDto.getFileIdList();
         List<String> prefixList = deleteRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
-        if(!fileIdList.isEmpty()){
+        if (!fileIdList.isEmpty()) {
             fileRepository.deleteFilesByIds(fileIdList, memberId);
         }
-        if(!prefixList.isEmpty()){
+        if (!prefixList.isEmpty()) {
             fileRepository.deleteFilesByPrefixes(prefixList, memberId);
         }
     }
-    
-	public Map<String, Object> getDirectoryStructure() {
-		String prefix = makeMemberPrefix("");
-		Long memberId = SecurityUtil.getCurrentMemberId();
 
-		List<String> directories = fileRepository.findDirectoriesByPrefixAndMemberId(prefix, memberId);
+    public Map<String, Object> getDirectoryStructure() {
+        String prefix = makeMemberPrefix("");
+        Long memberId = SecurityUtil.getCurrentMemberId();
 
-		Map<String, Object> root = new LinkedHashMap<>();
+        List<String> directories = fileRepository.findDirectoriesByPrefixAndMemberId(prefix, memberId);
 
-		for (String path : directories) {
-			if(path.isEmpty()) continue;
-	        String[] parts = path.split("/");
-	        Map<String, Object> current = root;
-	        StringBuilder currentPrefix = new StringBuilder();
+        Map<String, Object> root = new LinkedHashMap<>();
 
-	        for (String part : parts) {
-	            currentPrefix.append(part).append("/");
+        for (String path : directories) {
+            if (path.isEmpty()) continue;
+            String[] parts = path.split("/");
+            Map<String, Object> current = root;
+            StringBuilder currentPrefix = new StringBuilder();
 
-	            if (!current.containsKey(part)) {
-	                Map<String, Object> newNode = new LinkedHashMap<>();
-	                newNode.put("prefix", currentPrefix.toString());
-	                newNode.put("children", new LinkedHashMap<String, Object>());
-	                current.put(part, newNode);
-	            }
+            for (String part : parts) {
+                currentPrefix.append(part).append("/");
 
-	            Map<String, Object> node = (Map<String, Object>) current.get(part);
-	            current = (Map<String, Object>) node.get("children");
-	        }
-	    }
+                if (!current.containsKey(part)) {
+                    Map<String, Object> newNode = new LinkedHashMap<>();
+                    newNode.put("prefix", currentPrefix.toString());
+                    newNode.put("children", new LinkedHashMap<String, Object>());
+                    current.put(part, newNode);
+                }
 
-	    return root;
-	}
+                Map<String, Object> node = (Map<String, Object>) current.get(part);
+                current = (Map<String, Object>) node.get("children");
+            }
+        }
+
+        return root;
+    }
 
     // prefix 앞에 member의 email을 추가합니다.
-	private String makeMemberPrefix(String prefix) {
-		String email = SecurityUtil.getCurrentMemberEmail();
+    private String makeMemberPrefix(String prefix) {
+        String email = SecurityUtil.getCurrentMemberEmail();
         return String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-	}
+    }
 
 
-	@Override
-	public SearchResultResponseDto searchByKeyWord(String keyword) {
-		Long memberId = SecurityUtil.getCurrentMemberId();
-		// 해당 키워드를 갖는 디렉토리 검색
-		List<DirectoryPreviewResponseDto> directories = fileRepository.searchDirectoriesWithKeyword(memberId, keyword);
-		
-		// 해당 키워드를 갖는 파일 검색
-		List<FilePreviewResponseDto> files = fileRepository.searchFilesWithKeyword(memberId, keyword);
-		
-		return SearchResultResponseDto.builder()
-				.directories(directories)
-				.files(files)
-				.build();
-	}
+    @Override
+    public SearchResultResponseDto searchByKeyWord(String keyword) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        // 해당 키워드를 갖는 디렉토리 검색
+        List<DirectoryPreviewResponseDto> directories = fileRepository.searchDirectoriesWithKeyword(memberId, keyword);
+
+        // 해당 키워드를 갖는 파일 검색
+        List<FilePreviewResponseDto> files = fileRepository.searchFilesWithKeyword(memberId, keyword);
+
+        return SearchResultResponseDto.builder()
+                .directories(directories)
+                .files(files)
+                .build();
+    }
 
 
-	@Override
-	public SearchResultResponseDto searchByHashtag(String hashtag) {
-		Long memberId = SecurityUtil.getCurrentMemberId();
-		
-		// 해당 해시태그를 갖는 파일 검색
-		List<FilePreviewResponseDto> files = fileRepository.findFilesWithHashtag(memberId, hashtag);
-		
-		return SearchResultResponseDto.builder()
-				.files(files)
-				.build();
-	}
+    @Override
+    public SearchResultResponseDto searchByHashtag(String hashtag) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        // 해당 해시태그를 갖는 파일 검색
+        List<FilePreviewResponseDto> files = fileRepository.findFilesWithHashtag(memberId, hashtag);
+
+        return SearchResultResponseDto.builder()
+                .files(files)
+                .build();
+    }
+
+    @Override
+    public SearchResultResponseDto searchByDescription(String description) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+
+        // 해당 설명을 갖는 파일 탐색
+        List<FilePreviewResponseDto> files = fileRepository.findFilesWithDescription(memberId, description);
+
+        return SearchResultResponseDto.builder()
+                .files(files)
+                .build();
+    }
 }

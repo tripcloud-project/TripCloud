@@ -30,4 +30,5 @@ public interface FileRepository {
 	List<DirectoryPreviewResponseDto> searchDirectoriesWithKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> searchFilesWithKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> findFilesWithHashtag(Long memberId, String hashtag);
+    List<FilePreviewResponseDto> findFilesWithDescription(Long memberId, String description);
 }
