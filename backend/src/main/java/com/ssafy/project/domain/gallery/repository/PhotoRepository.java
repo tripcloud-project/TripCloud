@@ -5,6 +5,7 @@ import java.util.List;
 import com.ssafy.project.domain.board.dto.request.ThumbnailRequestDto;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
+import com.ssafy.project.domain.gallery.dto.internal.RegionDto;
 import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 
@@ -15,4 +16,6 @@ public interface PhotoRepository {
 	boolean updateDescription(PhotoDescriptionRequestDto requestDto);
 	FileDetailResponseDto findPhotoByPhotoId(Long memberId, Long photoId);
 	boolean setThumbnail(ThumbnailRequestDto requestDto);
+	List<String> findDistinctSidoByMemberId(Long memberId);
+	List<String> findDistinctSigunguBySidoAndMemberId(String sido, Long memberId);
 }

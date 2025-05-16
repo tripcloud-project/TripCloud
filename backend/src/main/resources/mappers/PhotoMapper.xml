@@ -66,5 +66,18 @@
   	ON DUPLICATE KEY UPDATE
   		photo_id = #{photoId}
   </insert>
+  
+  <select id="findDistinctSidoByMemberId">
+	SELECT DISTINCT sido
+	FROM file
+	WHERE member_id=#{memberId}
+  </select>
+  
+    <select id="findDistinctSigunguBySidoAndMemberId">
+	SELECT DISTINCT sigungu
+	FROM file
+	WHERE member_id=#{memberId}
+	AND sido=#{sido}
+  </select>
 
 </mapper>
