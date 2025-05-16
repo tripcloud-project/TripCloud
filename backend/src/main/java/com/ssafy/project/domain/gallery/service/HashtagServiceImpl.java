@@ -102,6 +102,6 @@ public class HashtagServiceImpl implements HashtagService{
     
     @Override
     public List<HashtagDto> getHashtags(Long fileId){
-    	return hashtagRepository.findHashtagByFildId(fileId);
+    	return hashtagRepository.findHashtagByFileId(fileId);
     }
 }

@@ -9,5 +9,5 @@ public interface HashtagRepository {
     Long findHashtagIdByKeyword(String keyword);
     void insertHashtag(String keyword);
     void insertHashtagFile(Long fileId, Long hashtagId);
-    List<HashtagDto> findHashtagByFildId(Long fileId);
+    List<HashtagDto> findHashtagByFileId(Long fileId);
 }

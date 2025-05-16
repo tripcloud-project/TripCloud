@@ -24,7 +24,7 @@ public class HashtagRepositoryImpl implements HashtagRepository{
     public void insertHashtagFile(Long fileId, Long hashtagId){
         hashtagMapper.insertHashtagFile(fileId, hashtagId);
     }
-    public List<HashtagDto> findHashtagByFildId(Long fileId){
-    	return hashtagMapper.findHashtagByFildId(fileId);
+    public List<HashtagDto> findHashtagByFileId(Long fileId){
+    	return hashtagMapper.findHashtagByFileId(fileId);
     }
 }
