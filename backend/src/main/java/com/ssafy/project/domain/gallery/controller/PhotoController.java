@@ -33,7 +33,7 @@ public class PhotoController {
     
     // 사진 설명 수정
     @PutMapping("/photo/{photoId}/description")
-    public ResponseEntity<?> updateDescription(@PathVariable("photoId") Long photoId,
+    public ResponseEntity<?> updateDescription(@PathVariable Long photoId,
     		@RequestBody PhotoDescriptionRequestDto requestDto){
     	photoService.updateDescription(photoId, requestDto);
     	return ResponseEntity.status(200)
@@ -42,10 +42,17 @@ public class PhotoController {
 
     // 대표 이미지 설정
     @PutMapping("/photo/{photoId}/thumbnail")
-    public ResponseEntity<?> setThumbnail(@PathVariable("photoId") Long photoId,
+    public ResponseEntity<?> setThumbnail(@PathVariable Long photoId,
     		@RequestParam("region") String region){
     	photoService.setThumbnail(photoId, region);
     	return ResponseEntity.status(200)
     			.body(createSuccessWithNoContent());
     }
+    
+    // 대표 이미지 조회
+    @GetMapping("/photo/thumbnail")
+    public ResponseEntity<?> getThumbnails(@RequestParam(required = false) String sido){
+    	return ResponseEntity.status(200)
+    			.body(createSuccess(photoService.getThumbnails(sido)));
+    }    
 }
