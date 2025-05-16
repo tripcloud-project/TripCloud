@@ -31,6 +31,7 @@ public class PhotoController {
                 .body(createSuccess(photoService.select(prefix)));
     }
     
+    // 사진 설명 수정
     @PutMapping("/photo/{photoId}/description")
     public ResponseEntity<?> updateDescription(@PathVariable("photoId") Long photoId,
     		@RequestBody PhotoDescriptionRequestDto requestDto){
@@ -39,4 +40,12 @@ public class PhotoController {
     			.body(createSuccessWithNoContent());
     }
 
+    // 대표 이미지 설정
+    @PutMapping("/photo/{photoId}/thumbnail")
+    public ResponseEntity<?> setThumbnail(@PathVariable("photoId") Long photoId,
+    		@RequestParam("region") String region){
+    	photoService.setThumbnail(photoId, region);
+    	return ResponseEntity.status(200)
+    			.body(createSuccessWithNoContent());
+    }
 }
