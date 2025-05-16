@@ -1,6 +1,5 @@
 package com.ssafy.project.exception;
 
-import com.ssafy.project.domain.board.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,9 +7,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ssafy.project.common.response.ApiResponse;
 import com.ssafy.project.domain.auth.exception.InvalidTokenException;
+import com.ssafy.project.domain.board.exception.CommentDeletionNotAllowedException;
+import com.ssafy.project.domain.board.exception.CommentInsertNotAllowedException;
+import com.ssafy.project.domain.board.exception.NotFoundPostException;
+import com.ssafy.project.domain.board.exception.PostDeletionNotAllowedException;
+import com.ssafy.project.domain.board.exception.PostUpdateNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.DownloadFailException;
 import com.ssafy.project.domain.gallery.exception.FileNotFoundException;
 import com.ssafy.project.domain.gallery.exception.RenameFailException;
+import com.ssafy.project.domain.gallery.exception.UpdateDescriptionNotAllowedException;
 import com.ssafy.project.domain.gallery.exception.UploadFailException;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
 import com.ssafy.project.domain.member.exception.InvalidPasswordException;
@@ -107,4 +112,10 @@ public class ControllerExceptionHandler {
     public ResponseEntity<?> postUpdateNotAllowedException(){
         return errorResponse(ErrorCode.POST_UPDATE_NOT_ALLOWED);
     }
+    
+    // 파일 설명 수정 실패
+    @ExceptionHandler(UpdateDescriptionNotAllowedException.class)
+	public ResponseEntity<?> updateDescriptionNotAllowedException(){
+		return errorResponse(ErrorCode.PHOTO_UPDATE_DESCRIPTION_NOT_ALLOWED);
+	}
 }
