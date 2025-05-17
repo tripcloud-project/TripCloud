@@ -73,11 +73,12 @@
 	WHERE member_id=#{memberId}
   </select>
   
-    <select id="findDistinctSigunguBySidoAndMemberId">
+  <select id="findDistinctSigunguBySidoAndMemberId">
 	SELECT DISTINCT sigungu
 	FROM file
 	WHERE member_id=#{memberId}
 	AND sido=#{sido}
+  </select>
 
   <select id="selectSidoThumbnailsByMemberId" resultType="com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto">
   SELECT
