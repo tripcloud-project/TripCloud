@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ssafy.project.domain.gallery.dto.internal.*;
+import com.ssafy.project.util.AesUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +46,7 @@ public class FileServiceImpl implements FileService {
     private final FileRepository fileRepository;
     private final S3Service s3Service;
     private final HashtagService hashtagService;
+    private final AesUtil aesUtil;
 
     // [/upload]
     @Override
@@ -174,8 +176,8 @@ public class FileServiceImpl implements FileService {
         // ✅ 위치 정보 로그
         GeoLocation location = ExifUtil.extractGps(file);
         if (location != null) {
-            fileDto.setLatitude(location.getLatitude());
-            fileDto.setLongitude(location.getLongitude());
+            fileDto.setLatitude(aesUtil.encrypt(location.getLatitude()));
+            fileDto.setLongitude(aesUtil.encrypt(location.getLongitude()));
 
             AddressDto address = kakaoGeocodingService.reverseGeocode(location.getLatitude(), location.getLongitude());
             if (address != null) {
@@ -220,6 +222,12 @@ public class FileServiceImpl implements FileService {
     public FileDetailResponseDto getDetailFile(Long fileId) {
     	Long memberId = SecurityUtil.getCurrentMemberId();
     	FileDetailResponseDto detailResponseDto = fileRepository.findFileDetailByFileIdAndMemberId(fileId, memberId);
+
+        // 복호화
+        detailResponseDto.setLatitude(aesUtil.decrypt(detailResponseDto.getLatitude()));
+        detailResponseDto.setLongitude(aesUtil.decrypt(detailResponseDto.getLongitude()));
+
+        // 해시태그 추가
     	detailResponseDto.setHashtags(hashtagService.getHashtags(fileId));
         return detailResponseDto;
     }

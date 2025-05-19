@@ -20,8 +20,8 @@ public class FileDto {
     private String sido;       // 시/도
     private String sigungu;    // 시/군/구
     private String eupmyeondong; // 읍/면/동
-    private Double latitude;
-    private Double longitude;
+    private String latitude;
+    private String longitude;
     private Boolean isDeleted;
     private LocalDateTime deletedAt;
     private LocalDateTime takenAt;
