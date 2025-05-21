@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.domain.gallery.mapper.PhotoMapper">
+  <select id="findAllSidoByMemberId">
+    SELECT CONCAT(sido, '/') AS name, count(sido) count, sum(size) size
+    FROM file
+    WHERE member_id=#{memberId}
+    AND is_deleted=false
+    GROUP BY sido
+  </select>
+
+  <select id="findSigunguBySidoAndMemberId">
+    SELECT CONCAT(sigungu, '/') AS name, count(*) count, sum(size) size
+    FROM file
+    WHERE member_id=#{memberId}
+    AND sido=#{sido}
+    AND is_deleted=false
+    GROUP BY sigungu
+  </select>
+
+  <select id="findPhotosBySidoAndSigunguAndMemberId">
+    SELECT file_id, s3_key, original_filename AS name, size
+    FROM file
+    WHERE member_id=#{memberId}
+    AND sido=#{sido}
+    AND sigungu=#{sigungu}
+    AND is_deleted=false
+  </select>
+  
+  <update id="updateDescription">
+  	UPDATE
+  		file
+  	SET
+  		description = #{description}
+  	WHERE
+  		member_id = #{memberId}
+  		AND file_id = #{fileId}
+  </update>
+  
+  <select id="selectByMemberIdAndPhotoId">
+    SELECT
+    p.original_filename,
+    p.size,
+    p.content_type,
+    p.sido,
+    p.sigungu,
+    p.eupmyeondong,
+    p.latitude,
+    p.longitude,
+    p.is_deleted,
+    p.created_at,
+    p.taken_at,
+    m.name AS member_name
+    FROM file p
+    JOIN member m ON p.member_id = m.member_id
+    WHERE p.file_id = #{photoId}
+    AND p.member_id = #{memberId}
+  </select>
+  
+  <insert id="updateThumbnail">
+  	INSERT INTO thumbnail(member_id, photo_id, sido, sigungu)
+  	VALUES (#{memberId}, #{photoId}, #{sido}, #{sigungu})
+  	ON DUPLICATE KEY UPDATE
+  		photo_id = #{photoId}
+  </insert>
+  
+  <select id="findDistinctSidoByMemberId">
+	SELECT DISTINCT sido
+	FROM file
+	WHERE member_id=#{memberId}
+  </select>
+  
+  <select id="findDistinctSigunguBySidoAndMemberId">
+	SELECT DISTINCT sigungu
+	FROM file
+	WHERE member_id=#{memberId}
+	AND sido=#{sido}
+  </select>
+
+  <select id="selectSidoThumbnailsByMemberId" resultType="com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto">
+  SELECT
+  	t.sido,
+  	t.sigungu,
+  	f.s3_key as presignedURL
+  FROM
+  	thumbnail t, file f
+  WHERE
+  	t.member_id = #{memberId}
+  	AND t.sigungu = ""
+  	AND t.photo_id = f.file_id
+  </select>
+  
+  <select id="selectSidoThumbnailsByMemberIdAndSido" resultType="com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto">
+    SELECT
+  	t.sido,
+  	t.sigungu,
+  	f.s3_key as presignedURL
+  FROM
+  	thumbnail t, file f
+  WHERE
+  	t.member_id = #{memberId}
+  	AND t.sido = #{sido}
+  	AND t.sigungu != ""
+  	AND t.photo_id = f.file_id
+  </select>
+
+</mapper>

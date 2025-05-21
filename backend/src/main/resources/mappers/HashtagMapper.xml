@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.domain.gallery.mapper.HashtagMapper">
+    <!-- file_id 찾기 -->
+    <select id="findFileIdByS3Key" resultType="long">
+        SELECT file_id FROM file WHERE s3_key = #{s3Key}
+    </select>
+
+    <!-- keyword 중복 검사 -->
+    <select id="findHashtagIdByKeyword" resultType="long">
+        SELECT hashtag_id FROM hashtag WHERE keyword = #{keyword}
+    </select>
+
+    <!-- hashtag 삽입 (존재하지 않을 때만) -->
+    <insert id="insertHashtag">
+        INSERT INTO hashtag (keyword) VALUES (#{keyword})
+    </insert>
+
+    <!-- 관계 테이블 삽입 -->
+    <insert id="insertHashtagFile">
+        INSERT IGNORE INTO file_hashtag (file_id, hashtag_id)
+        VALUES (#{fileId}, #{hashtagId})
+    </insert>
+    
+    <!-- hashtag keyword 선택 -->
+    <select id="findHashtagByFileId">
+    	SELECT keyword
+		FROM file_hashtag
+		JOIN hashtag USING (hashtag_id)
+		WHERE file_id=#{fileId};
+    </select>
+
+</mapper>

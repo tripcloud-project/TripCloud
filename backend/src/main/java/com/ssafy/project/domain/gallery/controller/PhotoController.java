@@ -1,91 +1,64 @@
 package com.ssafy.project.domain.gallery.controller;
 
-import com.ssafy.project.common.response.ApiResponse;
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyUpdateDto;
-import com.ssafy.project.domain.gallery.dto.internal.UploadDto;
-import com.ssafy.project.domain.gallery.dto.request.RenameRequestDto;
-import com.ssafy.project.domain.gallery.dto.response.DirectoryResponseDto;
-import com.ssafy.project.domain.gallery.exception.UploadFailException;
-import com.ssafy.project.domain.gallery.service.MinioService;
-import com.ssafy.project.domain.gallery.service.PhotoService;
+import static com.ssafy.project.common.response.ApiResponse.createSuccess;
+import static com.ssafy.project.common.response.ApiResponse.createSuccessWithNoContent;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.ssafy.project.domain.gallery.dto.request.PhotoDescriptionRequestDto;
+import com.ssafy.project.domain.gallery.service.PhotoService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/gallery")
 @Slf4j
 public class PhotoController {
-    private final MinioService minioService;
     private final PhotoService photoService;
 
-    @Value("${minio.bucket}")
-    private String buckName;
-
-    @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,
-                                    @RequestParam("prefix") String prefix) {
-        if (files == null || files.isEmpty()) {
-            throw new UploadFailException();
-        }
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-
-        try {
-            List<UploadDto> uploadList = minioService.uploadFiles(files, prefix);
-            photoService.uploadPhotos(uploadList);
-            return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
-        } catch (Exception e) {
-            throw new UploadFailException();
-        }
+    @GetMapping(value = "/photo", params = "prefix")
+    public ResponseEntity<?> select(@RequestParam("prefix") String prefix){
+        return ResponseEntity.status(200)
+                .body(createSuccess(photoService.select(prefix)));
     }
     
-    @GetMapping("/list")
-	public ResponseEntity<?> list(@RequestParam String prefix) {
-    	String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        prefix = String.format("%s/%s", email, prefix.replaceAll("^/+", ""));
-		DirectoryResponseDto directoryResponseDto = minioService.listDirectory(prefix);
-	    return ResponseEntity.ok(ApiResponse.createSuccess(directoryResponseDto));
-	}
-    
-    
-	@PutMapping("/rename")
-	public ResponseEntity<?> rename(@RequestBody RenameRequestDto renameRequestDto) {
-    	String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		String oldKey = renameRequestDto.getOldKey();
-		oldKey = String.format("%s/%s", email, oldKey.replaceAll("^/+", ""));
-		String newKey = renameRequestDto.getNewKey();
-		newKey = String.format("%s/%s", email, newKey.replaceAll("^/+", ""));
-		try {
-			if (oldKey.endsWith("/")) {
-				// 디렉토리 이름 번경
-				List<S3KeyUpdateDto> renameList = minioService.directoryKeyUpdate(oldKey, newKey);
-				photoService.renamePhotos(renameList);
-			} else {
-				// 파일 이름 변경
-				minioService.keyUpdate(oldKey, newKey);
-				photoService.renamePhoto(oldKey, newKey);
-			}
+    // 사진 설명 수정
+    @PutMapping("/photo/{photoId}/description")
+    public ResponseEntity<?> updateDescription(@PathVariable Long photoId,
+    		@RequestBody PhotoDescriptionRequestDto requestDto){
+    	photoService.updateDescription(photoId, requestDto);
+    	return ResponseEntity.status(200)
+    			.body(createSuccessWithNoContent());
+    }
 
-			return ResponseEntity.ok(ApiResponse.createSuccessWithNoContent());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("이름 변경 실패: " + e.getMessage());
-		}
-	}
+    // 대표 이미지 설정
+    @PutMapping("/photo/{photoId}/thumbnail")
+    public ResponseEntity<?> setThumbnail(@PathVariable Long photoId,
+    		@RequestParam("region") String region){
+    	photoService.setThumbnail(photoId, region);
+    	return ResponseEntity.status(200)
+    			.body(createSuccessWithNoContent());
+    }
+    
+    // 사진의 디렉토리 구조 조회
+    @GetMapping(value = "/photo", params = "!prefix")
+    public ResponseEntity<?> getDirectoryStructure() {
+    	return ResponseEntity.status(200)
+    			.body(createSuccess(photoService.getDirectoryStructure()));
+    }
+    // 대표 이미지 조회
+    @GetMapping("/photo/thumbnail")
+    public ResponseEntity<?> getThumbnails(@RequestParam(required = false) String sido){
+    	return ResponseEntity.status(200)
+    			.body(createSuccess(photoService.getThumbnails(sido)));
+    }
 }

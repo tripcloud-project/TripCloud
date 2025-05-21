@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.project.domain.board.mapper.PostMapper">
+ 
+    <insert id="insert">
+        INSERT INTO post (member_id, title, content)
+        VALUES (#{memberId}, #{title}, #{content})
+    </insert>
+    
+    <select id="existsByPostId" resultType="boolean">
+    	SELECT COUNT(1) > 0
+    	from post
+    	WHERE post_id = #{postId}
+    </select>
+
+    <delete id="delete">
+        DELETE 
+        FROM
+        	post
+        WHERE
+            post_id = #{postId} AND member_id = #{memberId}
+    </delete>
+
+    <select id="existsLikeByPostIdAndMemberId" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM post_like
+        WHERE post_id = #{postId} AND member_id = #{memberId}
+    </select>
+
+    <insert id="insertPostLike">
+        INSERT INTO post_like (post_id, member_id)
+        VALUES (#{postId}, #{memberId})
+    </insert>
+    
+    <delete id="deletePostLike">
+        DELETE FROM post_like
+        WHERE post_id = #{postId} AND member_id = #{memberId}
+    </delete>
+    
+    <select id="selectByOffsetAndSize" resultType="com.ssafy.project.domain.board.dto.response.PostPreviewResponseDto">
+	  	SELECT
+		    p.post_id as postId,
+		    p.title,
+		    m.name AS author,
+		    p.created_at as createdAt,
+		    p.modified_at as modifiedAt
+	  	FROM
+	    	post p
+	  	INNER JOIN
+	    	member m ON p.member_id = m.member_id
+	  	ORDER BY
+	    	p.post_id DESC
+	  	LIMIT #{size} OFFSET #{offset}
+	</select>
+
+    <select id="selectByPostId" resultType="com.ssafy.project.domain.board.dto.response.PostDetailResponseDto">
+        SELECT
+            p.post_id as postId,
+            p.title,
+            p.content,
+            m.name as author,
+            p.created_at as createdAt,
+            p.modified_at as modifiedAt,
+            CASE
+                WHEN m.member_id = #{memberId} THEN TRUE
+                ELSE false
+            END
+            as isMyPost
+        FROM
+            post p, member m
+        WHERE p.post_id = #{postId} AND p.member_id = m.member_id
+    </select>
+
+    <select id="countLikeByPostId">
+        SELECT
+            COUNT(1)
+        FROM
+            post_like
+        WHERE
+            post_id = #{postId}
+    </select>
+
+    <update id="update">
+        UPDATE
+            post
+        SET
+            title = #{title},
+            content = #{content}
+        WHERE
+            post_id = #{postId}
+            AND member_id = #{memberId}
+    </update>
+</mapper>

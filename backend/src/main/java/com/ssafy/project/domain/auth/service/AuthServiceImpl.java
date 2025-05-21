@@ -5,14 +5,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.project.domain.auth.dto.request.LoginRequestDto;
 import com.ssafy.project.domain.auth.dto.response.LoginResponseDto;
+import com.ssafy.project.domain.auth.dto.response.TokenResponseDto;
+import com.ssafy.project.domain.auth.exception.InvalidTokenException;
 import com.ssafy.project.domain.auth.repository.AuthRepository;
 import com.ssafy.project.domain.auth.repository.RedisRepository;
 import com.ssafy.project.domain.member.exception.NotFoundMemberException;
 import com.ssafy.project.util.JWTUtil;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -89,5 +93,46 @@ public class AuthServiceImpl implements AuthService {
 		
 		// accessToken 블랙리스트 등록, 7일간
 		redisRepository.save("logout: " + accessToken, "logout", 604800000L);
+	}
+
+	@Transactional
+	@Override
+	public TokenResponseDto reissueToken(String refreshToken) {
+		// 리프레시 토큰 검증
+		jwtUtil.validateToken(refreshToken);
+		Claims claim = jwtUtil.extractAllClaims(refreshToken);
+		
+		Long memberId = claim.get("id", Long.class);
+		String email = claim.get("email", String.class);
+		
+		// 리프레시 토큰이 redis에 있는지 확인
+		if(!redisRepository.exists("refresh: " + memberId))
+			throw new InvalidTokenException();
+		
+		// 리프레시 토큰이 유효하다면 redis에서 삭제
+		redisRepository.delete("refresh: " + memberId);
+		
+		// 리프레시 토큰을 재발급하여 redis에 추가
+		refreshToken = jwtUtil.generateRefreshToken(memberId, email);
+		redisRepository.save("refresh: " + memberId, refreshToken, jwtRefreshTokenExpiration);
+		
+		// 엑세스 토큰 재발급
+    	LoginResponseDto loginResponseDto = authRepository.findByEmail(email);
+    	
+    	if(loginResponseDto == null)
+    		throw new NotFoundMemberException();
+    	
+    	String accessToken = jwtUtil.generateAccessToken(
+        		loginResponseDto.getMemberId(),
+        		loginResponseDto.getEmail(),
+                loginResponseDto.getName(),
+                loginResponseDto.getRole()
+        );
+		
+		// 반환
+    	return TokenResponseDto.builder()
+    			.accessToken(accessToken)
+    			.refreshToken(refreshToken)
+    			.build();
 	}
 }

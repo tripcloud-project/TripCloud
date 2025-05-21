@@ -36,5 +36,6 @@ application-*.properties
 # ===== Minio =====
 minio-storage
 
-# ===== pem-key =====
+# ===== secret key =====
 *.pem
+*.key

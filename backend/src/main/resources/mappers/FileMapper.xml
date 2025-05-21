@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.project.domain.gallery.mapper.FileMapper">
+
+  <insert id="insertFiles">
+    INSERT INTO file (
+      s3_key, original_filename, size, content_type,
+      sido, sigungu, eupmyeondong,
+      latitude, longitude, taken_at,
+      is_deleted, created_at,
+      member_id
+    )
+    VALUES
+    <foreach collection="files" item="p" separator=",">
+      (
+      #{p.s3Key}, #{p.originalFilename}, #{p.size}, #{p.contentType},
+      #{p.sido}, #{p.sigungu}, #{p.eupmyeondong},
+      #{p.latitude}, #{p.longitude}, #{p.takenAt},
+      false, NOW(),
+      #{memberId}
+      )
+    </foreach>
+  </insert>
+
+  <insert id="insertFile">
+    INSERT INTO file (
+      s3_key, original_filename, size, content_type,
+      sido, sigungu, eupmyeondong,
+      latitude, longitude, taken_at,
+      is_deleted, created_at
+    ) 
+    VALUES (
+      #{s3Key}, #{originalFilename}, #{size}, #{contentType},
+      #{sido}, #{sigungu}, #{eupmyeondong},
+      #{latitude}, #{longitude}, #{takenAt},
+      false, NOW()
+    )
+  </insert>
+ 
+  <update id="renameFile">
+    UPDATE file
+    SET original_filename = #{filename}
+    WHERE file_id = #{fileId}
+    	AND member_id = #{memberId}
+  </update>
+  
+  <update id="renameFiles">
+    UPDATE file
+    SET s3_key = REPLACE(s3_key, #{oldPrefix}, #{newPrefix})
+    WHERE s3_key LIKE CONCAT(#{oldPrefix}, '%')
+      AND member_id = #{memberId}
+  </update>
+
+  <select id="findFileDetailByFileIdAndMemberId">
+    SELECT
+    p.original_filename,
+    p.size,
+    p.content_type,
+    p.sido,
+    p.sigungu,
+    p.eupmyeondong,
+    p.latitude,
+    p.longitude,
+    p.is_deleted,
+    p.created_at,
+    p.taken_at,
+    m.name AS member_name
+    FROM file p
+    JOIN member m ON p.member_id = m.member_id
+    WHERE p.file_id = #{fileId}
+    AND p.member_id = #{memberId}
+  </select>
+
+
+  <select id="findDirectoriesByPrefixAndIsDeleted">
+	SELECT
+	CONCAT(SUBSTRING_INDEX(TRIM(TRAILING '/' FROM d.dir_name), '/', -1),'/') AS name,
+	SUM(p.size) AS size,
+	COUNT(p.size) AS count
+	FROM (
+	SELECT *
+	FROM (
+	  SELECT DISTINCT
+	    CONCAT(
+	      SUBSTRING_INDEX(s3_key, '/',
+	        CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
+	      ),
+	      '/'
+	    ) AS dir_name
+	  FROM file
+	  WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+	  AND is_deleted = #{isDeleted}
+	) AS temp
+	WHERE CHAR_LENGTH(dir_name) - CHAR_LENGTH(REPLACE(dir_name, '/', '')) = 
+	      CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
+	) AS d
+	JOIN file p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
+	GROUP BY d.dir_name;
+  </select>
+
+  <select id="findFilesByPrefixAndIsDeleted">
+    SELECT file_id, s3_key, original_filename as name, size
+    FROM file
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (
+    CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', ''))
+    )
+    AND is_deleted=#{isDeleted}
+  </select>
+
+  <select id="existsByPrefix" resultType="boolean">
+    SELECT EXISTS (
+    SELECT 1 FROM file
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND is_deleted = false
+    LIMIT 1
+    )
+  </select>
+
+
+  <select id="findS3KeyAndOriginalFilenameByFileIdAndMemberId">
+    SELECT s3_key, original_filename
+    FROM file
+    WHERE file_id=#{fileId}
+      AND member_id=#{memberId}
+  </select>
+
+  <select id="findS3KeysAndOriginalFilenamesByPrefixAndMemberId">
+    SELECT s3_key, original_filename
+    FROM file
+    WHERE s3_key LIKE CONCAT(#{prefix}, '%')
+    AND is_deleted=false
+    AND member_id=#{memberId};
+  </select>
+
+  <update id="softDeleteFilesByIds">
+    UPDATE file
+    SET is_deleted = true, deleted_at = NOW()
+    WHERE member_id = #{memberId}
+    AND file_id IN
+    <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="softDeleteFilesByPrefixes">
+    UPDATE file
+    SET is_deleted = true, deleted_at = NOW()
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+    </foreach>
+  </update>
+
+  <update id="restoreFilesByIds">
+    UPDATE file
+    SET is_deleted = false, deleted_at = NULL
+    WHERE member_id = #{memberId}
+    AND file_id IN
+    <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="restoreFilesByPrefixes">
+    UPDATE file
+    SET is_deleted = false, deleted_at = NULL
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+    </foreach>
+  </update>
+
+  <update id="deleteFilesByIds">
+    DELETE FROM file
+    WHERE member_id = #{memberId}
+    AND is_deleted = true
+    AND file_id IN
+    <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="deleteFilesByPrefixes">
+    DELETE FROM file
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+      AND is_deleted = true
+    </foreach>
+  </update>
+  
+	<select id="findDirectoriesByPrefixAndMemberId">
+		SELECT DISTINCT
+		LEFT(
+		    SUBSTRING_INDEX(s3_key, '/', - (CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')))),
+		    CHAR_LENGTH(SUBSTRING_INDEX(s3_key, '/', - (CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', ''))))) -
+		    CHAR_LENGTH(SUBSTRING_INDEX(s3_key, '/', -1)) - 1
+		  ) AS prefix
+		FROM file
+		WHERE member_id=#{memberId};
+	</select>
+
+  
+  
+  	<select id="selectAllDirectoriesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto">
+	  SELECT
+		t.prefix,
+		SUBSTRING_INDEX(TRIM(TRAILING '/' FROM t.prefix), '/', -1) AS name
+	  FROM (
+	    SELECT
+	      DISTINCT SUBSTRING(
+	        	SUBSTRING_INDEX(s3_key, '/', CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', ''))),
+	        	LOCATE('/', s3_key) + 1
+	      	) AS prefix,
+	      		member_id
+	    	FROM file
+	  	) t
+	  WHERE
+	  	t.member_id = #{memberId}
+     	AND t.prefix LIKE CONCAT('%', #{keyword}, '%')
+  	</select>
+  
+  	<select id="selectAllFilesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">	
+		SELECT
+			file_id as fileId,
+			original_filename as name
+		FROM
+			file
+		WHERE
+			member_id = #{memberId}
+			AND original_filename LIKE CONCAT('%', #{keyword}, '%')
+	</select>
+	
+	<select id="selectAllFilesByMemberIdAndHashtag" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
+		SELECT
+			f.file_id as fileId,
+			f.original_filename as name
+		FROM
+			file f, file_hashtag fh, hashtag h
+		WHERE
+			f.member_id = #{memberId}
+			AND f.file_id = fh.file_id
+			AND fh.hashtag_id = h.hashtag_id
+			AND h.word = #{hashtag}
+	</select>
+
+    <select id="selectAllFilesByMemberIdAndDescription" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
+        SELECT
+            file_id as fileId,
+            original_filename as name
+        FROM
+            file
+        WHERE
+            member_id = #{memberId}
+          AND description LIKE CONCAT('%', #{description}, '%')
+    </select>
+</mapper>
