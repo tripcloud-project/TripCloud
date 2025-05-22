@@ -3,7 +3,10 @@ package com.ssafy.project.domain.auth.filter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -42,26 +45,36 @@ public class JWTFilter extends OncePerRequestFilter {
     private final RedisRepository redisRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     // 필터를 적용하지 않을 URL 패턴 목록
-    private static final List<String> EXCLUDE_URL = Arrays.asList(
-    		// TODO: 01-1. Vue 추가시 삭제 필요합니다.
-    		"/",	
-    		"/index.html",
-            "/api/v1/auth/login",
-            "/api/v1/auth/logout",
-            "/api/v1/auth/refresh-token", // 추가 필요
-            "/api/v1/members/checkEmail",
-            "/api/v1/members"
-    );
+    
+    private static final Map<String, List<String>> EXCLUDE_URL = new HashMap<>();
+    
+    static {
+    	EXCLUDE_URL.put("GET", Arrays.asList(
+    			"/api/v1/posts",
+    			"/api/v1/refresh-token",
+    			"/api/v1/member/checkEmail",
+    			"/",
+    			"/index.html"
+    	));
+    	EXCLUDE_URL.put("POST", Arrays.asList(
+    			"/api/v1/members",
+    			"/api/v1/auth/login",
+    			"/api/v1/auth/logout"
+    	));
+    }
+    
     /**
      * 특정 요청에 대해 필터를 적용하지 않도록 설정
      */
     @Override
     public boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
+        String method = request.getMethod().toUpperCase();
         
+        List<String> excludedPaths = EXCLUDE_URL.getOrDefault(method, Collections.emptyList());
         // 지정된 URL 패턴이 포함된 경로 제외
-        return EXCLUDE_URL.stream()
-        		.anyMatch(path::equals);
+        return excludedPaths.stream()
+        		.anyMatch(path::contains);
     }
 
     @Override
