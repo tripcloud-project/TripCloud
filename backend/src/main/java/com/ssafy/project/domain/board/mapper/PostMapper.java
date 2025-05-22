@@ -31,4 +31,6 @@ public interface PostMapper {
     int countLikeByPostId(@NonNull Long postId);
 
     int update(PostRequestDto postRequestDto);
+
+	Integer count();
 }
