@@ -42,7 +42,8 @@ CREATE TABLE `post_comment` (
 	`post_comment_id`	BIGINT	NOT NULL,
 	`member_id`	BIGINT	NOT NULL,
 	`post_id`	BIGINT	NOT NULL,
-	`content`	TEXT	NOT NULL
+	`content`	TEXT	NOT NULL,
+    `created_at`	DATETIME	NOT NULL	DEFAULT NOW()
 );
 
 CREATE TABLE `badge` (
