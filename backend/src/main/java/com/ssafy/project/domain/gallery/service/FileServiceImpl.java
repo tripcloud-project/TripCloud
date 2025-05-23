@@ -264,7 +264,7 @@ public class FileServiceImpl implements FileService {
         List<String> prefixList = downloadRequestDto.getPrefixList();
         List<Long> fileIdList = downloadRequestDto.getFileIdList();
         String currentPrefix = downloadRequestDto.getCurrentPrefix();
-
+        
         // 단일 파일 다운로드. zip일 필요가 없는 경우
         if (prefixList.isEmpty() && fileIdList.size() == 1) {
             return downloadPhoto(fileIdList.get(0));

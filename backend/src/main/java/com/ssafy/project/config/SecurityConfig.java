@@ -70,6 +70,9 @@ public class SecurityConfig {
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setMaxAge(3600L); // Preflight 요청 결과를 캐시하는 시간 (초)
 
+        // Content-Disposition 추가
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 URL에 위의 CORS 설정 적용
 
