@@ -28,7 +28,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId) {
+    public boolean existsLikeByPostIdAndMemberId(Long postId, Long memberId) {
         return postMapper.existsLikeByPostIdAndMemberId(postId, memberId);
     }
 
@@ -66,4 +66,9 @@ public class PostRepositoryImpl implements PostRepository {
     public boolean update(PostRequestDto postRequestDto) {
         return postMapper.update(postRequestDto) == 1;
     }
+
+	@Override
+	public Integer getTotalCount() {
+		return postMapper.count();
+	}
 }

@@ -95,6 +95,12 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public OffsetPageResponse<?> getPagedPostList(Integer page, Integer size) {
         List<PostPreviewResponseDto> postResponseList = postRepository.selectByPageAndSize(page, size);
+        Integer totalCount = postRepository.getTotalCount();
+        for(PostPreviewResponseDto postResponse : postResponseList) {
+        	if(postResponse.getProfilePresignedURL() == null)
+        		continue;
+        	postResponse.setProfilePresignedURL(s3Service.generatePresignedUrl(postResponse.getProfilePresignedURL()));
+        }
 
         Boolean hasNext = postResponseList.size() == size + 1;
         List<PostPreviewResponseDto> content = hasNext ? postResponseList.subList(0, size) : postResponseList;
@@ -106,6 +112,7 @@ public class BoardServiceImpl implements BoardService {
                 .hasNext(hasNext)
                 .size(answerSize)
                 .nextPage(nextPage)
+                .totalCount(totalCount)
                 .build();
 
         return pageResponse;
@@ -113,14 +120,24 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public PostDetailResponseDto getPost(Long postId) {
-        Member member = SecurityUtil.getCurrentMember();
-        PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, member.getMemberId());
+    	Long memberId = null;
+    	
+    	try {
+    		memberId = SecurityUtil.getCurrentMemberId();
+        }
+    	catch (IllegalStateException e) {
+    		memberId = null;
+    	}
+    	
+    	System.out.println(memberId);
+        PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, memberId);
+        postDetailResponseDto.setLiked(postRepository.existsLikeByPostIdAndMemberId(postId, memberId));
 
         // 게시글 조회 실패 시
         if (postDetailResponseDto == null)
             throw new NotFoundPostException("게시글 조회에 실패했습니다.");
 
-        List<CommentResponseDto> comments = commentRepository.selectByPostId(postId, member.getMemberId());
+        List<CommentResponseDto> comments = commentRepository.selectByPostId(postId, memberId);
 
         postDetailResponseDto.setLikeCount(postRepository.countLikeByPostId(postId));
         postDetailResponseDto.setComments(comments);

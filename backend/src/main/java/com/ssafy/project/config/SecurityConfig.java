@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/**").permitAll() // /auth/** 경로에 해당하는 모든 요청은 그냥 허용
                                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll() // POST /members만 허용
                                 .requestMatchers(HttpMethod.GET, "/api/v1/members/checkEmail").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 // TODO: 01-3. Vue 추가시 삭제 필요합니다.

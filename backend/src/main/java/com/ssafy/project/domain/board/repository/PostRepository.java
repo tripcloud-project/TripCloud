@@ -13,7 +13,7 @@ public interface PostRepository {
 
     boolean delete(@NonNull Long memberId, Long postId);
 
-    boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId);
+    boolean existsLikeByPostIdAndMemberId(Long postId, Long memberId);
 
     void insertPostLike(Long postId, @NonNull Long memberId);
 
@@ -28,4 +28,6 @@ public interface PostRepository {
     int countLikeByPostId(@NonNull Long postId);
 
     boolean update(PostRequestDto postRequestDto);
+
+	Integer getTotalCount();
 }

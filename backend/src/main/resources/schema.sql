@@ -11,8 +11,8 @@ CREATE TABLE `file` (
 	`size`	BIGINT	NOT NULL,
 	`content_type`	VARCHAR(255)	NOT NULL	DEFAULT "",
 	`description`	VARCHAR(255)	NOT NULL	DEFAULT "",
-	`latitude`	DOUBLE	NULL,
-	`longitude`	DOUBLE	NULL,
+	`latitude`	VARCHAR(255)	NULL,
+	`longitude`	VARCHAR(255)	NULL,
 	`sido`	VARCHAR(255)	NULL,
 	`sigungu`	VARCHAR(255)	NULL,
 	`eupmyeondong`	VARCHAR(255)	NULL,
@@ -82,8 +82,7 @@ CREATE TABLE `post` (
 	`content`	TEXT	NOT NULL,
 	`file_path`	VARCHAR(512)	NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT NOW(),
-	`modified_at`	DATETIME	NOT NULL	DEFAULT NOW(),
-	`is_deleted`	BOOLEAN	NOT NULL
+	`modified_at`	DATETIME	NOT NULL	DEFAULT NOW()
 );
 
 CREATE TABLE `attraction` (
