@@ -39,7 +39,7 @@
       <!-- Page Title and Filters -->
       <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 class="text-3xl font-bold text-deep-sage mb-2">Community Bulletin Board</h2>
+          <h2 class="text-3xl font-bold text-deep-sage mb-2">자유게시판</h2>
           <p class="text-gray-600">Discover and share nature experiences with our community</p>
         </div>
 
@@ -55,30 +55,6 @@
               <i class="fas fa-search text-gray-400"></i>
             </div>
           </div>
-
-          <div class="relative">
-            <div
-              @click="toggleFilterDropdown"
-              class="flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer !rounded-button whitespace-nowrap"
-            >
-              <span>{{ selectedFilter }}</span>
-              <i class="fas fa-chevron-down ml-2 text-gray-500"></i>
-            </div>
-
-            <div
-              v-if="showFilterDropdown"
-              class="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10"
-            >
-              <div
-                v-for="filter in filters"
-                :key="filter"
-                @click="selectFilter(filter)"
-                class="px-4 py-2 hover:bg-gray-100 cursor-pointer first:rounded-t-lg last:rounded-b-lg"
-              >
-                {{ filter }}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -88,17 +64,17 @@
         <div
           class="bg-sage-green/10 px-6 py-3 border-b border-sage-green/20 grid grid-cols-12 gap-4"
         >
-          <div class="col-span-1 font-medium text-deep-sage">ID</div>
-          <div class="col-span-5 font-medium text-deep-sage">Title</div>
-          <div class="col-span-2 font-medium text-deep-sage">Author</div>
-          <div class="col-span-2 font-medium text-deep-sage">Comments</div>
-          <div class="col-span-2 font-medium text-deep-sage">Posted</div>
+          <div class="col-span-1 font-medium text-deep-sage">번호</div>
+          <div class="col-span-5 font-medium text-deep-sage">제목</div>
+          <div class="col-span-2 font-medium text-deep-sage">글쓴이</div>
+          <div class="col-span-2 font-medium text-deep-sage">댓글</div>
+          <div class="col-span-2 font-medium text-deep-sage">날짜</div>
         </div>
 
         <!-- Posts -->
-        <div v-if="filteredPosts.length > 0">
+        <div v-if="allPosts.length > 0">
           <div
-            v-for="post in paginatedPosts"
+            v-for="post in allPosts"
             :key="post.id"
             class="px-6 py-4 border-b border-gray-200 grid grid-cols-12 gap-4 hover:bg-sage-green/5 transition-colors cursor-pointer"
           >
@@ -135,13 +111,13 @@
       <!-- Pagination -->
       <div class="mt-8 flex justify-between items-center">
         <div class="text-gray-600">
-          Showing {{ startIndex + 1 }}-{{ Math.min(endIndex, filteredPosts.length) }} of
-          {{ filteredPosts.length }} posts
+          Showing {{ startIndex + 1 }}-{{ Math.min(endIndex, totalCount) }} of
+          {{ totalCount }} posts
         </div>
 
         <div class="flex items-center space-x-1">
           <button
-            @click="goToPage(currentPage - 1)"
+            @click="goToPage(1)"
             :disabled="currentPage === 1"
             :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
             class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
@@ -161,11 +137,10 @@
             >
               {{ page }}
             </button>
-            <span v-else class="px-4 py-2 text-gray-500"> ... </span>
           </template>
 
           <button
-            @click="goToPage(currentPage + 1)"
+            @click="goToPage(totalPages)"
             :disabled="currentPage === totalPages"
             :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }"
             class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
@@ -185,7 +160,7 @@
               <div class="w-8 h-8 flex items-center justify-center bg-sage-green rounded-full mr-2">
                 <i class="fas fa-leaf text-white text-sm"></i>
               </div>
-              <span class="text-lg font-bold text-deep-sage">NatureBoard</span>
+              <span class="text-lg font-bold text-deep-sage">TripCloud</span>
             </div>
             <p class="text-gray-500 text-sm mt-2">Connect with nature enthusiasts worldwide</p>
           </div>
@@ -253,151 +228,68 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup>
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/lib/api'
 
-// Filter dropdown state
-const showFilterDropdown = ref(false)
-const selectedFilter = ref('Latest Posts')
-const filters = ['Latest Posts', 'Most Comments', 'Oldest Posts', 'Alphabetical']
-
-const toggleFilterDropdown = () => {
-  showFilterDropdown.value = !showFilterDropdown.value
-}
-
-const selectFilter = (filter) => {
-  selectedFilter.value = filter
-  showFilterDropdown.value = false
-
-  // Reset to first page when changing filters
-  currentPage.value = 1
-}
-
-// Close dropdown when clicking outside
-onMounted(() => {
-  document.addEventListener('click', (event) => {
-    const target = event.target as HTMLElement
-    if (!target.closest('.dropdown')) {
-      showFilterDropdown.value = false
-    }
-  })
-})
-
-// Search functionality
-const searchQuery = ref('')
-
 // Pagination
 const currentPage = ref(1)
-const postsPerPage = 20
+const totalCount = ref(0)
+const postsPerPage = 10
 
 // Mock data for posts
 const getPostList = async () => {
   const posts = []
-  const authors = []
-  const titles = []
 
   const response = await api.get('/posts', {
     params: {
-      page: 1,
-      size: 10,
+      page: currentPage.value,
+      size: postsPerPage,
     },
   })
 
   const content = response.data.result.content
-  const hasNext = response.data.result.hasNext
-  const nextPage = response.data.result.size
+  totalCount.value = response.data.result.totalCount
 
-  console.log(content)
-
-  // Current date for reference
-  const now = new Date()
-
-  for (let i = 1; i <= 100; i++) {
-    // Random date within the last 30 days
-    const randomDaysAgo = Math.floor(Math.random() * 30)
-    const randomHoursAgo = Math.floor(Math.random() * 24)
-    const randomMinutesAgo = Math.floor(Math.random() * 60)
-
-    const postDate = new Date(now)
-    postDate.setDate(postDate.getDate() - randomDaysAgo)
-    postDate.setHours(postDate.getHours() - randomHoursAgo)
-    postDate.setMinutes(postDate.getMinutes() - randomMinutesAgo)
-
-    // Format the time display
-    let timeDisplay
-    if (randomDaysAgo > 0) {
-      timeDisplay = `${randomDaysAgo}d ago`
-    } else if (randomHoursAgo > 0) {
-      timeDisplay = `${randomHoursAgo}h ago`
-    } else {
-      timeDisplay = `${randomMinutesAgo}m ago`
-    }
-
+  for (let i = 0; i < content.length; i++) {
     posts.push({
-      id: i,
-      title: titles[Math.floor(Math.random() * titles.length)],
-      author: authors[Math.floor(Math.random() * authors.length)],
-      comments: Math.floor(Math.random() * 50),
-      time: timeDisplay,
-      date: postDate, // Store actual date for sorting
+      id: content[i].postId,
+      title: content[i].title,
+      author: content[i].author,
+      comments: content[i].commentCount,
+      time: content[i].createdAt,
     })
   }
 
   return posts
 }
 
-const allPosts = ref(getPostList())
+const allPosts = ref([])
 
-// Filter and sort posts based on search query and selected filter
-const filteredPosts = computed(() => {
-  return allPosts
-  // let result = [...allPosts.value]
-
-  // // Apply search filter
-  // if (searchQuery.value) {
-  //   const query = searchQuery.value.toLowerCase()
-  //   result = result.filter(
-  //     (post) =>
-  //       post.title.toLowerCase().includes(query) || post.author.toLowerCase().includes(query),
-  //   )
-  // }
-
-  // // Apply sorting based on selected filter
-  // switch (selectedFilter.value) {
-  //   case 'Latest Posts':
-  //     result.sort((a, b) => b.date.getTime() - a.date.getTime())
-  //     break
-  //   case 'Oldest Posts':
-  //     result.sort((a, b) => a.date.getTime() - b.date.getTime())
-  //     break
-  //   case 'Most Comments':
-  //     result.sort((a, b) => b.comments - a.comments)
-  //     break
-  //   case 'Alphabetical':
-  //     result.sort((a, b) => a.title.localeCompare(b.title))
-  //     break
-  // }
-
-  // return result
-})
+watch(
+  currentPage,
+  async () => {
+    allPosts.value = await getPostList()
+  },
+  { immediate: true },
+)
 
 // Calculate total pages
 const totalPages = computed(() => {
-  return Math.ceil(filteredPosts.value.length / postsPerPage)
+  return Math.ceil(totalCount.value / postsPerPage)
 })
 
 // Get current page posts
 const startIndex = computed(() => (currentPage.value - 1) * postsPerPage)
 const endIndex = computed(() => startIndex.value + postsPerPage)
-const paginatedPosts = computed(() => {
-  return filteredPosts.value.slice(startIndex.value, endIndex.value)
+watch([startIndex, endIndex], ([newStart, newEnd]) => {
+  console.log('startIndex:', newStart, 'endIndex:', newEnd)
 })
 
 // Page navigation
-const goToPage = (page: number) => {
-  if (page >= 1 && page <= totalPages.value) {
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalCount.value) {
     currentPage.value = page
   }
 }
@@ -406,40 +298,32 @@ const goToPage = (page: number) => {
 const visiblePageNumbers = computed(() => {
   const totalPagesCount = totalPages.value
   const current = currentPage.value
-  const delta = 1 // Number of pages to show before and after current page
-
-  if (totalPagesCount <= 5) {
-    // If we have 5 or fewer pages, show all
-    return Array.from({ length: totalPagesCount }, (_, i) => i + 1)
-  }
+  const delta = 2 // Number of pages to show before and after current page
 
   let range = []
-
-  // Always include first page
-  range.push(1)
+  if (totalPagesCount <= 5) {
+    for (let i = 1; i <= totalPagesCount; i++) {
+      range.push(i)
+    }
+    return range
+  }
 
   // Calculate start and end of range around current page
-  const rangeStart = Math.max(2, current - delta)
-  const rangeEnd = Math.min(totalPagesCount - 1, current + delta)
+  let start = current - delta
+  let end = current + delta
 
-  // Add ellipsis if there's a gap after first page
-  if (rangeStart > 2) {
-    range.push('...')
+  if (start < 1) {
+    start = 1
+    end = 5
   }
 
-  // Add pages around current page
-  for (let i = rangeStart; i <= rangeEnd; i++) {
+  if (end > totalPagesCount) {
+    end = totalPagesCount
+    start = totalPagesCount - 4
+  }
+
+  for (let i = start; i <= end; i++) {
     range.push(i)
-  }
-
-  // Add ellipsis if there's a gap before last page
-  if (rangeEnd < totalPagesCount - 1) {
-    range.push('...')
-  }
-
-  // Always include last page
-  if (totalPagesCount > 1) {
-    range.push(totalPagesCount)
   }
 
   return range
