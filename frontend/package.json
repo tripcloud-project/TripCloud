@@ -12,8 +12,12 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.9.0",
     "pinia": "^3.0.1",
+    "quill": "^2.0.3",
+    "quill-image-drop-module": "^1.0.3",
+    "quill2-image-uploader": "^1.0.4",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
