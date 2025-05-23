@@ -204,7 +204,8 @@
 		    CHAR_LENGTH(SUBSTRING_INDEX(s3_key, '/', -1)) - 1
 		  ) AS prefix
 		FROM file
-		WHERE member_id=#{memberId};
+		WHERE member_id=#{memberId}
+        AND is_deleted = false;
 	</select>
 
   
