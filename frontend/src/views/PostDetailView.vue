@@ -271,6 +271,7 @@ const postId = route.params.id
 const post = ref({
   comments: [],
 })
+
 onMounted(async () => {
   post.value = await getPost()
 })
@@ -363,11 +364,6 @@ const deletePost = () => {
 const goBack = () => {
   router.push('/board')
 }
-
-onMounted(() => {
-  // In a real app, this would fetch the post data from an API
-  console.log('Post detail page loaded')
-})
 </script>
 
 <style scoped>
