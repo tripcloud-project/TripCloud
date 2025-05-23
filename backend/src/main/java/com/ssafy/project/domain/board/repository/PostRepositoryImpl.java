@@ -28,7 +28,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public boolean existsLikeByPostIdAndMemberId(Long postId, @NonNull Long memberId) {
+    public boolean existsLikeByPostIdAndMemberId(Long postId, Long memberId) {
         return postMapper.existsLikeByPostIdAndMemberId(postId, memberId);
     }
 
