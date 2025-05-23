@@ -151,10 +151,7 @@
           v-if="filteredItems.length === 0"
           class="flex flex-col items-center justify-center h-full text-center"
         >
-          <img :src="emptyFolderImage" alt="Empty folder" 
-          
-          class="w-64 h-64 object-contain mb-4"
-          />
+          <img :src="emptyFolderImage" alt="Empty folder" class="w-64 h-64 object-contain mb-4" />
           <h3 class="text-lg font-medium text-gray-700 mb-1">This folder is empty</h3>
           <p class="text-sm text-gray-500 mb-4">Drag and drop files here to upload</p>
           <button
@@ -188,37 +185,40 @@
               <i v-if="selectedItems.includes(item.id)" class="fas fa-check text-white text-xs"></i>
             </div>
 
-             <!-- Icon / Image Preview -->
-      <div class="flex flex-col items-center pt-6 pb-2">
-        <div class="w-20 h-20 flex items-center justify-center mb-2"> <!-- 크기 증가 -->
-          <i 
-            v-if="item.type === 'folder'" 
-            class="fas fa-folder text-5xl text-yellow-400"
-          ></i>
-          <img 
-            v-else-if="item.type === 'image'" 
-            :src="item.preview" 
-            alt="Preview" 
-            class="w-20 h-20 object-cover rounded-lg"
-          />
-          <i 
-            v-else-if="item.type === 'document'" 
-            class="fas fa-file-alt text-5xl text-green-400"
-          ></i>
-          <i 
-            v-else-if="item.type === 'video'" 
-            class="fas fa-file-video text-5xl text-purple-400"
-          ></i>
-          <i 
-            v-else 
-            class="fas fa-file text-5xl text-gray-400"
-          ></i>
-        </div>
-        <span v-if="item.type !== 'folder'" class="text-sm font-medium text-center truncate w-full">{{ item.name }}</span>
-        <span v-else class="text-sm font-medium text-center truncate w-full">{{ item.name.slice(0,-1) }}</span>
-        <span v-if="item.type !== 'folder'" class="text-xs text-gray-500 mt-1">{{ formatDate(item.modified) }}</span>
-        <span class="text-xs text-gray-500">{{ formatSize(item.size) }}</span>
-      </div>
+            <!-- Icon / Image Preview -->
+            <div class="flex flex-col items-center pt-6 pb-2">
+              <div class="w-20 h-20 flex items-center justify-center mb-2">
+                <!-- 크기 증가 -->
+                <i v-if="item.type === 'folder'" class="fas fa-folder text-5xl text-yellow-400"></i>
+                <img
+                  v-else-if="item.type === 'image'"
+                  :src="item.preview"
+                  alt="Preview"
+                  class="w-20 h-20 object-cover rounded-lg"
+                />
+                <i
+                  v-else-if="item.type === 'document'"
+                  class="fas fa-file-alt text-5xl text-green-400"
+                ></i>
+                <i
+                  v-else-if="item.type === 'video'"
+                  class="fas fa-file-video text-5xl text-purple-400"
+                ></i>
+                <i v-else class="fas fa-file text-5xl text-gray-400"></i>
+              </div>
+              <span
+                v-if="item.type !== 'folder'"
+                class="text-sm font-medium text-center truncate w-full"
+                >{{ item.name }}</span
+              >
+              <span v-else class="text-sm font-medium text-center truncate w-full">{{
+                item.name.slice(0, -1)
+              }}</span>
+              <span v-if="item.type !== 'folder'" class="text-xs text-gray-500 mt-1">{{
+                formatDate(item.modified)
+              }}</span>
+              <span class="text-xs text-gray-500">{{ formatSize(item.size) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -292,7 +292,7 @@
             <h4 class="text-sm font-medium text-gray-500 mb-1">촬영일</h4>
             <p class="text-sm text-gray-800">{{ formatDate(selectedFile.taken) }}</p>
           </div>
-<!-- 
+          <!-- 
           <div>
             <h4 class="text-sm font-medium text-gray-500 mb-1">Location</h4>
             <p class="text-sm text-gray-800">{{ selectedFile.location }}</p>
@@ -362,7 +362,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 const emptyFolderImage =
   'https://readdy.ai/api/search-image?query=A%20minimalist%20illustration%20of%20an%20empty%20folder%20with%20a%20slight%20shadow%2C%20clean%20lines%2C%20simple%20design%2C%20light%20background%2C%20professional%20look%2C%20subtle%20colors%2C%20business%20context%2C%20cloud%20storage%20concept&width=300&height=300&seq=1&orientation=squarish'
 
-
 import api from '@/lib/api'
 import flattenDirectoryTree from '@/utils/flattenDirectoryTree'
 
@@ -397,7 +396,6 @@ const fetchItems = async () => {
     console.error('[fetchItems] 오류:', err)
   }
 }
-
 
 const selectItem = (itemId) => {
   const item = items.value.find((i) => i.id === itemId)
