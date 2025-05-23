@@ -3,6 +3,7 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import DriveView from '@/views/DriveView.vue'
 import BoardListView from '@/views/BoardListView.vue'
+import PostDetailView from '@/views/PostDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,13 +21,19 @@ const router = createRouter({
     {
       path: '/drive',
       name: 'drive',
-      component: DriveView
+      component: DriveView,
     },
     {
       path: '/board',
       name: 'board',
       component: BoardListView,
-    }
+    },
+    {
+      path: '/posts/:id',
+      name: 'posts',
+      component: PostDetailView,
+      props: true,
+    },
   ],
 })
 
