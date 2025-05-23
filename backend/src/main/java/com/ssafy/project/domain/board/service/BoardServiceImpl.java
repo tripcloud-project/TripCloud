@@ -121,6 +121,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public PostDetailResponseDto getPost(Long postId) {
     	Long memberId = null;
+    	
     	try {
     		memberId = SecurityUtil.getCurrentMemberId();
         }
@@ -128,7 +129,9 @@ public class BoardServiceImpl implements BoardService {
     		memberId = null;
     	}
     	
+    	System.out.println(memberId);
         PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, memberId);
+        postDetailResponseDto.setLiked(postRepository.existsLikeByPostIdAndMemberId(postId, memberId));
 
         // 게시글 조회 실패 시
         if (postDetailResponseDto == null)
