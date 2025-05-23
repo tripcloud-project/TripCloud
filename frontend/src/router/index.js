@@ -5,6 +5,7 @@ import DriveView from '@/views/DriveView.vue'
 import BoardListView from '@/views/BoardListView.vue'
 import DriveTestView from '@/views/DriveTestView.vue'
 import PostDetailView from '@/views/PostDetailView.vue'
+import NewPostView from '@/views/NewPostView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,11 @@ const router = createRouter({
       name: 'posts',
       component: PostDetailView,
       props: true,
+    },
+    {
+      path: '/posts/new',
+      name: 'newPost',
+      component: NewPostView,
     },
   ],
 })

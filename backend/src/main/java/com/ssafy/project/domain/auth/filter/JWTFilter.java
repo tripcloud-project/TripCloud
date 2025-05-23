@@ -52,13 +52,14 @@ public class JWTFilter extends OncePerRequestFilter {
     static {
     	EXCLUDE_URL.put("GET", Arrays.asList(
     			"/api/v1/refresh-token",
-    			"/api/v1/member/checkEmail",
+    			"/api/v1/members/checkEmail",
     			"/index.html"
     	));
     	
     	EXCLUDE_URL.put("POST", Arrays.asList(
     			"/api/v1/auth/login",
-    			"/api/v1/auth/logout"
+    			"/api/v1/auth/logout",
+                "/api/v1/members"
     	));
     }
     
@@ -69,7 +70,7 @@ public class JWTFilter extends OncePerRequestFilter {
     public boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
         String method = request.getMethod().toUpperCase();
-        
+
         List<String> excludedPaths = EXCLUDE_URL.getOrDefault(method, Collections.emptyList());
         // 지정된 URL 패턴이 포함된 경로 제외
         return excludedPaths.stream()
