@@ -188,10 +188,8 @@ const handleLogin = () => {
           email: email.value,
           password: password.value,
         })
-        console.log('before')
         const token = response.headers['authorization']
         authStore.setToken(token)
-        console.log(token)
         router.push('/')
       } catch (error) {
         console.log('Login failed: ', error)
@@ -225,76 +223,5 @@ checkRememberedEmail()
 /* Custom checkbox styling */
 input[type='checkbox']:checked + div svg {
   display: block;
-}
-
-/* Custom colors */
-:root {
-  --sage-green: #8ba888;
-  --deep-sage: #5a7157;
-  --sky-blue: #a8c5d6;
-  --deep-sky-blue: #7fabc5;
-  --light-brown: #d4c5b2;
-  --brown: #b8a99a;
-  --soft-white: #f8f9fa;
-}
-
-.bg-sage-green {
-  background-color: var(--sage-green);
-}
-
-.bg-deep-sage {
-  background-color: var(--deep-sage);
-}
-
-.bg-sky-blue {
-  background-color: var(--sky-blue);
-}
-
-.bg-light-brown {
-  background-color: var(--light-brown);
-}
-
-.bg-brown {
-  background-color: var(--brown);
-}
-
-.bg-soft-white {
-  background-color: var(--soft-white);
-}
-
-.text-sage-green {
-  color: var(--sage-green);
-}
-
-.text-deep-sage {
-  color: var(--deep-sage);
-}
-
-.text-sky-blue {
-  color: var(--sky-blue);
-}
-
-.text-deep-sky-blue {
-  color: var(--deep-sky-blue);
-}
-
-.border-sage-green {
-  border-color: var(--sage-green);
-}
-
-.focus\:ring-sage-green:focus {
-  --tw-ring-color: var(--sage-green);
-}
-
-.hover\:bg-deep-sage:hover {
-  background-color: var(--deep-sage);
-}
-
-.hover\:bg-brown:hover {
-  background-color: var(--brown);
-}
-
-.hover\:text-sage-green:hover {
-  color: var(--sage-green);
 }
 </style>
