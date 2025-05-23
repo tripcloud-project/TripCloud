@@ -158,32 +158,29 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
+import api from '@/lib/api'
+import { useRouter } from 'vue-router'
 
 // Form state
 const postTitle = ref('')
-const selectedCategory = ref('')
 const editor = ref('')
 const characterCount = ref(0)
 const isSubmitting = ref(false)
 
+const router = useRouter()
+
 // Handle editor input
 const handleEditorInput = () => {
-  console.log(editor.value)
   const div = document.createElement('div')
   div.innerHTML = editor.value
-  const text = div.textContent || div.innerText || ''
+  const text = div.textContent.trim() || div.innerText || ''
   characterCount.value = text.length || 0
 }
 
 // Form validation
 const isFormValid = computed(() => {
-  return (
-    postTitle.value.trim() !== '' &&
-    selectedCategory.value !== '' &&
-    characterCount.value > 0 &&
-    characterCount.value <= 1000
-  )
+  return postTitle.value.trim() !== '' && characterCount.value > 0 && characterCount.value <= 1000
 })
 
 // Handle form submission
@@ -194,17 +191,12 @@ const handleSubmit = async () => {
   try {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // Reset form
-    postTitle.value = ''
-    selectedCategory.value = ''
-    if (editor.value) {
-      editor.value.innerHTML = ''
-    }
-    characterCount.value = 0
-
-    // Show success message (you can implement your own notification system)
-    alert('Post created successfully!')
+    api.post('/posts', {
+      title: postTitle.value,
+      content: editor.value,
+    })
+    alert('게시글 업로드 완료')
+    router.push('/board')
   } catch (error) {
     console.error('Error creating post:', error)
     alert('Failed to create post. Please try again.')
