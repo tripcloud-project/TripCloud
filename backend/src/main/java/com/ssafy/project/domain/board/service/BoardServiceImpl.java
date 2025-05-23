@@ -65,7 +65,7 @@ public class BoardServiceImpl implements BoardService {
             String originalFilename = image.getOriginalFilename();
             String s3Key = UploadHelper.generateUuidS3Key("board/" + originalFilename);
             s3Service.uploadObject(image, s3Key);
-            return s3Key;
+            return s3Service.generatePresignedUrl(s3Key);
         } catch (IOException e) {
             throw new UploadFailException("잘못된 업로드 요청입니다.");
         }
@@ -97,9 +97,9 @@ public class BoardServiceImpl implements BoardService {
         List<PostPreviewResponseDto> postResponseList = postRepository.selectByPageAndSize(page, size);
         Integer totalCount = postRepository.getTotalCount();
         for(PostPreviewResponseDto postResponse : postResponseList) {
-        	if(postResponse.getProfilePresignedURL() == null)
-        		continue;
-        	postResponse.setProfilePresignedURL(s3Service.generatePresignedUrl(postResponse.getProfilePresignedURL()));
+            if(postResponse.getProfilePresignedURL() == null)
+                continue;
+            postResponse.setProfilePresignedURL(s3Service.generatePresignedUrl(postResponse.getProfilePresignedURL()));
         }
 
         Boolean hasNext = postResponseList.size() == size + 1;
@@ -120,16 +120,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public PostDetailResponseDto getPost(Long postId) {
-    	Long memberId = null;
-    	
-    	try {
-    		memberId = SecurityUtil.getCurrentMemberId();
-        }
-    	catch (IllegalStateException e) {
-    		memberId = null;
-    	}
-    	
-    	System.out.println(memberId);
+        Long memberId = SecurityUtil.getCurrentMemberId();
         PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, memberId);
         postDetailResponseDto.setLiked(postRepository.existsLikeByPostIdAndMemberId(postId, memberId));
 
