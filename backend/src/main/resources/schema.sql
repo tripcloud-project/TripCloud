@@ -82,8 +82,7 @@ CREATE TABLE `post` (
 	`content`	TEXT	NOT NULL,
 	`file_path`	VARCHAR(512)	NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT NOW(),
-	`modified_at`	DATETIME	NOT NULL	DEFAULT NOW(),
-	`is_deleted`	BOOLEAN	NOT NULL
+	`modified_at`	DATETIME	NOT NULL	DEFAULT NOW()
 );
 
 CREATE TABLE `attraction` (
