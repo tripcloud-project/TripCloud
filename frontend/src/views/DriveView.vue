@@ -127,11 +127,11 @@
           >
             <i class="fas fa-download mr-1"></i> Download
           </button>
-          <button
+          <!-- <button
             class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
           >
             <i class="fas fa-share-alt mr-1"></i> Share
-          </button>
+          </button> -->
           <button
             class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 cursor-pointer !rounded-button whitespace-nowrap"
             @click="deleteSelectedFiles"
@@ -337,18 +337,20 @@
         <div class="grid grid-cols-3 gap-2">
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
+            @click="downloadSingleFile"
           >
             <i class="fas fa-download text-gray-700 mb-1"></i>
             <span class="text-xs">Download</span>
           </button>
-          <button
+          <!-- <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
           >
             <i class="fas fa-share-alt text-gray-700 mb-1"></i>
             <span class="text-xs">Share</span>
-          </button>
+          </button> -->
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
+            @click="deleteSingleFile"
           >
             <i class="fas fa-trash-alt text-gray-700 mb-1"></i>
             <span class="text-xs">Delete</span>
@@ -436,7 +438,7 @@ const selectItem = (itemId) => {
 const quickAccess = ref([
   { id: 'recent', name: 'Recent', icon: 'fas fa-clock', color: 'text-blue-500' },
   { id: 'starred', name: 'Starred', icon: 'fas fa-star', color: 'text-yellow-500' },
-  { id: 'shared', name: 'Shared with me', icon: 'fas fa-user-friends', color: 'text-green-500' },
+  // { id: 'shared', name: 'Shared with me', icon: 'fas fa-user-friends', color: 'text-green-500' },
   { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' },
 ])
 
@@ -529,7 +531,7 @@ const contextMenuItems = computed(() => {
     { label: 'Move to', icon: 'fa-cut', action: 'move' },
     { type: 'divider' },
     { label: 'Download', icon: 'fa-download', action: 'download' },
-    { label: 'Share', icon: 'fa-share-alt', action: 'share' },
+    // { label: 'Share', icon: 'fa-share-alt', action: 'share' },
     { type: 'divider' },
     { label: 'Delete', icon: 'fa-trash-alt', action: 'delete', danger: true },
   ]
@@ -697,15 +699,17 @@ const handleContextMenuAction = (action) => {
       break
     case 'download':
       // Implement download functionality
-      console.log('Download', item.name)
-      break
-    case 'share':
-      // Implement share functionality
-      console.log('Share', item.name)
+      if (!selectedItems.value.includes(item.id)) {
+        toggleItemSelection(item.id)
+      }
+      downloadSelectedFiles()
       break
     case 'delete':
       // Implement delete functionality
-      console.log('Delete', item.name)
+      if (!selectedItems.value.includes(item.id)) {
+        toggleItemSelection(item.id)
+      }
+      deleteSelectedFiles()
       break
   }
 
@@ -770,7 +774,7 @@ watch(sortDirection, (newValue, oldValue) => {
   console.log('sortDirection changed:', { oldValue, newValue })
 })
 
-// 다운로드 요청
+// 다중 다운로드 요청
 const downloadSelectedFiles = async () => {
   try {
     const prefixList = selectedItems.value
@@ -830,13 +834,56 @@ const downloadSelectedFiles = async () => {
   }
 }
 
-// 삭제 요청
+// 단건 다운로드 요청
+const downloadSingleFile = async () => {
+  try {
+    const file = selectedFile.value
+    if (!file || file.type === 'folder') return
+
+    const response = await api.post(
+      '/gallery/download',
+      {
+        prefixList: [], // 폴더가 아니므로 빈 배열
+        fileIdList: [file.id],
+        currentPrefix: driveStore.prefix,
+      },
+      { responseType: 'blob' },
+    )
+
+    const blob = await response.data
+    const contentDisposition = response.headers.get('content-disposition')
+    let filename = file.name // fallback
+
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename\*=UTF-8''(.+)/)
+      if (match && match[1]) {
+        filename = decodeURIComponent(match[1])
+      } else {
+        const fallback = contentDisposition.match(/filename="([^"]+)"/)
+        if (fallback && fallback[1]) {
+          filename = fallback[1]
+        }
+      }
+    }
+
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('단일 파일 다운로드 중 오류 발생:', error)
+  }
+}
+
+// 단건 삭제 요청
 const deleteSelectedFiles = async () => {
   try {
     const prefixList = selectedItems.value
       .map((itemId) => {
         const item = filteredItems.value.find((item) => item.id === itemId) // item.id로 item 찾기
-        return item && item.type === 'folder' ? item.name : null // type이 'folder'인 경우만 반환
+        return item && item.type === 'folder' ? item.id : null // type이 'folder'인 경우만 반환
       })
       .filter((id) => id !== null) // null 값 제외
 
@@ -854,16 +901,48 @@ const deleteSelectedFiles = async () => {
       },
     })
     // 삭제가 성공하면, 전체 데이터를 다시 불러오는 방식으로 갱신
-    await fetchItems() // 데이터 다시 불러오기 (fetchItems는 서버에서 데이터를 받아오는 함수)
+    console.log(response.data)
+    if(response.data.status==='success'){
+      await fetchItems() // 데이터 다시 불러오기 (fetchItems는 서버에서 데이터를 받아오는 함수)
+      // 선택 항목 초기화
+      selectedItems.value = []
+      loadDirectoryTree()
+      console.log('Items deleted successfully.')
+    }
 
-    // 선택 항목 초기화
-    selectedItems.value = []
 
-    console.log('Items deleted successfully.')
   } catch (error) {
     console.error('Error during file deleting:', error)
   }
 }
+
+const deleteSingleFile = async () => {
+  try {
+    const item = selectedFile.value
+    if (!item) return
+
+    const prefixList = item.type === 'folder' ? [item.id] : []
+    const fileIdList = item.type !== 'folder' ? [item.id] : []
+
+    const response = await api.delete('/gallery/trash', {
+      data: {
+        prefixList,
+        fileIdList,
+      },
+    })
+
+    if (response.data.status === 'success') {
+      await fetchItems() // 목록 갱신
+      selectedItems.value = []
+      selectedFile.value = null // 단건 선택 해제
+      loadDirectoryTree()
+      console.log('Item deleted successfully.')
+    }
+  } catch (error) {
+    console.error('Error during single file deletion:', error)
+  }
+}
+
 </script>
 
 <style scoped>
