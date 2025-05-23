@@ -123,6 +123,7 @@
         <div class="flex space-x-2">
           <button
             class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
+            @click="downloadSelectedFiles"
           >
             <i class="fas fa-download mr-1"></i> Download
           </button>
@@ -151,10 +152,7 @@
           v-if="filteredItems.length === 0"
           class="flex flex-col items-center justify-center h-full text-center"
         >
-          <img :src="emptyFolderImage" alt="Empty folder" 
-          
-          class="w-64 h-64 object-contain mb-4"
-          />
+          <img :src="emptyFolderImage" alt="Empty folder" class="w-64 h-64 object-contain mb-4" />
           <h3 class="text-lg font-medium text-gray-700 mb-1">This folder is empty</h3>
           <p class="text-sm text-gray-500 mb-4">Drag and drop files here to upload</p>
           <button
@@ -188,37 +186,40 @@
               <i v-if="selectedItems.includes(item.id)" class="fas fa-check text-white text-xs"></i>
             </div>
 
-             <!-- Icon / Image Preview -->
-      <div class="flex flex-col items-center pt-6 pb-2">
-        <div class="w-20 h-20 flex items-center justify-center mb-2"> <!-- 크기 증가 -->
-          <i 
-            v-if="item.type === 'folder'" 
-            class="fas fa-folder text-5xl text-yellow-400"
-          ></i>
-          <img 
-            v-else-if="item.type === 'image'" 
-            :src="item.preview" 
-            alt="Preview" 
-            class="w-20 h-20 object-cover rounded-lg"
-          />
-          <i 
-            v-else-if="item.type === 'document'" 
-            class="fas fa-file-alt text-5xl text-green-400"
-          ></i>
-          <i 
-            v-else-if="item.type === 'video'" 
-            class="fas fa-file-video text-5xl text-purple-400"
-          ></i>
-          <i 
-            v-else 
-            class="fas fa-file text-5xl text-gray-400"
-          ></i>
-        </div>
-        <span v-if="item.type !== 'folder'" class="text-sm font-medium text-center truncate w-full">{{ item.name }}</span>
-        <span v-else class="text-sm font-medium text-center truncate w-full">{{ item.name.slice(0,-1) }}</span>
-        <span v-if="item.type !== 'folder'" class="text-xs text-gray-500 mt-1">{{ formatDate(item.modified) }}</span>
-        <span class="text-xs text-gray-500">{{ formatSize(item.size) }}</span>
-      </div>
+            <!-- Icon / Image Preview -->
+            <div class="flex flex-col items-center pt-6 pb-2">
+              <div class="w-20 h-20 flex items-center justify-center mb-2">
+                <!-- 크기 증가 -->
+                <i v-if="item.type === 'folder'" class="fas fa-folder text-5xl text-yellow-400"></i>
+                <img
+                  v-else-if="item.type === 'image'"
+                  :src="item.preview"
+                  alt="Preview"
+                  class="w-20 h-20 object-cover rounded-lg"
+                />
+                <i
+                  v-else-if="item.type === 'document'"
+                  class="fas fa-file-alt text-5xl text-green-400"
+                ></i>
+                <i
+                  v-else-if="item.type === 'video'"
+                  class="fas fa-file-video text-5xl text-purple-400"
+                ></i>
+                <i v-else class="fas fa-file text-5xl text-gray-400"></i>
+              </div>
+              <span
+                v-if="item.type !== 'folder'"
+                class="text-sm font-medium text-center truncate w-full"
+                >{{ item.name }}</span
+              >
+              <span v-else class="text-sm font-medium text-center truncate w-full">{{
+                item.name.slice(0, -1)
+              }}</span>
+              <span v-if="item.type !== 'folder'" class="text-xs text-gray-500 mt-1">{{
+                formatDate(item.modified)
+              }}</span>
+              <span class="text-xs text-gray-500">{{ formatSize(item.size) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -292,7 +293,7 @@
             <h4 class="text-sm font-medium text-gray-500 mb-1">촬영일</h4>
             <p class="text-sm text-gray-800">{{ formatDate(selectedFile.taken) }}</p>
           </div>
-<!-- 
+          <!-- 
           <div>
             <h4 class="text-sm font-medium text-gray-500 mb-1">Location</h4>
             <p class="text-sm text-gray-800">{{ selectedFile.location }}</p>
@@ -362,7 +363,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 const emptyFolderImage =
   'https://readdy.ai/api/search-image?query=A%20minimalist%20illustration%20of%20an%20empty%20folder%20with%20a%20slight%20shadow%2C%20clean%20lines%2C%20simple%20design%2C%20light%20background%2C%20professional%20look%2C%20subtle%20colors%2C%20business%20context%2C%20cloud%20storage%20concept&width=300&height=300&seq=1&orientation=squarish'
 
-
 import api from '@/lib/api'
 import flattenDirectoryTree from '@/utils/flattenDirectoryTree'
 
@@ -371,7 +371,6 @@ const folders = ref([])
 const loadDirectoryTree = async () => {
   const { data } = await api.get('/gallery') // 백엔드 API
   folders.value = flattenDirectoryTree(data.result)
-  console.log('data.result: ', data)
 }
 
 onMounted(() => {
@@ -391,13 +390,11 @@ const fetchItems = async () => {
     })
     if (res.data.status === 'success') {
       items.value = mapApiResponseToItems(res.data.result, driveStore.prefix)
-      console.log('items.value: ', items.value)
     }
   } catch (err) {
     console.error('[fetchItems] 오류:', err)
   }
 }
-
 
 const selectItem = (itemId) => {
   const item = items.value.find((i) => i.id === itemId)
@@ -732,6 +729,65 @@ watch(sortBy, (newValue, oldValue) => {
 watch(sortDirection, (newValue, oldValue) => {
   console.log('sortDirection changed:', { oldValue, newValue })
 })
+
+// 다운로드 요청
+const downloadSelectedFiles = async () => {
+  console.log('selectedItems: ', selectedItems.value)
+  try {
+    const prefixList = selectedItems.value
+      .map((itemId) => {
+        const item = filteredItems.value.find((item) => item.id === itemId); // item.id로 item 찾기
+        return item && item.type === 'folder' ? item.name : null; // type이 'folder'인 경우만 반환
+      })
+      .filter((id) => id !== null); // null 값 제외
+
+    const fileIdList = selectedItems.value
+      .map((itemId) => {
+        const item = filteredItems.value.find((item) => item.id === itemId); // item.id로 item 찾기
+        return item && item.type !== 'folder' ? item.id : null; // 'folder'가 아닌 경우만 반환
+      })
+      .filter((id) => id !== null); // null 값 제외
+
+    // 서버로 다운로드 요청 (responseType을 'blob'으로 설정)
+    const response = await api.post('/gallery/download', {
+      prefixList: prefixList,
+      fileIdList: fileIdList,
+      currentPrefix: driveStore.prefix  // 현재 경로, 필요에 따라 변경
+    }, { responseType: 'blob' });  // 응답을 Blob으로 처리
+
+    // Blob 처리 및 다운로드
+    const blob = await response.data; // Blob 형식으로 응답 받기
+    const contentDisposition = response.headers.get('content-disposition');
+    let filename = 'downloaded_file'; // 기본값을 zip이 아닌 일반 이름으로 설정
+
+    // 파일 이름 추출
+    console.log("contentDisposition: ", contentDisposition)
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename\*=UTF-8''(.+)/);
+      if (match && match[1]) {
+        filename = decodeURIComponent(match[1]);
+      } else {
+        // fallback: filename="..."
+        const fallback = contentDisposition.match(/filename="([^"]+)"/);
+        if (fallback && fallback[1]) {
+          filename = fallback[1];
+        }
+      }
+    }
+
+    // Blob URL 생성 및 다운로드 처리
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename; // 추출된 파일 이름으로 다운로드
+    a.click(); // 다운로드 트리거
+    URL.revokeObjectURL(url); // URL 해제
+
+  } catch (error) {
+    console.error('Error during file download:', error);
+  }
+};
+
 </script>
 
 <style scoped>
