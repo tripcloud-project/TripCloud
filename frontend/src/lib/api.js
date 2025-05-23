@@ -15,9 +15,6 @@ api.interceptors.request.use(
   async (config) => {
     console.log('[요청 발신]: ', config.method, config.url, config.data)
     const authStore = useAuthStore();
-    console.log("authStore.token: ", authStore.token)
-
-
     if(authStore.token){
       config.headers['Authorization'] = `${authStore.token}`
     }
@@ -32,7 +29,6 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
-    console.log(response)
     console.log('[응답 수신 1]: ', response.status, response.data)
     return response
   },

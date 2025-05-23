@@ -1,5 +1,7 @@
 package com.ssafy.project.domain.gallery.dto.internal;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +17,7 @@ public class FileEntry {
     private String name;
     private Long size;
     private String presignedUrl;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
+    private LocalDateTime takenAt;
 }
