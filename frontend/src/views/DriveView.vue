@@ -74,11 +74,39 @@
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
       <!-- Header -->
       <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="flex space-x-4">
+            <button
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 cursor-pointer whitespace-nowrap"
+              @click="triggerFileSelect"
+            >
+              <i class="fas fa-file-upload mr-1"></i> 파일 업로드
+            </button>
+
+            <!-- 폴더 업로드 버튼 -->
+            <button
+              class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 cursor-pointer whitespace-nowrap"
+              @click="triggerFolderSelect"
+            >
+              <i class="fas fa-folder-open mr-1"></i> 폴더 업로드
+            </button>
+            <!-- 숨겨진 input들 -->
+            <input type="file" ref="fileInput" multiple class="hidden" @change="handleFileUpload" />
+            <input
+              type="file"
+              ref="folderInput"
+              webkitdirectory
+              directory
+              multiple
+              class="hidden"
+              @change="handleFolderUpload"
+            />
+          </div>
+        </div>
         <div class="flex items-center">
           <h2 class="text-lg font-medium text-gray-800">{{ currentFolderName }}</h2>
           <span class="text-gray-500 ml-2">({{ filteredItems.length }} items)</span>
         </div>
-
         <!-- Sort Options -->
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-500">정렬: </span>
@@ -156,11 +184,6 @@
           <img :src="emptyFolderImage" alt="Empty folder" class="w-64 h-64 object-contain mb-4" />
           <h3 class="text-lg font-medium text-gray-700 mb-1">This folder is empty</h3>
           <p class="text-sm text-gray-500 mb-4">Drag and drop files here to upload</p>
-          <button
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-upload mr-1"></i> Upload Files
-          </button>
         </div>
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -346,7 +369,7 @@
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
           >
             <i class="fas fa-share-alt text-gray-700 mb-1"></i>
-            <span class="text-xs">Share</span>
+            <span class="text-xs">Share</span>  
           </button> -->
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
@@ -539,25 +562,11 @@ const contextMenuItems = computed(() => {
   return baseItems
 })
 
-// Methods
-// const selectFolder = (folderId) => {
-//   selectedFolder.value = folderId;
-//   clearSelection();
-//   clearFileSelection();
-// };
 const selectFolder = (folderId) => {
-  console.log('selectFolder\nfolderId:', folderId)
-  // const folder = items.value.find(i => i.id === folderId)
-  // console.log("folder: ", folder)
-  // if (folder) {
   selectedFolder.value = folderId
-  // const newPrefix = `${driveStore.prefix}${folder.name}`
   const newPrefix = folderId
-  // const newPrefix = driveStore.prefix==='/'?`${folder.name}`:`${driveStore.prefix}${folder.name}`
   driveStore.setPrefix(newPrefix)
   fetchItems()
-
-  // }
 }
 
 const toggleFolder = (folderId) => {
@@ -568,18 +577,6 @@ const toggleFolder = (folderId) => {
     expandedFolders.value.splice(index, 1)
   }
 }
-
-// const selectItem = (itemId) => {
-//   const item = items.value.find(i => i.id === itemId);
-//   if (item && item.type !== 'folder') {
-//     selectedFile.value = item;
-//   } else {
-//     // If it's a folder, navigate into it
-//     if (item && item.type === 'folder') {
-//       selectFolder(itemId);
-//     }
-//   }
-// };
 
 const toggleItemSelection = (itemId) => {
   const index = selectedItems.value.indexOf(itemId)
@@ -639,21 +636,6 @@ const formatSize = (bytes) => {
   return `${size.toFixed(1)} ${units[unitIndex]}`
 }
 
-const getFileTypeLabel = (type) => {
-  switch (type) {
-    case 'document':
-      return 'Document'
-    case 'image':
-      return 'Image'
-    case 'video':
-      return 'Video'
-    case 'folder':
-      return 'Folder'
-    default:
-      return 'File'
-  }
-}
-
 const showContextMenu = (event, item) => {
   event.preventDefault()
   contextMenu.value = {
@@ -674,7 +656,7 @@ const closeContextMenu = () => {
   window.removeEventListener('click', closeContextMenu)
 }
 
-const handleContextMenuAction = (action) => {
+const handleContextMenuAction = async (action) => {
   const item = contextMenu.value.item
 
   switch (action) {
@@ -685,10 +667,28 @@ const handleContextMenuAction = (action) => {
         selectItem(item.id)
       }
       break
-    case 'rename':
-      // Implement rename functionality
-      console.log('Rename', item.name)
+    case 'rename': {
+      if (item.type !== 'folder') {
+        const currentName = item.name
+        const dotIndex = currentName.lastIndexOf('.')
+        const nameOnly = currentName.slice(0, dotIndex)
+        const extension = currentName.slice(dotIndex)
+        const newNameOnly = prompt('새 이름을 입력하세요', nameOnly)
+
+        if (newNameOnly && newNameOnly !== nameOnly) {
+          const newFullName = newNameOnly + extension
+          await renameFile(item.id, newFullName)
+        }
+      } else {
+        const oldPrefix = driveStore.prefix + item.name
+        const newName = prompt('새 이름을 입력하세요', item.name.slice(0, -1))
+        const newPrefix = driveStore.prefix + newName + '/'
+        if (oldPrefix && newPrefix) {
+          await renameDirectory(oldPrefix, newPrefix)
+        }
+      }
       break
+    }
     case 'copy':
       // Implement copy functionality
       console.log('Copy', item.name)
@@ -807,8 +807,6 @@ const downloadSelectedFiles = async () => {
     const contentDisposition = response.headers.get('content-disposition')
     let filename = 'downloaded_file' // 기본값을 zip이 아닌 일반 이름으로 설정
 
-    // 파일 이름 추출
-    console.log('contentDisposition: ', contentDisposition)
     if (contentDisposition) {
       const match = contentDisposition.match(/filename\*=UTF-8''(.+)/)
       if (match && match[1]) {
@@ -901,16 +899,13 @@ const deleteSelectedFiles = async () => {
       },
     })
     // 삭제가 성공하면, 전체 데이터를 다시 불러오는 방식으로 갱신
-    console.log(response.data)
-    if(response.data.status==='success'){
+    if (response.data.status === 'success') {
       await fetchItems() // 데이터 다시 불러오기 (fetchItems는 서버에서 데이터를 받아오는 함수)
       // 선택 항목 초기화
       selectedItems.value = []
       loadDirectoryTree()
       console.log('Items deleted successfully.')
     }
-
-
   } catch (error) {
     console.error('Error during file deleting:', error)
   }
@@ -943,6 +938,100 @@ const deleteSingleFile = async () => {
   }
 }
 
+const renameFile = async (fileId, newFilename) => {
+  try {
+    const response = await api.put(`/gallery/rename/${fileId}`, {
+      filename: newFilename,
+    })
+
+    if (response.data.status === 'success') {
+      await fetchItems()
+      loadDirectoryTree()
+    } else {
+      console.warn('이름 변경 실패:', response.data)
+    }
+  } catch (error) {
+    console.error('이름 변경 중 오류 발생:', error)
+  }
+}
+
+const renameDirectory = async (oldPrefix, newPrefix) => {
+  try {
+    const response = await api.put(`/gallery/rename`, {
+      oldPrefix: oldPrefix,
+      newPrefix: newPrefix,
+    })
+
+    if (response.data.status === 'success') {
+      await fetchItems()
+      loadDirectoryTree()
+    } else {
+      console.warn('이름 변경 실패:', response.data)
+    }
+  } catch (error) {
+    console.error('이름 변경 중 오류 발생:', error)
+  }
+}
+
+const fileInput = ref(null)
+const folderInput = ref(null)
+
+// 파일 선택창 열기
+const triggerFileSelect = () => {
+  fileInput.value.click()
+}
+
+// 폴더 선택창 열기
+const triggerFolderSelect = () => {
+  folderInput.value.click()
+}
+
+// 파일 업로드 처리
+const handleFileUpload = async () => {
+  const formData = new FormData()
+  const files = fileInput.value.files
+
+  for (let i = 0; i < files.length; i++) {
+    formData.append('files', files[i])
+  }
+
+  formData.append('prefix', driveStore.prefix)
+
+  await uploadToServer(formData)
+  fileInput.value.value = null // 초기화
+}
+
+// 폴더 업로드 처리
+const handleFolderUpload = async () => {
+  const formData = new FormData()
+  const files = folderInput.value.files
+
+  for (let i = 0; i < files.length; i++) {
+    formData.append('files', files[i])
+  }
+
+  formData.append('prefix', driveStore.prefix)
+
+  await uploadToServer(formData)
+  folderInput.value.value = null // 초기화
+}
+
+// 서버 업로드 공통 함수
+const uploadToServer = async (formData) => {
+  try {
+    await api.post('/gallery/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    alert('업로드 성공!')
+    await fetchItems()
+    loadDirectoryTree()
+  } catch (err) {
+    console.error('업로드 실패:', err)
+    alert('업로드 실패')
+  }
+}
 </script>
 
 <style scoped>
