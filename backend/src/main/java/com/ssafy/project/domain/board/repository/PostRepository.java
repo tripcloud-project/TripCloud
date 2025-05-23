@@ -28,4 +28,6 @@ public interface PostRepository {
     int countLikeByPostId(@NonNull Long postId);
 
     boolean update(PostRequestDto postRequestDto);
+
+	Integer getTotalCount();
 }

@@ -16,5 +16,7 @@ public class PostPreviewResponseDto {
 	private @NonNull Long postId;
 	private @NonNull String title;
 	private @NonNull String author;
+	private Integer commentCount;
+	private @NonNull String profilePresignedURL;
 	private @NonNull LocalDateTime createdAt;
 }
