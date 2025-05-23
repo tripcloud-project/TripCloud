@@ -62,7 +62,7 @@ public class BoardController {
     @GetMapping
     private ResponseEntity<?> getPagedPostList(@RequestParam Integer page, @RequestParam Integer size){
     	return ResponseEntity.status(200)
-    			.body(createSuccess(boardService.getPagedPostList(page, size)));
+    			.body(createSuccess(boardService.getPagedPostList(page-1, size)));
     }
 
     // 게시글 상세 조회
