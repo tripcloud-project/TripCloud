@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 /* Custom colors */
+
+.ql-editor {
+  font-size: 16px; /* 기본값은 약 13px이므로 크게 지정 */
+}
+
 :root {
   --sage-green: #8ba888;
   --deep-sage: #5a7157;
