@@ -8,10 +8,24 @@
 function flattenDirectoryTree(tree, level = 0, parent = null) {
   const result = []
 
+  // 최초 호출 시 루트 노드 추가
+  if (level === 0 && parent === null) {
+    result.push({
+      id: '/',
+      name: 'My Files',
+      level: 0,
+      parent: null,
+      hasChildren: Object.keys(tree).length > 0,
+    })
+    const childItems = flattenDirectoryTree(tree, 1, '/')
+    result.push(...childItems)
+    return result
+  }
+
   for (const name in tree) {
     if (Object.hasOwn(tree, name)) {
       const node = tree[name]
-      const fullPath = '/'+node.prefix // 예: '여행/상주/'
+      const fullPath = '/' + node.prefix // 예: '/여행/상주/'
       const children = node.children || {}
       const hasChildren = Object.keys(children).length > 0
 
@@ -30,8 +44,8 @@ function flattenDirectoryTree(tree, level = 0, parent = null) {
       }
     }
   }
-  console.log("tree: ", result)
 
   return result
 }
+
 export default flattenDirectoryTree
