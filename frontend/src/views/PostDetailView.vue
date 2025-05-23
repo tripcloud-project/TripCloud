@@ -8,7 +8,7 @@
           <div class="w-10 h-10 flex items-center justify-center bg-sage-green rounded-full mr-3">
             <i class="fas fa-leaf text-white text-lg"></i>
           </div>
-          <h1 class="text-2xl font-bold text-deep-sage">NatureBoard</h1>
+          <h1 class="text-2xl font-bold text-deep-sage">TripCloud</h1>
         </div>
         <div class="flex items-center space-x-4">
           <button
@@ -75,18 +75,7 @@
           </div>
 
           <!-- Post Content -->
-          <div class="prose max-w-none text-gray-700 mb-6">
-            <p>{{ post.content }}</p>
-          </div>
-
-          <!-- Post Image (if available) -->
-          <div v-if="post.imageUrl" class="mb-6 rounded-lg overflow-hidden">
-            <img
-              :src="post.imageUrl"
-              :alt="post.title"
-              class="w-full h-auto object-cover object-top"
-            />
-          </div>
+          <div ref="quillViewer" class="ql-container ql-snow"></div>
 
           <!-- Post Actions -->
           <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -262,6 +251,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Quill from 'quill'
 import api from '@/lib/api'
 
 const route = useRoute()
@@ -272,8 +262,20 @@ const post = ref({
   comments: [],
 })
 
+const quillViewer = ref(null)
+
 onMounted(async () => {
   post.value = await getPost()
+  const quill = new Quill(quillViewer.value, {
+    readOnly: true,
+    theme: 'snow',
+    modules: {
+      toolbar: false,
+    },
+  })
+
+  // 에디터에 HTML 콘텐츠 설정
+  quill.root.innerHTML = post.value.content
 })
 
 const getPost = async () => {
@@ -428,6 +430,10 @@ const goBack = () => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.ql-container {
+  border: none; /* 원하면 보더 제거 가능 */
 }
 
 /* Prose styling for content */
