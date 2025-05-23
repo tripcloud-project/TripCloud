@@ -49,6 +49,16 @@ function imageHandler() {
       // 이미지 URL 삽입
       quill.insertEmbed(range.index, 'image', imageUrl)
       quill.setSelection(range.index + 1)
+
+      setTimeout(() => {
+        const editor = document.querySelector('.ql-editor')
+        const imgs = editor.querySelectorAll(`img[src="${imageUrl}"]`)
+        imgs.forEach((img) => {
+          img.style.maxWidth = '100%' // 반응형
+          img.style.width = '400px' // 기본 크기
+          img.style.height = 'auto'
+        })
+      }, 100) // 삽입 후 DOM 렌더링 대기
     } catch (error) {
       console.error('이미지 업로드 실패', error)
     }
