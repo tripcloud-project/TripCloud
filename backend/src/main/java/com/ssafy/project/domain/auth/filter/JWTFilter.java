@@ -53,7 +53,6 @@ public class JWTFilter extends OncePerRequestFilter {
     			"/api/v1/posts",
     			"/api/v1/refresh-token",
     			"/api/v1/member/checkEmail",
-    			"/",
     			"/index.html"
     	));
     	EXCLUDE_URL.put("POST", Arrays.asList(
