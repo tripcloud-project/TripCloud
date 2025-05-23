@@ -272,7 +272,24 @@
 
           <div>
             <h4 class="text-sm font-medium text-gray-500 mb-1">타입</h4>
-            <p class="text-sm text-gray-800">{{ getFileTypeLabel(selectedFile.type) }}</p>
+            <p class="text-sm text-gray-800">{{ selectedFile.contentType }}</p>
+          </div>
+
+          <div v-if="selectedFile.sido">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">위치</h4>
+            <p class="text-sm text-gray-800">
+              {{ selectedFile.sido }} {{ selectedFile.sigungu }} {{ selectedFile.eupmyeondong }}
+            </p>
+          </div>
+
+          <div v-if="selectedFile.latitude">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">위도</h4>
+            <p class="text-sm text-gray-800">{{ selectedFile.latitude }}</p>
+          </div>
+
+          <div v-if="selectedFile.longitude">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">경도</h4>
+            <p class="text-sm text-gray-800">{{ selectedFile.longitude }}</p>
           </div>
 
           <div>
@@ -282,23 +299,31 @@
 
           <div>
             <h4 class="text-sm font-medium text-gray-500 mb-1">생성일</h4>
-            <p class="text-sm text-gray-800">{{ formatDate(selectedFile.created) }}</p>
+            <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.created) }}</p>
           </div>
 
           <div>
             <h4 class="text-sm font-medium text-gray-500 mb-1">수정일</h4>
-            <p class="text-sm text-gray-800">{{ formatDate(selectedFile.modified) }}</p>
+            <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.modified) }}</p>
           </div>
 
-          <div v-if="selectedFile.type === 'image'">
+          <div v-if="selectedFile.taken">
             <h4 class="text-sm font-medium text-gray-500 mb-1">촬영일</h4>
-            <p class="text-sm text-gray-800">{{ formatDate(selectedFile.taken) }}</p>
+            <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.taken) }}</p>
           </div>
-          <!-- 
-          <div>
-            <h4 class="text-sm font-medium text-gray-500 mb-1">Location</h4>
-            <p class="text-sm text-gray-800">{{ selectedFile.location }}</p>
-          </div> -->
+
+          <div v-if="selectedFile.hashtags && selectedFile.hashtags.length > 0">
+            <h4 class="text-sm font-medium text-gray-500 mb-1">해시태그</h4>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="(tag, index) in selectedFile.hashtags"
+                :key="index"
+                class="inline-block bg-blue-100 text-blue-800 text-xs px-2.5 py-0.5 rounded-full"
+              >
+                #{{ tag }}
+              </span>
+            </div>
+          </div>
 
           <div v-if="selectedFile.description">
             <h4 class="text-sm font-medium text-gray-500 mb-1">Description</h4>
@@ -577,10 +602,23 @@ const toggleSortDirection = () => {
 
 const formatDate = (dateString) => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('ko-KR', {
     year: 'numeric',
-    month: 'short',
+    month: 'long',
     day: 'numeric',
+  })
+}
+
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true,
   })
 }
 

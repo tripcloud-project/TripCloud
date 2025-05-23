@@ -102,7 +102,7 @@
   </select>
 
   <select id="findFilesByPrefixAndIsDeleted">
-    SELECT file_id, s3_key, original_filename as name, size, created_at, modified_at, taken_at
+    SELECT file_id, s3_key, original_filename as name, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description
     FROM file
     WHERE s3_key LIKE CONCAT(#{prefix}, '%')
     AND CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')) = (

@@ -242,6 +242,13 @@ public class FileServiceImpl implements FileService {
         for (FileEntry file : files) {
             file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
             file.setS3Key(null);
+            if(file.getLatitude()!=null && file.getLongitude()!=null){
+                file.setLatitude(aesUtil.decrypt(file.getLatitude()));
+                file.setLongitude(aesUtil.decrypt(file.getLongitude()));
+            }
+
+            // 해시태그 추가
+            file.setHashtags(hashtagService.getHashtags(file.getFileId()));
         }
 
         // prefix 앞에 사용자 email 제거해서 반환
