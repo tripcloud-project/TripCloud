@@ -22,5 +22,6 @@ public class PostDetailResponseDto {
 	private @NonNull LocalDateTime modifiedAt;
 	private @NonNull Integer likeCount;
 	private boolean isMyPost;
+	private boolean isLiked;
 	private List<CommentResponseDto> comments;
 }
