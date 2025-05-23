@@ -16,4 +16,5 @@ public class OffsetPageResponse<T> {
 	private boolean hasNext;
 	private Integer size;
 	private Integer nextPage;
+	private Integer totalCount;
 }

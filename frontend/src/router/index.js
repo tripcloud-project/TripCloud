@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import DriveView from '@/views/DriveView.vue'
+import BoardListView from '@/views/BoardListView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/drive',
       name: 'drive',
       component: DriveView
+    },
+    {
+      path: '/board',
+      name: 'board',
+      component: BoardListView,
     }
   ],
 })

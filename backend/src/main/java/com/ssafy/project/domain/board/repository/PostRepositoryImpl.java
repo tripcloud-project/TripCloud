@@ -66,4 +66,9 @@ public class PostRepositoryImpl implements PostRepository {
     public boolean update(PostRequestDto postRequestDto) {
         return postMapper.update(postRequestDto) == 1;
     }
+
+	@Override
+	public Integer getTotalCount() {
+		return postMapper.count();
+	}
 }
