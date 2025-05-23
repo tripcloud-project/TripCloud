@@ -61,7 +61,7 @@ public class JWTFilter extends OncePerRequestFilter {
         
         // 지정된 URL 패턴이 포함된 경로 제외
         return EXCLUDE_URL.stream()
-                .anyMatch(path::equals);
+                .anyMatch(path::contains);
     }
 
     @Override
