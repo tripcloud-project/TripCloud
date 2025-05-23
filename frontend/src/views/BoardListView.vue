@@ -76,6 +76,7 @@
           <div
             v-for="post in allPosts"
             :key="post.id"
+            @click="goToDetail(post.id)"
             class="px-6 py-4 border-b border-gray-200 grid grid-cols-12 gap-4 hover:bg-sage-green/5 transition-colors cursor-pointer"
           >
             <div class="col-span-1 text-gray-500">#{{ post.id }}</div>
@@ -238,7 +239,8 @@ const currentPage = ref(1)
 const totalCount = ref(0)
 const postsPerPage = 10
 
-// Mock data for posts
+const router = useRouter()
+
 const getPostList = async () => {
   const posts = []
 
@@ -328,6 +330,10 @@ const visiblePageNumbers = computed(() => {
 
   return range
 })
+
+const goToDetail = (id) => {
+  router.push(`/posts/${id}`)
+}
 </script>
 
 <style scoped>
