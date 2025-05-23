@@ -46,17 +46,17 @@ public class JWTFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
     // 필터를 적용하지 않을 URL 패턴 목록
     
+    // 토큰이 없어도 인증 없이 허용
     private static final Map<String, List<String>> EXCLUDE_URL = new HashMap<>();
     
     static {
     	EXCLUDE_URL.put("GET", Arrays.asList(
-    			"/api/v1/posts",
     			"/api/v1/refresh-token",
     			"/api/v1/member/checkEmail",
     			"/index.html"
     	));
+    	
     	EXCLUDE_URL.put("POST", Arrays.asList(
-    			"/api/v1/members",
     			"/api/v1/auth/login",
     			"/api/v1/auth/logout"
     	));
@@ -84,7 +84,7 @@ public class JWTFilter extends OncePerRequestFilter {
     ) throws IOException {
         // 인증 필요한 경로에 대한 JWT 토큰 검증
         final String authHeader = request.getHeader("Authorization");
-
+        
         // 인증 헤더 검사
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             sendErrorResponse(response, ErrorCode.INVALID_TOKEN);

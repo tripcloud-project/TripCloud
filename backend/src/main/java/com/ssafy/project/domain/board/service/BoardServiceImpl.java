@@ -120,14 +120,24 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public PostDetailResponseDto getPost(Long postId) {
-        Member member = SecurityUtil.getCurrentMember();
-        PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, member.getMemberId());
+    	Long memberId = null;
+    	
+    	try {
+    		memberId = SecurityUtil.getCurrentMemberId();
+        }
+    	catch (IllegalStateException e) {
+    		memberId = null;
+    	}
+    	
+    	System.out.println(memberId);
+        PostDetailResponseDto postDetailResponseDto = postRepository.selectByPostId(postId, memberId);
+        postDetailResponseDto.setLiked(postRepository.existsLikeByPostIdAndMemberId(postId, memberId));
 
         // 게시글 조회 실패 시
         if (postDetailResponseDto == null)
             throw new NotFoundPostException("게시글 조회에 실패했습니다.");
 
-        List<CommentResponseDto> comments = commentRepository.selectByPostId(postId, member.getMemberId());
+        List<CommentResponseDto> comments = commentRepository.selectByPostId(postId, memberId);
 
         postDetailResponseDto.setLikeCount(postRepository.countLikeByPostId(postId));
         postDetailResponseDto.setComments(comments);
