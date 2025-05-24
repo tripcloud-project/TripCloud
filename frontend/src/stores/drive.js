@@ -3,6 +3,9 @@ import { ref, computed } from 'vue'
 import api from '@/lib/api'
 import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
 import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
+import { downloadFiles } from '@/utils/drive/download.js'
+import { deleteFiles } from '@/utils/drive/delete.js'
+
 export const useDriveStore = defineStore(
   'drive',
   () => {
@@ -155,6 +158,79 @@ export const useDriveStore = defineStore(
     const clearFileSelection = () => {
       selectedFile.value = null
     }
+
+    const selectItem = (itemId) => {
+      const item = items.value.find((i) => i.id === itemId)
+      if (item && item.type !== 'folder') {
+        selectedFile.value = item
+      } else if (item && item.type === 'folder') {
+        selectFolder(itemId)
+      }
+    }
+
+    const toggleItemSelection = (itemId) => {
+      const index = selectedItems.value.indexOf(itemId)
+      if (index === -1) {
+        selectedItems.value.push(itemId)
+      } else {
+        selectedItems.value.splice(index, 1)
+      }
+    }
+
+    const showContextMenu = (event, item) => {
+      event.preventDefault()
+      contextMenu.value = {
+        show: true,
+        x: event.clientX,
+        y: event.clientY,
+        item,
+      }
+
+      // Add event listener to close context menu when clicking elsewhere
+      setTimeout(() => {
+        window.addEventListener('click', closeContextMenu)
+      }, 0)
+    }
+
+    const closeContextMenu = () => {
+      contextMenu.value.show = false
+      window.removeEventListener('click', closeContextMenu)
+    }
+
+    // [다중 다운로드]
+    const downloadSelectedFiles = async () => {
+      const prefixList = selectedItems.value
+        .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
+        .filter(Boolean)
+
+      const fileIdList = selectedItems.value
+        .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
+        .filter(Boolean)
+
+      await downloadFiles({
+        prefixList,
+        fileIdList,
+        currentPrefix: prefix.value,
+      })
+    }
+
+    const deleteSelectedFiles = async () => {
+      const prefixList = selectedItems.value
+        .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
+        .filter(Boolean)
+
+      const fileIdList = selectedItems.value
+        .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
+        .filter(Boolean)
+
+      const result = await deleteFiles({ prefixList, fileIdList })
+
+      if (result.status === 'success') {
+        await fetchItems()
+        await loadDirectoryTree()
+        selectedItems.value = []
+      }
+    }
     return {
       prefix,
       setPrefix,
@@ -181,6 +257,12 @@ export const useDriveStore = defineStore(
       fetchItems,
       loadDirectoryTree,
       clearFileSelection,
+      selectItem,
+      toggleItemSelection,
+      showContextMenu,
+      closeContextMenu,
+      downloadSelectedFiles,
+      deleteSelectedFiles,
     }
   },
   {

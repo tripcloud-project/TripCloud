@@ -185,27 +185,8 @@
     <MetadataPanel/>
 
     <!-- Context Menu -->
-    <div
-      v-if="contextMenu.show"
-      class="fixed bg-white shadow-lg rounded-lg border border-gray-200 w-48 z-50"
-      :style="{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }"
-    >
-      <div class="py-1">
-        <button
-          v-for="(item, index) in contextMenuItems"
-          :key="index"
-          :class="[
-            'w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer flex items-center',
-            item.type === 'divider' ? 'border-t border-gray-200 my-1' : '',
-            item.danger ? 'text-red-600' : 'text-gray-700',
-          ]"
-          @click="handleContextMenuAction(item.action)"
-        >
-          <i v-if="item.icon" :class="['fas', item.icon, 'mr-2 w-4']"></i>
-          <span>{{ item.label }}</span>
-        </button>
-      </div>
-    </div>
+    <ContextMenu/>
+
   </div>
 </template>
 
@@ -216,42 +197,33 @@ import { onMounted, watch } from 'vue'
 const emptyFolderImage =
   'https://readdy.ai/api/search-image?query=A%20minimalist%20illustration%20of%20an%20empty%20folder%20with%20a%20slight%20shadow%2C%20clean%20lines%2C%20simple%20design%2C%20light%20background%2C%20professional%20look%2C%20subtle%20colors%2C%20business%20context%2C%20cloud%20storage%20concept&width=300&height=300&seq=1&orientation=squarish'
 
-// import api from '@/lib/api'
-// import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { useDriveStore } from '@/stores/drive.js'
-// import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems.js'
 import { storeToRefs } from 'pinia'
 import { formatDate, formatSize } from '@/utils/format'
-import { deleteFiles } from '@/utils/drive/delete'
-import { renameFile, renameDirectory } from '@/utils/drive/rename'
 import { uploadToServer } from '@/utils/drive/upload'
-import { downloadFiles } from '@/utils/drive/download.js'
 import Sidebar from '@/components/drive/Sidebar.vue'
 import MetadataPanel from '@/components/drive/MetadataPanel.vue'
+import ContextMenu from '@/components/drive/ContextMenu.vue'
 const driveStore = useDriveStore()
 
 // ref 꺼내 쓰기
 const {
   prefix,
-  items,
   folders,
   selectedFolder,
   expandedFolders,
   selectedItems,
-  selectedFile,
   sortBy,
   sortDirection,
   contextMenu,
   currentFolderName,
   filteredItems,
-  contextMenuItems,
   fileInput,
   folderInput,
 } = storeToRefs(driveStore)
 
 // 함수 꺼내 쓰기
-const { clearSelection, selectFolder, fetchItems, loadDirectoryTree } = driveStore
-
+const { clearSelection, selectItem, fetchItems, loadDirectoryTree, toggleItemSelection, closeContextMenu, downloadSelectedFiles, deleteSelectedFiles, showContextMenu } = driveStore
 
 onMounted(() => {
   loadDirectoryTree()
@@ -263,112 +235,9 @@ onMounted(() => {
   })
 })
 
-const selectItem = (itemId) => {
-  const item = items.value.find((i) => i.id === itemId)
-  if (item && item.type !== 'folder') {
-    selectedFile.value = item
-  } else if (item && item.type === 'folder') {
-    selectFolder(itemId)
-  }
-}
-
-const toggleItemSelection = (itemId) => {
-  const index = selectedItems.value.indexOf(itemId)
-  if (index === -1) {
-    selectedItems.value.push(itemId)
-  } else {
-    selectedItems.value.splice(index, 1)
-  }
-}
-
-
-
-
 const toggleSortDirection = () => {
   sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
 }
-
-const showContextMenu = (event, item) => {
-  event.preventDefault()
-  contextMenu.value = {
-    show: true,
-    x: event.clientX,
-    y: event.clientY,
-    item,
-  }
-
-  // Add event listener to close context menu when clicking elsewhere
-  setTimeout(() => {
-    window.addEventListener('click', closeContextMenu)
-  }, 0)
-}
-
-const closeContextMenu = () => {
-  contextMenu.value.show = false
-  window.removeEventListener('click', closeContextMenu)
-}
-
-const handleContextMenuAction = async (action) => {
-  const item = contextMenu.value.item
-
-  switch (action) {
-    case 'open':
-      if (item.type === 'folder') {
-        selectFolder(item.id)
-      } else {
-        selectItem(item.id)
-      }
-      break
-    case 'rename': {
-      if (item.type !== 'folder') {
-        const currentName = item.name
-        const dotIndex = currentName.lastIndexOf('.')
-        const nameOnly = currentName.slice(0, dotIndex)
-        const extension = currentName.slice(dotIndex)
-        const newNameOnly = prompt('새 이름을 입력하세요', nameOnly)
-
-        if (newNameOnly && newNameOnly !== nameOnly) {
-          const newFullName = newNameOnly + extension
-          await handleRenameFile(item.id, newFullName)
-        }
-      } else {
-        const oldPrefix = prefix.value + item.name
-        const newName = prompt('새 이름을 입력하세요', item.name.slice(0, -1))
-        const newPrefix = prefix.value + newName + '/'
-        if (oldPrefix && newPrefix) {
-          await handleRenameDirectory(oldPrefix, newPrefix)
-        }
-      }
-      break
-    }
-    case 'copy':
-      // Implement copy functionality
-      console.log('Copy', item.name)
-      break
-    case 'move':
-      // Implement move functionality
-      console.log('Move', item.name)
-      break
-    case 'download':
-      // Implement download functionality
-      if (!selectedItems.value.includes(item.id)) {
-        toggleItemSelection(item.id)
-      }
-      downloadSelectedFiles()
-      break
-    case 'delete':
-      // Implement delete functionality
-      if (!selectedItems.value.includes(item.id)) {
-        toggleItemSelection(item.id)
-      }
-      deleteSelectedFiles()
-      break
-  }
-
-  closeContextMenu()
-}
-
-
 
 // Watch for changes in selected folder to update expanded folders
 watch(selectedFolder, (newFolderId) => {
@@ -388,68 +257,6 @@ watch(selectedFolder, (newFolderId) => {
     }
   }
 })
-
-// [다중 다운로드]
-const downloadSelectedFiles = async () => {
-  const prefixList = selectedItems.value
-    .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
-    .filter(Boolean)
-
-  const fileIdList = selectedItems.value
-    .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
-    .filter(Boolean)
-
-  await downloadFiles({
-    prefixList,
-    fileIdList,
-    currentPrefix: prefix.value,
-  })
-}
-
-
-
-// [다중 삭제]
-const deleteSelectedFiles = async () => {
-  const prefixList = selectedItems.value
-    .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
-    .filter(Boolean)
-
-  const fileIdList = selectedItems.value
-    .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
-    .filter(Boolean)
-
-  const result = await deleteFiles({ prefixList, fileIdList })
-
-  if (result.status === 'success') {
-    await fetchItems()
-    await loadDirectoryTree()
-    selectedItems.value = []
-  }
-}
-
-
-
-// [이름 변경]
-const handleRenameFile = async (fileId, newFilename) => {
-  const result = await renameFile(fileId, newFilename)
-  if (result.status === 'success') {
-    await fetchItems()
-    await loadDirectoryTree()
-  } else {
-    console.warn('이름 변경 실패:', result)
-  }
-}
-
-// [디렉토리 이름 변경]
-const handleRenameDirectory = async (oldPrefix, newPrefix) => {
-  const result = await renameDirectory(oldPrefix, newPrefix)
-  if (result.status === 'success') {
-    await fetchItems()
-    await loadDirectoryTree()
-  } else {
-    console.warn('디렉토리 이름 변경 실패:', result)
-  }
-}
 
 // 파일 선택창 열기
 const triggerFileSelect = () => {
