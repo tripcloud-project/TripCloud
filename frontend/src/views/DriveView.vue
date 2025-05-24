@@ -363,20 +363,33 @@
             @click="downloadSingleFile"
           >
             <i class="fas fa-download text-gray-700 mb-1"></i>
-            <span class="text-xs">Download</span>
+            <span class="text-xs">다운로드</span>
           </button>
-          <!-- <button
-            class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-share-alt text-gray-700 mb-1"></i>
-            <span class="text-xs">Share</span>  
-          </button> -->
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
             @click="deleteSingleFile"
           >
             <i class="fas fa-trash-alt text-gray-700 mb-1"></i>
-            <span class="text-xs">Delete</span>
+            <span class="text-xs">삭제</span>
+          </button>
+          <button
+            class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
+            @click="renameSingleFile"
+          >
+            <i class="fas fa-share-alt text-gray-700 mb-1"></i>
+            <span class="text-xs">이름 변경</span>  
+          </button>
+          <button
+            class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
+          >
+            <i class="fas fa-share-alt text-gray-700 mb-1"></i>
+            <span class="text-xs">설명 추가</span>  
+          </button>
+          <button
+            class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
+          >
+            <i class="fas fa-share-alt text-gray-700 mb-1"></i>
+            <span class="text-xs">해시태그 추가</span>  
           </button>
         </div>
       </div>
@@ -971,6 +984,21 @@ const renameDirectory = async (oldPrefix, newPrefix) => {
   } catch (error) {
     console.error('이름 변경 중 오류 발생:', error)
   }
+}
+
+const renameSingleFile = async () => {
+    const item = selectedFile.value
+    if (!item) return
+    const currentName = item.name
+    const dotIndex = currentName.lastIndexOf('.')
+    const nameOnly = currentName.slice(0, dotIndex)
+    const extension = currentName.slice(dotIndex)
+    const newNameOnly = prompt('새 이름을 입력하세요', nameOnly)
+
+    if (newNameOnly && newNameOnly !== nameOnly) {
+      const newFullName = newNameOnly + extension
+      await renameFile(item.id, newFullName)
+    }
 }
 
 const fileInput = ref(null)
