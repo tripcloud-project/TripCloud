@@ -15,6 +15,7 @@
     "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.9.0",
     "pinia": "^3.0.1",
+    "pinia-plugin-persistedstate": "^4.3.0",
     "quill": "^2.0.3",
     "quill-image-drop-module": "^1.0.3",
     "quill2-image-uploader": "^1.0.4",
