@@ -9,6 +9,7 @@
     FROM file
     WHERE member_id=#{memberId}
     AND is_deleted=false
+    AND sido IS NOT NULL
     GROUP BY sido
   </select>
 
@@ -22,7 +23,7 @@
   </select>
 
   <select id="findPhotosBySidoAndSigunguAndMemberId">
-    SELECT file_id, s3_key, original_filename AS name, size
+    SELECT file_id, s3_key, original_filename AS name, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description
     FROM file
     WHERE member_id=#{memberId}
     AND sido=#{sido}
@@ -71,6 +72,8 @@
 	SELECT DISTINCT sido
 	FROM file
 	WHERE member_id=#{memberId}
+    AND sido IS NOT NULL
+    AND is_deleted = false
   </select>
   
   <select id="findDistinctSigunguBySidoAndMemberId">
@@ -78,6 +81,7 @@
 	FROM file
 	WHERE member_id=#{memberId}
 	AND sido=#{sido}
+    AND is_deleted = false
   </select>
 
   <select id="selectSidoThumbnailsByMemberId" resultType="com.ssafy.project.domain.gallery.dto.response.ThumbnailResponseDto">
