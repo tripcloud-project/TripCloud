@@ -25,7 +25,7 @@ public interface FileService {
 	void trashBulk(TrashRequestDto trashRequestDto);
 	void restore(RestoreRequestDto restoreRequestDto);
 	void delete(DeleteRequestDto deleteRequestDto);
-	Map<String, Object> getDirectoryStructure();
+	Map<String, Object> getDirectoryStructure(boolean isDeleted);
 	SearchResultResponseDto searchByKeyWord(String keyword);
 	SearchResultResponseDto searchByHashtag(String hashtag);
     SearchResultResponseDto searchByDescription(String description);

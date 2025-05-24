@@ -356,11 +356,11 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    public Map<String, Object> getDirectoryStructure() {
+    public Map<String, Object> getDirectoryStructure(boolean isDeleted) {
         String prefix = makeMemberPrefix("");
         Long memberId = SecurityUtil.getCurrentMemberId();
 
-        List<String> directories = fileRepository.findDirectoriesByPrefixAndMemberId(prefix, memberId);
+        List<String> directories = fileRepository.findDirectoriesByPrefixAndMemberIdAndIsDeleted(prefix, memberId, isDeleted);
 
         Map<String, Object> root = new LinkedHashMap<>();
 
