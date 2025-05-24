@@ -6,6 +6,7 @@ import flattenDirectoryTree from '@/utils/map/flattenDirectoryTree'
 import { downloadFiles } from '@/utils/map/download.js'
 import { deleteFiles } from '@/utils/map/delete.js'
 import { useRouter } from 'vue-router'
+import { setThumbnail } from '@/utils/map/thumbnail'
 
 export const useMapStore = defineStore(
   'map',
@@ -29,10 +30,12 @@ export const useMapStore = defineStore(
       item: null,
     })
     const quickAccess = ref([
-      { id: 'drive', name: 'Drive', icon: 'fas fa-clock', color: 'text-blue-500' },
-      { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' },
-      { id: 'map', name: 'Map', icon: 'fas fa-star', color: 'text-yellow-500' },
+      { id: 'drive', name: '드라이브', icon: 'fas fa-clock', color: 'text-blue-500' },
+      { id: 'trash', name: '휴지통', icon: 'fas fa-trash-alt', color: 'text-red-500' },
+      { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' }
     ])
+
+    const showThumbnailDialog = ref(false)
 
     const router = useRouter()
     const handleQuickAccessClick = (id) => {
@@ -135,18 +138,18 @@ export const useMapStore = defineStore(
 
       const baseItems = [
         {
-          label: isFolder ? 'Open' : 'Preview',
+          label: isFolder ? '열기' : '미리보기',
           icon: isFolder ? 'fa-folder-open' : 'fa-eye',
           action: 'open',
         },
-        { label: 'Rename', icon: 'fa-edit', action: 'rename' },
-        { label: 'Copy to', icon: 'fa-copy', action: 'copy' },
-        { label: 'Move to', icon: 'fa-cut', action: 'move' },
+        { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
         { type: 'divider' },
-        { label: 'Download', icon: 'fa-download', action: 'download' },
+        { label: '다운로드', icon: 'fa-download', action: 'download' },
         // { label: 'Share', icon: 'fa-share-alt', action: 'share' },
         { type: 'divider' },
-        { label: 'Delete', icon: 'fa-trash-alt', action: 'delete', danger: true },
+        { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
+        { type: 'divider' },
+        { label: '썸네일 설정', icon: 'fa-cut', action: 'thumbnail' },
       ]
 
       return baseItems
@@ -266,6 +269,16 @@ export const useMapStore = defineStore(
         selectedItems.value = []
       }
     }
+
+    const setThumbnailFile = async (fileId, region) => {
+      setThumbnail(fileId, region)
+    }
+    const selectedRegion = ref('')
+
+    const thumbnailCandidate = ref({
+      id: null,
+      options: [],
+    })
     return {
       prefix,
       setPrefix,
@@ -299,7 +312,11 @@ export const useMapStore = defineStore(
       downloadSelectedFiles,
       deleteSelectedFiles,
       handleQuickAccessClick,
-      visibleFolders
+      visibleFolders,
+      setThumbnailFile,
+      showThumbnailDialog,
+      selectedRegion,
+      thumbnailCandidate,
     }
   },
   {
