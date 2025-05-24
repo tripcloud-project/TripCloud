@@ -12,7 +12,7 @@ export const useTrashStore = defineStore(
   () => {
     // ref properties
     const prefix = ref('/') // 기본 경로
-    
+
     const selectedFolder = ref('/')
     const expandedFolders = ref(['/'])
     const selectedItems = ref([])
@@ -38,10 +38,10 @@ export const useTrashStore = defineStore(
     const handleQuickAccessClick = (id) => {
       if (id === 'trash') {
         router.push({ name: 'trash' })
-      }else if(id === 'map'){
-        router.push({name : 'map'})
-      }else if(id === 'drive'){
-        router.push({name : 'drive'})
+      } else if (id === 'map') {
+        router.push({ name: 'map' })
+      } else if (id === 'drive') {
+        router.push({ name: 'drive' })
       }
     }
 
@@ -128,20 +128,12 @@ export const useTrashStore = defineStore(
       const item = contextMenu.value.item
       if (!item) return []
 
-      const isFolder = item.type === 'folder'
-
       const baseItems = [
-        {
-          label: isFolder ? '열기' : '미리보기',
-          icon: isFolder ? 'fa-folder-open' : 'fa-eye',
-          action: 'open',
-        },
-        { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
+        { label: '복원', icon: 'fa-trash-restore', action: 'restore' },
         { type: 'divider' },
-        { label: '다운로드', icon: 'fa-download', action: 'download' },
-        { type: 'divider' },
-        { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
+        { label: 'Delete', icon: 'fa-trash-alt', action: 'delete', danger: true },
       ]
+
 
       return baseItems
     })
@@ -227,7 +219,7 @@ export const useTrashStore = defineStore(
       window.removeEventListener('click', closeContextMenu)
     }
 
-    // [다중 복원원]
+    // [다중 복원]
     const restoreSelectedFiles = async () => {
       const prefixList = selectedItems.value
         .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)

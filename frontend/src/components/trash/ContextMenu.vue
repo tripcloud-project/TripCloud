@@ -26,33 +26,19 @@
 import { useTrashStore } from '@/stores/trash.js'
 import { storeToRefs } from 'pinia'
 const trashStore = useTrashStore()
-const {
-  contextMenu,
-  contextMenuItems,
-  selectedItems,
+const { contextMenu, contextMenuItems, selectedItems } = storeToRefs(trashStore)
 
-} = storeToRefs(trashStore)
-
-const { selectItem, selectFolder, closeContextMenu, toggleItemSelection, deleteSelectedFiles } = trashStore
+const { closeContextMenu, toggleItemSelection, deleteSelectedFiles, restoreSelectedFiles } = trashStore
 
 const handleContextMenuAction = async (action) => {
   const item = contextMenu.value.item
 
   switch (action) {
-    case 'open':
-      if (item.type === 'folder') {
-        selectFolder(item.id)
-      } else {
-        selectItem(item.id)
+    case 'restore':
+      if (!selectedItems.value.includes(item.id)) {
+        toggleItemSelection(item.id)
       }
-      break
-    case 'copy':
-      // Implement copy functionality
-      console.log('Copy', item.name)
-      break
-    case 'move':
-      // Implement move functionality
-      console.log('Move', item.name)
+      restoreSelectedFiles()
       break
     case 'delete':
       // Implement delete functionality
@@ -65,10 +51,6 @@ const handleContextMenuAction = async (action) => {
 
   closeContextMenu()
 }
-
-
-
-
 </script>
 
 <style scoped></style>
