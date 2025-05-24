@@ -12,7 +12,7 @@ export const useMapStore = defineStore(
   () => {
     // ref properties
     const prefix = ref('/') // 기본 경로
-    
+
     const selectedFolder = ref('/')
     const expandedFolders = ref(['/'])
     const selectedItems = ref([])
@@ -38,10 +38,10 @@ export const useMapStore = defineStore(
     const handleQuickAccessClick = (id) => {
       if (id === 'trash') {
         router.push({ name: 'trash' })
-      }else if(id === 'map'){
-        router.push({name : 'map'})
-      }else if(id === 'drive'){
-        router.push({name : 'drive'})
+      } else if (id === 'map') {
+        router.push({ name: 'map' })
+      } else if (id === 'drive') {
+        router.push({ name: 'drive' })
       }
     }
 
@@ -104,8 +104,11 @@ export const useMapStore = defineStore(
         let valueA, valueB
 
         if (sortBy.value === 'name') {
-          valueA = a.name.toLowerCase()
-          valueB = b.name.toLowerCase()
+          // valueA = a.name.toLowerCase()
+          // valueB = b.name.toLowerCase()
+          valueA = (a.name ?? '').toLowerCase()
+          valueB = (b.name ?? '').toLowerCase()
+
         } else if (sortBy.value === 'modified') {
           valueA = new Date(a.modified).getTime()
           valueB = new Date(b.modified).getTime()
@@ -173,12 +176,11 @@ export const useMapStore = defineStore(
     }
     const fetchItems = async () => {
       try {
-        const res = await api.get(`/gallery/list`, {
+        const res = await api.get(`/gallery/photo`, {
           params: { prefix: prefix.value },
         })
         if (res.data.status === 'success') {
           items.value = mapApiResponseToItems(res.data.result, prefix.value)
-          console.log(items.value)
         }
       } catch (err) {
         console.error('[fetchItems] 오류:', err)

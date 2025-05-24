@@ -49,11 +49,9 @@ watch(selectedFolder, (newFolderId) => {
   if (folder) {
     // Make sure all parent folders are expanded
     let parentId = folder.parent
-    console.log('parentId: ', parentId)
     while (parentId) {
       if (!expandedFolders.value.includes(parentId)) {
         expandedFolders.value.push(parentId)
-        console.log('expandedFolders.value: ', expandedFolders.value)
       }
       const parentFolder = folders.value.find((f) => f.id === parentId)
       parentId = parentFolder ? parentFolder.parent : null

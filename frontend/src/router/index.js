@@ -48,8 +48,8 @@ const router = createRouter({
       component: DriveTrashView
     },
     {
-      path: '/drive/map',
-      name: 'map',
+      path: '/drive/map-test',
+      name: 'map-test',
       component: DriveMapView
     }
   ],

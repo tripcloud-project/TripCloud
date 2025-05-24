@@ -2,11 +2,11 @@
   <div class="min-h-screen bg-gray-50 flex">
     <DriveSidebar />
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
-      <p>지도입니다</p>
       <DriveHeader />
       <DriveToolbar />
       <ContentGrid />
     </div>
+    <MetadataPanel />
     <ContextMenu />
   </div>
 </template>
@@ -22,6 +22,7 @@ import ContextMenu from '@/components/map/ContextMenu.vue'
 import DriveToolbar from '@/components/map/DriveToolbar.vue'
 import DriveHeader from '@/components/map/DriveHeader.vue'
 import ContentGrid from '@/components/map/ContentGrid.vue'
+import MetadataPanel from '@/components/map/MetadataPanel.vue'
 
 const mapStore = useMapStore()
 
@@ -48,11 +49,9 @@ watch(selectedFolder, (newFolderId) => {
   if (folder) {
     // Make sure all parent folders are expanded
     let parentId = folder.parent
-    console.log('parentId: ', parentId)
     while (parentId) {
       if (!expandedFolders.value.includes(parentId)) {
         expandedFolders.value.push(parentId)
-        console.log('expandedFolders.value: ', expandedFolders.value)
       }
       const parentFolder = folders.value.find((f) => f.id === parentId)
       parentId = parentFolder ? parentFolder.parent : null

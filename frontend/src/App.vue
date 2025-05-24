@@ -10,6 +10,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/drive">드라이브</RouterLink>
       <RouterLink to="/board">게시판</RouterLink>
       <RouterLink to="/posts/new">새 글 쓰기</RouterLink>
+      <RouterLink to="/drive/map-test">지도 테스트</RouterLink>
     </nav>
   </header>
   <RouterView />
