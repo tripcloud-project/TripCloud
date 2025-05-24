@@ -32,10 +32,21 @@ const {
   contextMenuItems,
   prefix,
   selectedItems,
-
+  showThumbnailDialog,
+  selectedRegion,
+  thumbnailCandidate,
 } = storeToRefs(mapStore)
 
-const { selectItem, selectFolder, closeContextMenu, toggleItemSelection, downloadSelectedFiles, deleteSelectedFiles, fetchItems, loadDirectoryTree } = mapStore
+const {
+  selectItem,
+  selectFolder,
+  closeContextMenu,
+  toggleItemSelection,
+  downloadSelectedFiles,
+  deleteSelectedFiles,
+  fetchItems,
+  loadDirectoryTree,
+} = mapStore
 
 const handleContextMenuAction = async (action) => {
   const item = contextMenu.value.item
@@ -92,11 +103,27 @@ const handleContextMenuAction = async (action) => {
       }
       deleteSelectedFiles()
       break
+    // 예시 흐름
+    case 'thumbnail': {
+      // thumbnailCandidate.value = {
+      //   id: item.id,
+      //   options: [item.sido, item.sigungu].filter(Boolean),
+      // }
+      thumbnailCandidate.value = {
+        id: item.id,
+        options: [
+          { label: item.sido, type: 'sido' },
+          { label: item.sigungu, type: 'sigungu' },
+        ].filter((opt) => !!opt.label), // null 제거
+      }
+      selectedRegion.value = '' // 초기화
+      showThumbnailDialog.value = true
+      break
+    }
   }
 
   closeContextMenu()
 }
-
 
 // [이름 변경]
 const handleRenameFile = async (fileId, newFilename) => {
@@ -119,8 +146,6 @@ const handleRenameDirectory = async (oldPrefix, newPrefix) => {
     console.warn('디렉토리 이름 변경 실패:', result)
   }
 }
-
-
 </script>
 
 <style scoped></style>

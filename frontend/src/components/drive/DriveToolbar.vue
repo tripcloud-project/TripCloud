@@ -3,7 +3,7 @@
     v-if="selectedItems.length > 0"
     class="bg-white border-b border-gray-200 p-3 flex items-center"
   >
-    <span class="text-sm font-medium mr-4">{{ selectedItems.length }} items selected</span>
+    <span class="text-sm font-medium mr-4">{{ selectedItems.length }}개 선택됨</span>
     <div class="flex space-x-2">
       <button
         class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
@@ -22,7 +22,7 @@
       @click="clearSelection"
       class="ml-auto text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
     >
-      Clear selection
+      선택 취소
     </button>
   </div>
 </template>

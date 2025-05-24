@@ -8,6 +8,7 @@
     </div>
     <MetadataPanel />
     <ContextMenu />
+    <ThumbnailModal v-if="showThumbnailDialog"/>
   </div>
 </template>
 
@@ -23,11 +24,12 @@ import DriveToolbar from '@/components/map/DriveToolbar.vue'
 import DriveHeader from '@/components/map/DriveHeader.vue'
 import ContentGrid from '@/components/map/ContentGrid.vue'
 import MetadataPanel from '@/components/map/MetadataPanel.vue'
+import ThumbnailModal from '@/components/map/ThumbnailModal.vue'
 
 const mapStore = useMapStore()
 
 // ref 꺼내 쓰기
-const { folders, selectedFolder, expandedFolders, contextMenu } = storeToRefs(mapStore)
+const { folders, selectedFolder, expandedFolders, contextMenu, showThumbnailDialog } = storeToRefs(mapStore)
 
 // 함수 꺼내 쓰기
 const { fetchItems, loadDirectoryTree, closeContextMenu } = mapStore

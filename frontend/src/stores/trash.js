@@ -29,9 +29,9 @@ export const useTrashStore = defineStore(
       item: null,
     })
     const quickAccess = ref([
-      { id: 'drive', name: 'Drive', icon: 'fas fa-clock', color: 'text-blue-500' },
-      { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' },
-      { id: 'map', name: 'Map', icon: 'fas fa-star', color: 'text-yellow-500' },
+      { id: 'drive', name: '드라이브', icon: 'fas fa-clock', color: 'text-blue-500' },
+      { id: 'trash', name: '휴지통', icon: 'fas fa-trash-alt', color: 'text-red-500' },
+      { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' }
     ])
 
     const router = useRouter()
@@ -132,18 +132,15 @@ export const useTrashStore = defineStore(
 
       const baseItems = [
         {
-          label: isFolder ? 'Open' : 'Preview',
+          label: isFolder ? '열기' : '미리보기',
           icon: isFolder ? 'fa-folder-open' : 'fa-eye',
           action: 'open',
         },
-        { label: 'Rename', icon: 'fa-edit', action: 'rename' },
-        { label: 'Copy to', icon: 'fa-copy', action: 'copy' },
-        { label: 'Move to', icon: 'fa-cut', action: 'move' },
+        { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
         { type: 'divider' },
-        { label: 'Download', icon: 'fa-download', action: 'download' },
-        // { label: 'Share', icon: 'fa-share-alt', action: 'share' },
+        { label: '다운로드', icon: 'fa-download', action: 'download' },
         { type: 'divider' },
-        { label: 'Delete', icon: 'fa-trash-alt', action: 'delete', danger: true },
+        { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
       ]
 
       return baseItems
