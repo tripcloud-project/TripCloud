@@ -123,6 +123,7 @@ public class PhotoServiceImpl implements PhotoService{
     	List<RegionDto> directories = new ArrayList<>();
     	List<String> sidoList = photoRepository.findDistinctSidoByMemberId(memberId);
     	for(String sido : sidoList) {
+			if(sido == null) continue;
     		RegionDto regionDto = RegionDto.builder()
     				.sido(sido)
     				.sigungu(photoRepository.findDistinctSigunguBySidoAndMemberId(sido, memberId))
