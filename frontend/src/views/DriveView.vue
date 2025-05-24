@@ -1,74 +1,7 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 <template>
   <div class="min-h-screen bg-gray-50 flex">
-    <!-- Left Sidebar -->
-    <div class="w-[250px] bg-white border-r border-gray-200 flex flex-col h-screen">
-      <div class="p-4 border-b border-gray-200">
-        <h1 class="text-xl font-semibold text-gray-800">CloudStorage</h1>
-      </div>
-
-      <!-- Search Filter -->
-      <div class="p-3 border-b border-gray-200">
-        <div class="relative">
-          <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search files and folders"
-            class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-        </div>
-      </div>
-
-      <!-- Directory Tree -->
-      <div class="overflow-y-auto flex-grow p-2">
-        <div class="space-y-1">
-          <div v-for="folder in filteredFolders" :key="folder.id" class="cursor-pointer">
-            <div
-              :class="[
-                'flex items-center p-2 rounded-lg',
-                selectedFolder === folder.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100',
-              ]"
-              @click="selectFolder(folder.id)"
-            >
-              <div class="flex items-center" :style="{ marginLeft: `${folder.level * 12}px` }">
-                <i
-                  v-if="folder.hasChildren"
-                  :class="[
-                    'mr-1 text-gray-500 w-4',
-                    expandedFolders.includes(folder.id)
-                      ? 'fas fa-chevron-down'
-                      : 'fas fa-chevron-right',
-                  ]"
-                  @click.stop="toggleFolder(folder.id)"
-                ></i>
-                <span v-else class="w-4"></span>
-                <i class="fas fa-folder text-yellow-400 mr-2"></i>
-                <span class="text-sm font-medium truncate">{{ folder.name }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Access -->
-      <div class="p-3 border-t border-gray-200">
-        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-          Quick Access
-        </h3>
-        <div class="space-y-1">
-          <div
-            v-for="item in quickAccess"
-            :key="item.id"
-            class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
-          >
-            <i :class="[item.icon, 'mr-2', item.color]"></i>
-            <span class="text-sm">{{ item.name }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <Sidebar/>
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
       <!-- Header -->
@@ -426,16 +359,17 @@ import { onMounted, watch } from 'vue'
 const emptyFolderImage =
   'https://readdy.ai/api/search-image?query=A%20minimalist%20illustration%20of%20an%20empty%20folder%20with%20a%20slight%20shadow%2C%20clean%20lines%2C%20simple%20design%2C%20light%20background%2C%20professional%20look%2C%20subtle%20colors%2C%20business%20context%2C%20cloud%20storage%20concept&width=300&height=300&seq=1&orientation=squarish'
 
-import api from '@/lib/api'
-import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
+// import api from '@/lib/api'
+// import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { useDriveStore } from '@/stores/drive.js'
-import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems.js'
+// import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems.js'
 import { storeToRefs } from 'pinia'
 import { formatDate, formatDateTime, formatSize } from '@/utils/format'
 import { deleteFiles } from '@/utils/drive/delete'
 import { renameFile, renameDirectory, renameSingleFile } from '@/utils/drive/rename'
 import { uploadToServer } from '@/utils/drive/upload'
 import { downloadFiles } from '@/utils/drive/download.js'
+import Sidebar from '@/components/drive/Sidebar.vue'
 const driveStore = useDriveStore()
 
 // ref 꺼내 쓰기
@@ -447,12 +381,9 @@ const {
   expandedFolders,
   selectedItems,
   selectedFile,
-  searchQuery,
   sortBy,
   sortDirection,
   contextMenu,
-  quickAccess,
-  filteredFolders,
   currentFolderName,
   filteredItems,
   contextMenuItems,
@@ -461,12 +392,8 @@ const {
 } = storeToRefs(driveStore)
 
 // 함수 꺼내 쓰기
-const { setPrefix } = driveStore
+const { clearSelection, selectFolder, fetchItems, loadDirectoryTree } = driveStore
 
-const loadDirectoryTree = async () => {
-  const { data } = await api.get('/gallery') // 백엔드 API
-  folders.value = flattenDirectoryTree(data.result)
-}
 
 onMounted(() => {
   loadDirectoryTree()
@@ -478,42 +405,12 @@ onMounted(() => {
   })
 })
 
-const fetchItems = async () => {
-  try {
-    const res = await api.get(`/gallery/list`, {
-      params: { prefix: prefix.value },
-    })
-    if (res.data.status === 'success') {
-      items.value = mapApiResponseToItems(res.data.result, prefix.value)
-      console.log(items.value)
-    }
-  } catch (err) {
-    console.error('[fetchItems] 오류:', err)
-  }
-}
-
 const selectItem = (itemId) => {
   const item = items.value.find((i) => i.id === itemId)
   if (item && item.type !== 'folder') {
     selectedFile.value = item
   } else if (item && item.type === 'folder') {
     selectFolder(itemId)
-  }
-}
-
-const selectFolder = (folderId) => {
-  selectedFolder.value = folderId
-  const newPrefix = folderId
-  setPrefix(newPrefix)
-  fetchItems()
-}
-
-const toggleFolder = (folderId) => {
-  const index = expandedFolders.value.indexOf(folderId)
-  if (index === -1) {
-    expandedFolders.value.push(folderId)
-  } else {
-    expandedFolders.value.splice(index, 1)
   }
 }
 
@@ -526,9 +423,6 @@ const toggleItemSelection = (itemId) => {
   }
 }
 
-const clearSelection = () => {
-  selectedItems.value = []
-}
 
 const clearFileSelection = () => {
   selectedFile.value = null
@@ -710,7 +604,7 @@ const handleRenameFile = async (fileId, newFilename) => {
   const result = await renameFile(fileId, newFilename)
   if (result.status === 'success') {
     await fetchItems()
-    loadDirectoryTree()
+    await loadDirectoryTree()
   } else {
     console.warn('이름 변경 실패:', result)
   }
@@ -721,7 +615,7 @@ const handleRenameDirectory = async (oldPrefix, newPrefix) => {
   const result = await renameDirectory(oldPrefix, newPrefix)
   if (result.status === 'success') {
     await fetchItems()
-    loadDirectoryTree()
+    await loadDirectoryTree()
   } else {
     console.warn('디렉토리 이름 변경 실패:', result)
   }
@@ -733,7 +627,7 @@ const handleRenameSingleFile = async () => {
     file: selectedFile.value,
     onRename: async () => {
       await fetchItems()
-      loadDirectoryTree()
+      await loadDirectoryTree()
     },
   })
 }

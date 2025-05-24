@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
+import api from '@/lib/api'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
+import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 export const useDriveStore = defineStore(
   'drive',
   () => {
@@ -127,6 +129,30 @@ export const useDriveStore = defineStore(
         expandedFolders.value.splice(index, 1)
       }
     }
+    const selectFolder = (folderId) => {
+      selectedFolder.value = folderId
+      const newPrefix = folderId
+      setPrefix(newPrefix)
+      fetchItems()
+    }
+    const fetchItems = async () => {
+      try {
+        const res = await api.get(`/gallery/list`, {
+          params: { prefix: prefix.value },
+        })
+        if (res.data.status === 'success') {
+          items.value = mapApiResponseToItems(res.data.result, prefix.value)
+          console.log(items.value)
+        }
+      } catch (err) {
+        console.error('[fetchItems] 오류:', err)
+      }
+    }
+    const loadDirectoryTree = async () => {
+      const { data } = await api.get('/gallery') // 백엔드 API
+      folders.value = flattenDirectoryTree(data.result)
+
+    }
     return {
       prefix,
       setPrefix,
@@ -149,6 +175,9 @@ export const useDriveStore = defineStore(
       contextMenuItems,
       fileInput,
       folderInput,
+      selectFolder,
+      fetchItems,
+      loadDirectoryTree,
     }
   },
   {
