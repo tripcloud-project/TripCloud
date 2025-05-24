@@ -151,7 +151,9 @@ export const useDriveStore = defineStore(
     const loadDirectoryTree = async () => {
       const { data } = await api.get('/gallery') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result)
-
+    }
+    const clearFileSelection = () => {
+      selectedFile.value = null
     }
     return {
       prefix,
@@ -178,6 +180,7 @@ export const useDriveStore = defineStore(
       selectFolder,
       fetchItems,
       loadDirectoryTree,
+      clearFileSelection,
     }
   },
   {
