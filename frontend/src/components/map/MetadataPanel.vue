@@ -96,7 +96,7 @@
         </div>
 
         <div v-if="selectedFile.description">
-          <h4 class="text-sm font-medium text-gray-500 mb-1">Description</h4>
+          <h4 class="text-sm font-medium text-gray-500 mb-1">설명</h4>
           <p class="text-sm text-gray-800">{{ selectedFile.description }}</p>
         </div>
       </div>
@@ -129,6 +129,7 @@
 
         <button
           class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
+          @click="handleDescriptionSingleFile"
         >
           <i class="fas fa-comment-alt text-gray-700 mb-1"></i>
           <span class="text-xs">설명 추가</span>
@@ -152,6 +153,7 @@ import { downloadFiles } from '@/utils/map/download.js'
 import { deleteFiles } from '@/utils/map/delete.js'
 import { renameSingleFile } from '@/utils/map/rename.js'
 import { formatDateTime, formatSize } from '@/utils/format'
+import { descriptionSingleFile } from '@/utils/map/description.js'
 
 const mapStore = useMapStore()
 const { prefix, selectedFile, selectedItems } = storeToRefs(mapStore)
@@ -198,6 +200,26 @@ const handleRenameSingleFile = async () => {
     },
   })
 }
+
+// [선택 설명 추가]
+const handleDescriptionSingleFile = async () => {
+  const fileId = selectedFile.value.id // 또는 contextMenu.value.item.id 등
+  const newDescription = prompt('설명을 입력하세요:', selectedFile.value.description || '')
+
+  if (!newDescription) return
+
+  const result = await descriptionSingleFile({
+    fileId,
+    description: newDescription
+  })
+
+  if (result.status === 'success') {
+    alert('설명이 수정되었습니다.')
+    selectedFile.value.description = newDescription
+    await fetchItems()
+  }
+}
+
 </script>
 
 <style scoped></style>
