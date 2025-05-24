@@ -3,7 +3,6 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import DriveView from '@/views/DriveView.vue'
 import BoardListView from '@/views/BoardListView.vue'
-import DriveTestView from '@/views/DriveTestView.vue'
 import PostDetailView from '@/views/PostDetailView.vue'
 import NewPostView from '@/views/NewPostView.vue'
 
@@ -29,11 +28,6 @@ const router = createRouter({
       path: '/board',
       name: 'board',
       component: BoardListView,
-    },
-    {
-      path: '/drive-test',
-      name: 'drive-test',
-      component: DriveTestView,
     },
     {
       path: '/posts/:id',

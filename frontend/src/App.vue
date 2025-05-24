@@ -8,7 +8,6 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/login">로그인</RouterLink>
       <RouterLink to="/register">회원가입</RouterLink>
       <RouterLink to="/drive">드라이브</RouterLink>
-      <RouterLink to="/drive-test">드라이브 테스트</RouterLink>
       <RouterLink to="/board">게시판</RouterLink>
       <RouterLink to="/posts/new">새 글 쓰기</RouterLink>
     </nav>
