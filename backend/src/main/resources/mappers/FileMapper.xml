@@ -97,7 +97,7 @@
 	WHERE CHAR_LENGTH(dir_name) - CHAR_LENGTH(REPLACE(dir_name, '/', '')) = 
 	      CHAR_LENGTH(#{prefix}) - CHAR_LENGTH(REPLACE(#{prefix}, '/', '')) + 1
 	) AS d
-	JOIN file p ON p.s3_key LIKE CONCAT(d.dir_name, '%')
+	JOIN file p ON p.s3_key LIKE CONCAT(d.dir_name, '%') AND p.is_deleted = #{isDeleted}
 	GROUP BY d.dir_name;
   </select>
 
