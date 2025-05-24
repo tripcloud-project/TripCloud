@@ -1,5 +1,4 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
-
 <template>
   <div class="min-h-screen bg-gray-50 flex">
     <!-- Left Sidebar -->
@@ -374,22 +373,22 @@
           </button>
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
-            @click="renameSingleFile"
+            @click="handleRenameSingleFile"
           >
             <i class="fas fa-share-alt text-gray-700 mb-1"></i>
-            <span class="text-xs">이름 변경</span>  
+            <span class="text-xs">이름 변경</span>
           </button>
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
           >
             <i class="fas fa-share-alt text-gray-700 mb-1"></i>
-            <span class="text-xs">설명 추가</span>  
+            <span class="text-xs">설명 추가</span>
           </button>
           <button
             class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
           >
             <i class="fas fa-share-alt text-gray-700 mb-1"></i>
-            <span class="text-xs">해시태그 추가</span>  
+            <span class="text-xs">해시태그 추가</span>
           </button>
         </div>
       </div>
@@ -421,16 +420,48 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 
 // Empty folder image
 const emptyFolderImage =
   'https://readdy.ai/api/search-image?query=A%20minimalist%20illustration%20of%20an%20empty%20folder%20with%20a%20slight%20shadow%2C%20clean%20lines%2C%20simple%20design%2C%20light%20background%2C%20professional%20look%2C%20subtle%20colors%2C%20business%20context%2C%20cloud%20storage%20concept&width=300&height=300&seq=1&orientation=squarish'
 
 import api from '@/lib/api'
-import flattenDirectoryTree from '@/utils/flattenDirectoryTree'
+import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
+import { useDriveStore } from '@/stores/drive.js'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems.js'
+import { storeToRefs } from 'pinia'
+import { formatDate, formatDateTime, formatSize } from '@/utils/format'
+import { deleteFiles } from '@/utils/drive/delete'
+import { renameFile, renameDirectory, renameSingleFile } from '@/utils/drive/rename'
+import { uploadToServer } from '@/utils/drive/upload'
+import { downloadFiles } from '@/utils/drive/download.js'
+const driveStore = useDriveStore()
 
-const folders = ref([])
+// ref 꺼내 쓰기
+const {
+  prefix,
+  items,
+  folders,
+  selectedFolder,
+  expandedFolders,
+  selectedItems,
+  selectedFile,
+  searchQuery,
+  sortBy,
+  sortDirection,
+  contextMenu,
+  quickAccess,
+  filteredFolders,
+  currentFolderName,
+  filteredItems,
+  contextMenuItems,
+  fileInput,
+  folderInput,
+} = storeToRefs(driveStore)
+
+// 함수 꺼내 쓰기
+const { setPrefix } = driveStore
 
 const loadDirectoryTree = async () => {
   const { data } = await api.get('/gallery') // 백엔드 API
@@ -440,20 +471,20 @@ const loadDirectoryTree = async () => {
 onMounted(() => {
   loadDirectoryTree()
   fetchItems()
+  document.addEventListener('click', () => {
+    if (contextMenu.value.show) {
+      closeContextMenu()
+    }
+  })
 })
-
-const items = ref([])
-import { useDriveStore } from '@/stores/drive.js'
-import mapApiResponseToItems from '@/utils/mapApiResponseToItems.js'
-const driveStore = useDriveStore()
 
 const fetchItems = async () => {
   try {
     const res = await api.get(`/gallery/list`, {
-      params: { prefix: driveStore.prefix },
+      params: { prefix: prefix.value },
     })
     if (res.data.status === 'success') {
-      items.value = mapApiResponseToItems(res.data.result, driveStore.prefix)
+      items.value = mapApiResponseToItems(res.data.result, prefix.value)
       console.log(items.value)
     }
   } catch (err) {
@@ -470,115 +501,10 @@ const selectItem = (itemId) => {
   }
 }
 
-// Quick access items
-const quickAccess = ref([
-  { id: 'recent', name: 'Recent', icon: 'fas fa-clock', color: 'text-blue-500' },
-  { id: 'starred', name: 'Starred', icon: 'fas fa-star', color: 'text-yellow-500' },
-  // { id: 'shared', name: 'Shared with me', icon: 'fas fa-user-friends', color: 'text-green-500' },
-  { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' },
-])
-
-// State variables
-const selectedFolder = ref('/')
-const expandedFolders = ref(['/'])
-const selectedItems = ref([])
-const selectedFile = ref(null)
-const searchQuery = ref('')
-const sortBy = ref('name')
-const sortDirection = ref('asc')
-
-// Context menu
-const contextMenu = ref({
-  show: false,
-  x: 0,
-  y: 0,
-  item: null,
-})
-
-// Computed properties
-const filteredFolders = computed(() => {
-  let result = [...folders.value]
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter((folder) => folder.name.toLowerCase().includes(query))
-  }
-
-  return result
-})
-
-const currentFolderName = computed(() => {
-  const folder = folders.value.find((f) => f.id === selectedFolder.value)
-  return folder ? folder.name : 'My Files'
-})
-
-const filteredItems = computed(() => {
-  let result = items.value.filter((item) => item.parent === selectedFolder.value)
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter((item) => item.name.toLowerCase().includes(query))
-  }
-
-  // Sort items
-  result.sort((a, b) => {
-    // Always put folders first
-    if (a.type === 'folder' && b.type !== 'folder') return -1
-    if (a.type !== 'folder' && b.type === 'folder') return 1
-
-    // Then sort by selected criteria
-    let valueA, valueB
-
-    if (sortBy.value === 'name') {
-      valueA = a.name.toLowerCase()
-      valueB = b.name.toLowerCase()
-    } else if (sortBy.value === 'modified') {
-      valueA = new Date(a.modified).getTime()
-      valueB = new Date(b.modified).getTime()
-    } else if (sortBy.value === 'size') {
-      valueA = a.size || 0
-      valueB = b.size || 0
-    }
-
-    if (sortDirection.value === 'asc') {
-      return valueA < valueB ? -1 : 1
-    } else {
-      return valueA > valueB ? -1 : 1
-    }
-  })
-
-  return result
-})
-
-const contextMenuItems = computed(() => {
-  const item = contextMenu.value.item
-  if (!item) return []
-
-  const isFolder = item.type === 'folder'
-
-  const baseItems = [
-    {
-      label: isFolder ? 'Open' : 'Preview',
-      icon: isFolder ? 'fa-folder-open' : 'fa-eye',
-      action: 'open',
-    },
-    { label: 'Rename', icon: 'fa-edit', action: 'rename' },
-    { label: 'Copy to', icon: 'fa-copy', action: 'copy' },
-    { label: 'Move to', icon: 'fa-cut', action: 'move' },
-    { type: 'divider' },
-    { label: 'Download', icon: 'fa-download', action: 'download' },
-    // { label: 'Share', icon: 'fa-share-alt', action: 'share' },
-    { type: 'divider' },
-    { label: 'Delete', icon: 'fa-trash-alt', action: 'delete', danger: true },
-  ]
-
-  return baseItems
-})
-
 const selectFolder = (folderId) => {
   selectedFolder.value = folderId
   const newPrefix = folderId
-  driveStore.setPrefix(newPrefix)
+  setPrefix(newPrefix)
   fetchItems()
 }
 
@@ -610,43 +536,6 @@ const clearFileSelection = () => {
 
 const toggleSortDirection = () => {
   sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-}
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
-const formatDateTime = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-  })
-}
-
-const formatSize = (bytes) => {
-  if (!bytes) return '—'
-
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  let size = bytes
-  let unitIndex = 0
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024
-    unitIndex++
-  }
-
-  return `${size.toFixed(1)} ${units[unitIndex]}`
 }
 
 const showContextMenu = (event, item) => {
@@ -690,14 +579,14 @@ const handleContextMenuAction = async (action) => {
 
         if (newNameOnly && newNameOnly !== nameOnly) {
           const newFullName = newNameOnly + extension
-          await renameFile(item.id, newFullName)
+          await handleRenameFile(item.id, newFullName)
         }
       } else {
-        const oldPrefix = driveStore.prefix + item.name
+        const oldPrefix = prefix.value + item.name
         const newName = prompt('새 이름을 입력하세요', item.name.slice(0, -1))
-        const newPrefix = driveStore.prefix + newName + '/'
+        const newPrefix = prefix.value + newName + '/'
         if (oldPrefix && newPrefix) {
-          await renameDirectory(oldPrefix, newPrefix)
+          await handleRenameDirectory(oldPrefix, newPrefix)
         }
       }
       break
@@ -729,14 +618,7 @@ const handleContextMenuAction = async (action) => {
   closeContextMenu()
 }
 
-// Close context menu when clicking outside
-onMounted(() => {
-  document.addEventListener('click', (event) => {
-    if (contextMenu.value.show) {
-      closeContextMenu()
-    }
-  })
-})
+
 
 // Watch for changes in selected folder to update expanded folders
 watch(selectedFolder, (newFolderId) => {
@@ -757,252 +639,106 @@ watch(selectedFolder, (newFolderId) => {
   }
 })
 
-// Debug
-// Watchers for each reactive reference
-watch(selectedFolder, (newValue, oldValue) => {
-  console.log('selectedFolder changed:', { oldValue, newValue })
-})
-
-watch(expandedFolders, (newValue, oldValue) => {
-  console.log('expandedFolders changed:', { oldValue, newValue })
-})
-
-watch(selectedItems, (newValue, oldValue) => {
-  console.log('selectedItems changed:', { oldValue, newValue })
-})
-
-watch(selectedFile, (newValue, oldValue) => {
-  console.log('selectedFile changed:', { oldValue, newValue })
-})
-
-watch(searchQuery, (newValue, oldValue) => {
-  console.log('searchQuery changed:', { oldValue, newValue })
-})
-
-watch(sortBy, (newValue, oldValue) => {
-  console.log('sortBy changed:', { oldValue, newValue })
-})
-
-watch(sortDirection, (newValue, oldValue) => {
-  console.log('sortDirection changed:', { oldValue, newValue })
-})
-
-// 다중 다운로드 요청
+// [다중 다운로드]
 const downloadSelectedFiles = async () => {
-  try {
-    const prefixList = selectedItems.value
-      .map((itemId) => {
-        const item = filteredItems.value.find((item) => item.id === itemId) // item.id로 item 찾기
-        return item && item.type === 'folder' ? item.id : null // type이 'folder'인 경우만 반환
-      })
-      .filter((id) => id !== null) // null 값 제외
+  const prefixList = selectedItems.value
+    .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
+    .filter(Boolean)
 
-    const fileIdList = selectedItems.value
-      .map((itemId) => {
-        const item = filteredItems.value.find((item) => item.id === itemId) // item.id로 item 찾기
-        return item && item.type !== 'folder' ? item.id : null // 'folder'가 아닌 경우만 반환
-      })
-      .filter((id) => id !== null) // null 값 제외
+  const fileIdList = selectedItems.value
+    .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
+    .filter(Boolean)
 
-    // 서버로 다운로드 요청 (responseType을 'blob'으로 설정)
-    const response = await api.post(
-      '/gallery/download',
-      {
-        prefixList: prefixList,
-        fileIdList: fileIdList,
-        currentPrefix: driveStore.prefix, // 현재 경로, 필요에 따라 변경
-      },
-      { responseType: 'blob' },
-    ) // 응답을 Blob으로 처리
-
-    // Blob 처리 및 다운로드
-    const blob = await response.data // Blob 형식으로 응답 받기
-    const contentDisposition = response.headers.get('content-disposition')
-    let filename = 'downloaded_file' // 기본값을 zip이 아닌 일반 이름으로 설정
-
-    if (contentDisposition) {
-      const match = contentDisposition.match(/filename\*=UTF-8''(.+)/)
-      if (match && match[1]) {
-        filename = decodeURIComponent(match[1])
-      } else {
-        // fallback: filename="..."
-        const fallback = contentDisposition.match(/filename="([^"]+)"/)
-        if (fallback && fallback[1]) {
-          filename = fallback[1]
-        }
-      }
-    }
-
-    // Blob URL 생성 및 다운로드 처리
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename // 추출된 파일 이름으로 다운로드
-    a.click() // 다운로드 트리거
-    URL.revokeObjectURL(url) // URL 해제
-  } catch (error) {
-    console.error('Error during file download:', error)
-  }
+  await downloadFiles({
+    prefixList,
+    fileIdList,
+    currentPrefix: prefix.value,
+  })
 }
 
-// 단건 다운로드 요청
+// [단건 다운로드]
 const downloadSingleFile = async () => {
-  try {
-    const file = selectedFile.value
-    if (!file || file.type === 'folder') return
+  const file = selectedFile.value
+  if (!file || file.type === 'folder') return
 
-    const response = await api.post(
-      '/gallery/download',
-      {
-        prefixList: [], // 폴더가 아니므로 빈 배열
-        fileIdList: [file.id],
-        currentPrefix: driveStore.prefix,
-      },
-      { responseType: 'blob' },
-    )
-
-    const blob = await response.data
-    const contentDisposition = response.headers.get('content-disposition')
-    let filename = file.name // fallback
-
-    if (contentDisposition) {
-      const match = contentDisposition.match(/filename\*=UTF-8''(.+)/)
-      if (match && match[1]) {
-        filename = decodeURIComponent(match[1])
-      } else {
-        const fallback = contentDisposition.match(/filename="([^"]+)"/)
-        if (fallback && fallback[1]) {
-          filename = fallback[1]
-        }
-      }
-    }
-
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('단일 파일 다운로드 중 오류 발생:', error)
-  }
+  await downloadFiles({
+    prefixList: [],
+    fileIdList: [file.id],
+    currentPrefix: prefix.value,
+  })
 }
 
-// 단건 삭제 요청
+// [다중 삭제]
 const deleteSelectedFiles = async () => {
-  try {
-    const prefixList = selectedItems.value
-      .map((itemId) => {
-        const item = filteredItems.value.find((item) => item.id === itemId) // item.id로 item 찾기
-        return item && item.type === 'folder' ? item.id : null // type이 'folder'인 경우만 반환
-      })
-      .filter((id) => id !== null) // null 값 제외
+  const prefixList = selectedItems.value
+    .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
+    .filter(Boolean)
 
-    const fileIdList = selectedItems.value
-      .map((itemId) => {
-        const item = filteredItems.value.find((item) => item.id === itemId) // item.id로 item 찾기
-        return item && item.type !== 'folder' ? item.id : null // 'folder'가 아닌 경우만 반환
-      })
-      .filter((id) => id !== null) // null 값 제외
+  const fileIdList = selectedItems.value
+    .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
+    .filter(Boolean)
 
-    const response = await api.delete('/gallery/trash', {
-      data: {
-        prefixList: prefixList,
-        fileIdList: fileIdList,
-      },
-    })
-    // 삭제가 성공하면, 전체 데이터를 다시 불러오는 방식으로 갱신
-    if (response.data.status === 'success') {
-      await fetchItems() // 데이터 다시 불러오기 (fetchItems는 서버에서 데이터를 받아오는 함수)
-      // 선택 항목 초기화
-      selectedItems.value = []
-      loadDirectoryTree()
-      console.log('Items deleted successfully.')
-    }
-  } catch (error) {
-    console.error('Error during file deleting:', error)
+  const result = await deleteFiles({ prefixList, fileIdList })
+
+  if (result.status === 'success') {
+    await fetchItems()
+    await loadDirectoryTree()
+    selectedItems.value = []
   }
 }
 
+// [단건 삭제]
 const deleteSingleFile = async () => {
-  try {
-    const item = selectedFile.value
-    if (!item) return
+  const item = selectedFile.value
+  if (!item) return
 
-    const prefixList = item.type === 'folder' ? [item.id] : []
-    const fileIdList = item.type !== 'folder' ? [item.id] : []
+  const prefixList = item.type === 'folder' ? [item.id] : []
+  const fileIdList = item.type !== 'folder' ? [item.id] : []
 
-    const response = await api.delete('/gallery/trash', {
-      data: {
-        prefixList,
-        fileIdList,
-      },
-    })
+  const result = await deleteFiles({ prefixList, fileIdList })
 
-    if (response.data.status === 'success') {
-      await fetchItems() // 목록 갱신
-      selectedItems.value = []
-      selectedFile.value = null // 단건 선택 해제
-      loadDirectoryTree()
-      console.log('Item deleted successfully.')
-    }
-  } catch (error) {
-    console.error('Error during single file deletion:', error)
+  if (result.status === 'success') {
+    await fetchItems()
+    await loadDirectoryTree()
+    selectedItems.value = []
+    selectedFile.value = null
   }
 }
 
-const renameFile = async (fileId, newFilename) => {
-  try {
-    const response = await api.put(`/gallery/rename/${fileId}`, {
-      filename: newFilename,
-    })
+// [이름 변경]
+const handleRenameFile = async (fileId, newFilename) => {
+  const result = await renameFile(fileId, newFilename)
+  if (result.status === 'success') {
+    await fetchItems()
+    loadDirectoryTree()
+  } else {
+    console.warn('이름 변경 실패:', result)
+  }
+}
 
-    if (response.data.status === 'success') {
+// [디렉토리 이름 변경]
+const handleRenameDirectory = async (oldPrefix, newPrefix) => {
+  const result = await renameDirectory(oldPrefix, newPrefix)
+  if (result.status === 'success') {
+    await fetchItems()
+    loadDirectoryTree()
+  } else {
+    console.warn('디렉토리 이름 변경 실패:', result)
+  }
+}
+
+// [선택 이름 변경]
+const handleRenameSingleFile = async () => {
+  await renameSingleFile({
+    file: selectedFile.value,
+    onRename: async () => {
       await fetchItems()
       loadDirectoryTree()
-    } else {
-      console.warn('이름 변경 실패:', response.data)
-    }
-  } catch (error) {
-    console.error('이름 변경 중 오류 발생:', error)
-  }
+    },
+  })
 }
 
-const renameDirectory = async (oldPrefix, newPrefix) => {
-  try {
-    const response = await api.put(`/gallery/rename`, {
-      oldPrefix: oldPrefix,
-      newPrefix: newPrefix,
-    })
 
-    if (response.data.status === 'success') {
-      await fetchItems()
-      loadDirectoryTree()
-    } else {
-      console.warn('이름 변경 실패:', response.data)
-    }
-  } catch (error) {
-    console.error('이름 변경 중 오류 발생:', error)
-  }
-}
-
-const renameSingleFile = async () => {
-    const item = selectedFile.value
-    if (!item) return
-    const currentName = item.name
-    const dotIndex = currentName.lastIndexOf('.')
-    const nameOnly = currentName.slice(0, dotIndex)
-    const extension = currentName.slice(dotIndex)
-    const newNameOnly = prompt('새 이름을 입력하세요', nameOnly)
-
-    if (newNameOnly && newNameOnly !== nameOnly) {
-      const newFullName = newNameOnly + extension
-      await renameFile(item.id, newFullName)
-    }
-}
-
-const fileInput = ref(null)
-const folderInput = ref(null)
 
 // 파일 선택창 열기
 const triggerFileSelect = () => {
@@ -1013,52 +749,50 @@ const triggerFileSelect = () => {
 const triggerFolderSelect = () => {
   folderInput.value.click()
 }
-
-// 파일 업로드 처리
+// [파일 업로드]
 const handleFileUpload = async () => {
-  const formData = new FormData()
-  const files = fileInput.value.files
+  const files = fileInput.value?.files
+  if (!files || files.length === 0) return
 
+  const formData = new FormData()
   for (let i = 0; i < files.length; i++) {
     formData.append('files', files[i])
   }
+  formData.append('prefix', prefix.value)
 
-  formData.append('prefix', driveStore.prefix)
-
-  await uploadToServer(formData)
-  fileInput.value.value = null // 초기화
-}
-
-// 폴더 업로드 처리
-const handleFolderUpload = async () => {
-  const formData = new FormData()
-  const files = folderInput.value.files
-
-  for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i])
-  }
-
-  formData.append('prefix', driveStore.prefix)
-
-  await uploadToServer(formData)
-  folderInput.value.value = null // 초기화
-}
-
-// 서버 업로드 공통 함수
-const uploadToServer = async (formData) => {
-  try {
-    await api.post('/gallery/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+  const result = await uploadToServer(formData)
+  if (result.status === 'success') {
     alert('업로드 성공!')
     await fetchItems()
     loadDirectoryTree()
-  } catch (err) {
-    console.error('업로드 실패:', err)
+  } else {
     alert('업로드 실패')
   }
+
+  fileInput.value.value = null
+}
+
+// [폴더 업로드]
+const handleFolderUpload = async () => {
+  const files = folderInput.value?.files
+  if (!files || files.length === 0) return
+
+  const formData = new FormData()
+  for (let i = 0; i < files.length; i++) {
+    formData.append('files', files[i])
+  }
+  formData.append('prefix', prefix.value)
+
+  const result = await uploadToServer(formData)
+  if (result.status === 'success') {
+    alert('업로드 성공!')
+    await fetchItems()
+    loadDirectoryTree()
+  } else {
+    alert('업로드 실패')
+  }
+
+  folderInput.value.value = null
 }
 </script>
 
