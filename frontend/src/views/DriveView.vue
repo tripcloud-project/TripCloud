@@ -1,112 +1,10 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 <template>
   <div class="min-h-screen bg-gray-50 flex">
-    <Sidebar/>
-    <!-- Main Content Area -->
+    <DriveSidebar/>
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
-      <!-- Header -->
-      <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <div class="flex space-x-4">
-            <button
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 cursor-pointer whitespace-nowrap"
-              @click="triggerFileSelect"
-            >
-              <i class="fas fa-file-upload mr-1"></i> 파일 업로드
-            </button>
-
-            <!-- 폴더 업로드 버튼 -->
-            <button
-              class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 cursor-pointer whitespace-nowrap"
-              @click="triggerFolderSelect"
-            >
-              <i class="fas fa-folder-open mr-1"></i> 폴더 업로드
-            </button>
-            <!-- 숨겨진 input들 -->
-            <input type="file" ref="fileInput" multiple class="hidden" @change="handleFileUpload" />
-            <input
-              type="file"
-              ref="folderInput"
-              webkitdirectory
-              directory
-              multiple
-              class="hidden"
-              @change="handleFolderUpload"
-            />
-          </div>
-        </div>
-        <div class="flex items-center">
-          <h2 class="text-lg font-medium text-gray-800">{{ currentFolderName }}</h2>
-          <span class="text-gray-500 ml-2">({{ filteredItems.length }} items)</span>
-        </div>
-        <!-- Sort Options -->
-        <div class="flex items-center space-x-2">
-          <span class="text-sm text-gray-500">정렬: </span>
-          <select
-            v-model="sortBy"
-            class="text-sm border-none bg-gray-100 rounded-lg py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="name">이름</option>
-            <option value="modified">수정일</option>
-            <option value="size">크기</option>
-          </select>
-          <button
-            @click="toggleSortDirection"
-            class="p-1 rounded-full hover:bg-gray-100 cursor-pointer"
-          >
-            <i
-              :class="[
-                'fas',
-                sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down',
-                'text-gray-500',
-              ]"
-            ></i>
-          </button>
-
-          <div class="ml-4 border-l border-gray-300 pl-4">
-            <button class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
-              <i class="fas fa-th text-gray-500"></i>
-            </button>
-            <button class="p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
-              <i class="fas fa-list text-gray-500"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bulk Actions Toolbar (shows when items selected) -->
-      <div
-        v-if="selectedItems.length > 0"
-        class="bg-white border-b border-gray-200 p-3 flex items-center"
-      >
-        <span class="text-sm font-medium mr-4">{{ selectedItems.length }} items selected</span>
-        <div class="flex space-x-2">
-          <button
-            class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
-            @click="downloadSelectedFiles"
-          >
-            <i class="fas fa-download mr-1"></i> Download
-          </button>
-          <!-- <button
-            class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-share-alt mr-1"></i> Share
-          </button> -->
-          <button
-            class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 cursor-pointer !rounded-button whitespace-nowrap"
-            @click="deleteSelectedFiles"
-          >
-            <i class="fas fa-trash-alt mr-1"></i> Delete
-          </button>
-        </div>
-        <button
-          @click="clearSelection"
-          class="ml-auto text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
-        >
-          Clear selection
-        </button>
-      </div>
-
+      <DriveHeader/>
+      <DriveToolbar/>
       <!-- Content Grid -->
       <div class="flex-grow overflow-y-auto p-6 bg-white">
         <div
@@ -200,30 +98,26 @@ const emptyFolderImage =
 import { useDriveStore } from '@/stores/drive.js'
 import { storeToRefs } from 'pinia'
 import { formatDate, formatSize } from '@/utils/format'
-import { uploadToServer } from '@/utils/drive/upload'
-import Sidebar from '@/components/drive/Sidebar.vue'
+// import { uploadToServer } from '@/utils/drive/upload'
+import DriveSidebar from '@/components/drive/DriveSidebar.vue'
 import MetadataPanel from '@/components/drive/MetadataPanel.vue'
 import ContextMenu from '@/components/drive/ContextMenu.vue'
+import DriveToolbar from '@/components/drive/DriveToolbar.vue'
+import DriveHeader from '@/components/drive/DriveHeader.vue'
 const driveStore = useDriveStore()
 
 // ref 꺼내 쓰기
 const {
-  prefix,
   folders,
   selectedFolder,
   expandedFolders,
   selectedItems,
-  sortBy,
-  sortDirection,
   contextMenu,
-  currentFolderName,
   filteredItems,
-  fileInput,
-  folderInput,
 } = storeToRefs(driveStore)
 
 // 함수 꺼내 쓰기
-const { clearSelection, selectItem, fetchItems, loadDirectoryTree, toggleItemSelection, closeContextMenu, downloadSelectedFiles, deleteSelectedFiles, showContextMenu } = driveStore
+const { selectItem, fetchItems, loadDirectoryTree, toggleItemSelection, closeContextMenu, showContextMenu } = driveStore
 
 onMounted(() => {
   loadDirectoryTree()
@@ -235,9 +129,7 @@ onMounted(() => {
   })
 })
 
-const toggleSortDirection = () => {
-  sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-}
+
 
 // Watch for changes in selected folder to update expanded folders
 watch(selectedFolder, (newFolderId) => {
@@ -258,64 +150,9 @@ watch(selectedFolder, (newFolderId) => {
   }
 })
 
-// 파일 선택창 열기
-const triggerFileSelect = () => {
-  fileInput.value.click()
-}
-
-// 폴더 선택창 열기
-const triggerFolderSelect = () => {
-  folderInput.value.click()
-}
-// [파일 업로드]
-const handleFileUpload = async () => {
-  const files = fileInput.value?.files
-  if (!files || files.length === 0) return
-
-  const formData = new FormData()
-  for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i])
-  }
-  formData.append('prefix', prefix.value)
-
-  const result = await uploadToServer(formData)
-  if (result.status === 'success') {
-    alert('업로드 성공!')
-    await fetchItems()
-    loadDirectoryTree()
-  } else {
-    alert('업로드 실패')
-  }
-
-  fileInput.value.value = null
-}
-
-// [폴더 업로드]
-const handleFolderUpload = async () => {
-  const files = folderInput.value?.files
-  if (!files || files.length === 0) return
-
-  const formData = new FormData()
-  for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i])
-  }
-  formData.append('prefix', prefix.value)
-
-  const result = await uploadToServer(formData)
-  if (result.status === 'success') {
-    alert('업로드 성공!')
-    await fetchItems()
-    loadDirectoryTree()
-  } else {
-    alert('업로드 실패')
-  }
-
-  folderInput.value.value = null
-}
 </script>
 
 <style scoped>
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
