@@ -123,19 +123,21 @@
           class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
           @click="handleRenameSingleFile"
         >
-          <i class="fas fa-share-alt text-gray-700 mb-1"></i>
+          <i class="fas fa-pen text-gray-700 mb-1"></i>
           <span class="text-xs">이름 변경</span>
         </button>
+
         <button
           class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
         >
-          <i class="fas fa-share-alt text-gray-700 mb-1"></i>
+          <i class="fas fa-comment-alt text-gray-700 mb-1"></i>
           <span class="text-xs">설명 추가</span>
         </button>
+
         <button
           class="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap"
         >
-          <i class="fas fa-share-alt text-gray-700 mb-1"></i>
+          <i class="fas fa-hashtag text-gray-700 mb-1"></i>
           <span class="text-xs">해시태그 추가</span>
         </button>
       </div>
@@ -152,9 +154,9 @@ import { renameSingleFile } from '@/utils/map/rename.js'
 import { formatDateTime, formatSize } from '@/utils/format'
 
 const mapStore = useMapStore()
-const {prefix, selectedFile, selectedItems} = storeToRefs(mapStore)
+const { prefix, selectedFile, selectedItems } = storeToRefs(mapStore)
 
-const { clearFileSelection, fetchItems,  loadDirectoryTree} = mapStore
+const { clearFileSelection, fetchItems, loadDirectoryTree } = mapStore
 
 // [단건 다운로드]
 const downloadSingleFile = async () => {
