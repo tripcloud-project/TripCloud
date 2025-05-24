@@ -21,7 +21,8 @@
     <!-- Directory Tree -->
     <div class="overflow-y-auto flex-grow p-2">
       <div class="space-y-1">
-        <div v-for="folder in filteredFolders" :key="folder.id" class="cursor-pointer">
+        <!-- <div v-for="folder in filteredFolders" :key="folder.id" class="cursor-pointer"> -->
+        <div v-for="folder in visibleFolders" :key="folder.id" class="cursor-pointer">
           <div
             :class="[
               'flex items-center p-2 rounded-lg',
@@ -59,6 +60,7 @@
           v-for="item in quickAccess"
           :key="item.id"
           class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+          @click="handleQuickAccessClick(item.id)"
         >
           <i :class="[item.icon, 'mr-2', item.color]"></i>
           <span class="text-sm">{{ item.name }}</span>
@@ -71,16 +73,12 @@
 <script setup>
 import { useDriveStore } from '@/stores/drive.js'
 import { storeToRefs } from 'pinia'
+// import { useRouter } from 'vue-router'
 const driveStore = useDriveStore()
-const {
-  selectedFolder,
-  expandedFolders,
-  searchQuery,
-  filteredFolders,
-  quickAccess,
-} = storeToRefs(driveStore)
+const { selectedFolder, expandedFolders, searchQuery, visibleFolders, quickAccess } =
+  storeToRefs(driveStore)
 
-const { toggleFolder, selectFolder } = driveStore
+const { toggleFolder, selectFolder, handleQuickAccessClick } = driveStore
 </script>
 
 <style scoped></style>

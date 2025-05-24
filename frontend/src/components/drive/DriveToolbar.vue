@@ -9,13 +9,13 @@
         class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
         @click="downloadSelectedFiles"
       >
-        <i class="fas fa-download mr-1"></i> Download
+        <i class="fas fa-download mr-1"></i> 다운로드
       </button>
       <button
         class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 cursor-pointer !rounded-button whitespace-nowrap"
         @click="deleteSelectedFiles"
       >
-        <i class="fas fa-trash-alt mr-1"></i> Delete
+        <i class="fas fa-trash-alt mr-1"></i> 삭제
       </button>
     </div>
     <button
