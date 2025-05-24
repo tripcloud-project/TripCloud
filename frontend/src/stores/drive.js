@@ -5,6 +5,7 @@ import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
 import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { downloadFiles } from '@/utils/drive/download.js'
 import { deleteFiles } from '@/utils/drive/delete.js'
+import { useRouter } from 'vue-router'
 
 export const useDriveStore = defineStore(
   'drive',
@@ -27,10 +28,23 @@ export const useDriveStore = defineStore(
       item: null,
     })
     const quickAccess = ref([
-      { id: 'recent', name: 'Recent', icon: 'fas fa-clock', color: 'text-blue-500' },
-      { id: 'starred', name: 'Starred', icon: 'fas fa-star', color: 'text-yellow-500' },
+      { id: 'drive', name: 'Drive', icon: 'fas fa-clock', color: 'text-blue-500' },
       { id: 'trash', name: 'Trash', icon: 'fas fa-trash-alt', color: 'text-red-500' },
+      { id: 'map', name: 'Map', icon: 'fas fa-star', color: 'text-yellow-500' },
     ])
+
+    const router = useRouter()
+    const handleQuickAccessClick = (id) => {
+      if (id === 'trash') {
+        router.push({ name: 'trash' })
+      } else if (id === 'map') {
+        router.push({ name: 'map' })
+      } else if (id === 'drive') {
+        router.push({ name: 'drive' })
+      }
+    }
+
+
     const fileInput = ref(null)
     const folderInput = ref(null)
     // Computed properties
@@ -40,6 +54,27 @@ export const useDriveStore = defineStore(
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
         result = result.filter((folder) => folder.name.toLowerCase().includes(query))
+      }
+      return result
+    })
+    const visibleFolders = computed(() => {
+      // 검색 중일 땐 모두 보여줌
+      if (searchQuery.value) {
+        return filteredFolders.value
+      }
+
+      // 검색이 아닐 땐 트리 접힘 고려
+      const result = []
+      const visibleParents = new Set([]) // 루트는 항상 표시
+
+      for (const folder of filteredFolders.value) {
+        if (folder.level === 0 || visibleParents.has(folder.parent)) {
+          result.push(folder)
+
+          if (folder.hasChildren && expandedFolders.value.includes(folder.id)) {
+            visibleParents.add(folder.id)
+          }
+        }
       }
 
       return result
@@ -56,10 +91,10 @@ export const useDriveStore = defineStore(
     const filteredItems = computed(() => {
       let result = items.value.filter((item) => item.parent === selectedFolder.value)
 
-      if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
-        result = result.filter((item) => item.name.toLowerCase().includes(query))
-      }
+      // if (searchQuery.value) {
+      //   const query = searchQuery.value.toLowerCase()
+      //   result = result.filter((item) => item.name.toLowerCase().includes(query))
+      // }
 
       // Sort items
       result.sort((a, b) => {
@@ -263,6 +298,8 @@ export const useDriveStore = defineStore(
       closeContextMenu,
       downloadSelectedFiles,
       deleteSelectedFiles,
+      handleQuickAccessClick,
+      visibleFolders,
     }
   },
   {
