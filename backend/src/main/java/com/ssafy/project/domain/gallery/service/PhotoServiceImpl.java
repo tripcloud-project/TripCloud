@@ -2,13 +2,11 @@ package com.ssafy.project.domain.gallery.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import com.ssafy.project.util.AesUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.project.domain.board.dto.request.ThumbnailRequestDto;
 import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
 import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
@@ -32,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class PhotoServiceImpl implements PhotoService{
     private final PhotoRepository photoRepository;
     private final S3Service s3Service;
+	private final HashtagService hashtagService;
+	private final AesUtil aesUtil;
 
     @Override
     public DirectoryResponseDto select(String prefix){
@@ -44,13 +44,13 @@ public class PhotoServiceImpl implements PhotoService{
         if ("/".equals(prefix)) {
             // 시도 리스트 조회
             directories.addAll(photoRepository.findAllSidoByMemberId(memberId));
-        } else if (prefix.chars().filter(c -> c == '/').count() == 1) {
+        } else if (prefix.chars().filter(c -> c == '/').count() == 2) {
             // 시군구 리스트 조회
             String province = prefix.replace("/", "");
             directories.addAll(photoRepository.findSigunguBySidoAndMemberId(province, memberId));
-        } else if (prefix.chars().filter(c -> c == '/').count() == 2) {
+        } else if (prefix.chars().filter(c -> c == '/').count() == 3) {
             // 읍면동 리스트 조회
-            String trimmed = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+            String trimmed = prefix.endsWith("/") ? prefix.substring(1, prefix.length() - 1) : prefix;
             String[] parts = trimmed.split("/");
             String province = parts[0];
             String city = parts[1];
@@ -58,6 +58,13 @@ public class PhotoServiceImpl implements PhotoService{
             for(FileEntry file : files){
                 file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
                 file.setS3Key(null);
+				if(file.getLatitude()!=null && file.getLongitude()!=null){
+					file.setLatitude(aesUtil.decrypt(file.getLatitude()));
+					file.setLongitude(aesUtil.decrypt(file.getLongitude()));
+				}
+
+				// 해시태그 추가
+				file.setHashtags(hashtagService.getHashtags(file.getFileId()));
             }
         } else {
             throw new IllegalArgumentException("Invalid prefix format: " + prefix);
