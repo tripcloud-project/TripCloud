@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/map/mapApiResponseToItems'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
 import flattenDirectoryTree from '@/utils/map/flattenDirectoryTree'
-import { downloadFiles } from '@/utils/map/download.js'
-import { deleteFiles } from '@/utils/map/delete.js'
+import { downloadFiles } from '@/utils/drive/download.js'
+import { deleteFiles } from '@/utils/drive/delete.js'
 import { useRouter } from 'vue-router'
 import { setThumbnail } from '@/utils/map/thumbnail'
-import { getStorage } from '@/utils/map/storage.js'
+import { getStorage } from '@/utils/drive/storage.js'
 import { useCommonStore } from '@/stores/common.js'
 
 export const useMapStore = defineStore(

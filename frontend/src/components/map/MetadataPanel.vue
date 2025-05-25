@@ -157,11 +157,11 @@
 <script setup>
 import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
-import { downloadFiles } from '@/utils/map/download.js'
-import { deleteFiles } from '@/utils/map/delete.js'
-import { renameSingleFile } from '@/utils/map/rename.js'
+import { downloadFiles } from '@/utils/drive/download.js'
+import { deleteFiles } from '@/utils/drive/delete.js'
+import { renameSingleFile } from '@/utils/drive/rename.js'
 import { formatDateTime, formatSize } from '@/utils/format'
-import { descriptionSingleFile } from '@/utils/map/description.js'
+import { descriptionSingleFile } from '@/utils/drive/description.js'
 
 const mapStore = useMapStore()
 const { prefix, selectedFile, selectedItems } = storeToRefs(mapStore)

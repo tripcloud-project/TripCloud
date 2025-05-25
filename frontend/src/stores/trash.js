@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/trash/mapApiResponseToItems'
-import flattenDirectoryTree from '@/utils/trash/flattenDirectoryTree'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
+import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { restoreFiles } from '@/utils/trash/restore.js'
 import { deleteFiles } from '@/utils/trash/delete.js'
 import { useRouter } from 'vue-router'
-import { getStorage } from '@/utils/trash/storage.js'
+import { getStorage } from '@/utils/drive/storage.js'
 import { useCommonStore } from '@/stores/common.js'
 
 export const useTrashStore = defineStore(
