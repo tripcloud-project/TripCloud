@@ -225,9 +225,18 @@
 import { ref, onMounted, watch } from 'vue'
 import { mapFiles } from '@/assets/map/mapImports'
 import api from '@/lib/api'
+import { useMapStore } from '@/stores/map.js'
+import { storeToRefs } from 'pinia'
+const mapStore = useMapStore()
+const {
+  selectedSido, 
+} = storeToRefs(mapStore)
+
+// 함수 꺼내 쓰기
+const { selectFolder } = mapStore
+
 
 // 반응형 상태
-const selectedSido = ref('전국')
 const selectedMap = ref(null)
 const regionImageMap = ref({})
 const loading = ref(false)
@@ -379,7 +388,12 @@ async function loadTouristSpots(regionName) {
 const handleMapClick = (event) => {
   const id = event.target.id
   if (id && selectedSido.value === '전국') {
+    // 시도
     selectedSido.value = id
+    selectFolder(`/${id}/`)
+  }else{
+    // 시군구
+    selectFolder(`/${selectedSido.value}/${id}/`)
   }
 }
 
@@ -416,6 +430,7 @@ const closeTouristModal = () => {
 // 유틸리티 함수들
 const goBack = () => {
   selectedSido.value = '전국'
+  selectFolder('/')
 }
 
 const retryLoad = () => {

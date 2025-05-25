@@ -174,6 +174,16 @@ export const useMapStore = defineStore(
     const selectFolder = (folderId) => {
       selectedFolder.value = folderId
       const newPrefix = folderId
+
+      const parts = folderId.split('/').filter(Boolean)
+      if (parts.length === 0) {
+        selectedSido.value = '전국'
+      } else if (parts.length === 1) {
+        selectedSido.value = parts[0]
+      } else if (parts.length >= 2) {
+        selectedSido.value = parts[0]
+        // 원하면 selectedSigungu.value = parts[1] 도 가능
+      }
       setPrefix(newPrefix)
       fetchItems()
     }
@@ -279,6 +289,12 @@ export const useMapStore = defineStore(
       id: null,
       options: [],
     })
+
+    const selectedSido = ref('전국')
+    const shouldShowMap = computed(() => {
+      const parts = prefix.value.split('/').filter(Boolean)
+      return parts.length <= 1
+    })
     return {
       prefix,
       setPrefix,
@@ -317,6 +333,8 @@ export const useMapStore = defineStore(
       showThumbnailDialog,
       selectedRegion,
       thumbnailCandidate,
+      selectedSido,
+      shouldShowMap
     }
   },
   {
