@@ -11,7 +11,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 @Builder
 public class MemberUpdateRequestDto {
-	private @NonNull String password;
+	private String password;
 	private @NonNull String name;
 	private String profileImage;
 	private Long mainBadgeId;
