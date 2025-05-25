@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/trash/mapApiResponseToItems'
-import flattenDirectoryTree from '@/utils/trash/flattenDirectoryTree'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
+import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { restoreFiles } from '@/utils/trash/restore.js'
 import { deleteFiles } from '@/utils/trash/delete.js'
 import { useRouter } from 'vue-router'
+import { getStorage } from '@/utils/drive/storage.js'
 
 export const useTrashStore = defineStore(
   'trash',
@@ -174,6 +175,7 @@ export const useTrashStore = defineStore(
       }
     }
     const loadDirectoryTree = async () => {
+      fetchStorage()
       const { data } = await api.get('/gallery/trash') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result)
     }
@@ -255,6 +257,20 @@ export const useTrashStore = defineStore(
         selectedItems.value = []
       }
     }
+    const usedStorage = ref(0)
+    const maxStorage = ref(0)
+    const usagePercent = computed(() => {
+      if (!maxStorage.value) return 0
+      return (usedStorage.value / maxStorage.value) * 100
+    })
+    // const commonStore = useCommonStore()
+    async function fetchStorage() {
+      const data = await getStorage()
+      if (data.status === 'success') {
+        usedStorage.value = Number(data.result.usedStorage)
+        maxStorage.value = Number(data.result.maxStorage)
+      }
+    }
     return {
       prefix,
       setPrefix,
@@ -288,7 +304,11 @@ export const useTrashStore = defineStore(
       restoreSelectedFiles,
       deleteSelectedFiles,
       handleQuickAccessClick,
-      visibleFolders
+      visibleFolders,
+      usedStorage,
+      maxStorage,
+      fetchStorage,
+      usagePercent,
     }
   },
   {

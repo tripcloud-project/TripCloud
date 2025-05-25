@@ -1,5 +1,6 @@
 package com.ssafy.project.domain.member.repository;
 
+import com.ssafy.project.domain.member.dto.response.StorageResponseDto;
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
@@ -39,4 +40,7 @@ public class MemberRepositoryImpl implements MemberRepository {
 	public void deleteMember(@NonNull Long memberId) {
 		memberMapper.delete(memberId);
 	}
+
+    @Override
+    public StorageResponseDto getStorageByMemberId(Long memberId) { return memberMapper.getStorageByMemberId(memberId); }
 }

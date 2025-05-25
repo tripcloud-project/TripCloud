@@ -3,10 +3,8 @@ package com.ssafy.project.domain.gallery.service;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.util.AesUtil;
@@ -47,6 +45,7 @@ public class FileServiceImpl implements FileService {
     private final S3Service s3Service;
     private final HashtagService hashtagService;
     private final AesUtil aesUtil;
+    private final PhotoService photoService;
 
     // [/upload]
     @Override
@@ -75,6 +74,38 @@ public class FileServiceImpl implements FileService {
         }
         Long memberId = SecurityUtil.getCurrentMemberId();
         fileRepository.insertFiles(fileList, memberId);
+
+
+        // 썸네일에 대표 이미지가 없다면, 첫 번째 사진을 추가합니다.
+        List<ThumbnailDto> existingThumbnails = fileRepository.findThumbnailsByMemberId(memberId);
+        System.out.println(existingThumbnails);
+        Set<String> thumbnailKeySet = existingThumbnails.stream()
+                .map(t -> t.getSido() + "::" + (t.getSigungu() != null ? t.getSigungu() : ""))
+                .collect(Collectors.toSet());
+
+        for(FileDto file : fileList){
+            if(file.getSido() == null || file.getSigungu() == null) continue;
+
+            String sidoKey = file.getSido() + "::";
+            String sigunguKey = file.getSido() + "::" + file.getSigungu();
+
+            System.out.println(sidoKey);
+            System.out.println(sigunguKey);
+
+            // 썸네일이 없으면 이 파일을 썸네일로 설정
+            if (!thumbnailKeySet.contains(sidoKey)) {
+                System.out.println("시도 넣자");
+                Long fileId = fileRepository.findFileIdByS3KeyAndMemberId(file.getS3Key(), memberId);
+                photoService.setThumbnail(fileId, "sido");
+                thumbnailKeySet.add(sidoKey);
+            }
+            if (!thumbnailKeySet.contains(sigunguKey)) {
+                System.out.println("시군구 넣자");
+                Long fileId = fileRepository.findFileIdByS3KeyAndMemberId(file.getS3Key(), memberId);
+                photoService.setThumbnail(fileId, "sigungu");
+                thumbnailKeySet.add(sigunguKey);
+            }
+        }
 
 
         // 비동기 AI 호출을 위한 코드

@@ -19,10 +19,10 @@ public class Member {
 	private @NonNull String role;
 	private @NonNull String name;
 	private String profileImage;
-	private @NonNull Integer usedStorage;
+	private @NonNull Long usedStorage;
 	private LocalDateTime createdAt;
 	private LocalDateTime modifiedAt;
 	private Boolean isDeleted;
 	private Long mainBadgeId;
-	private Integer maxStorage;
+	private Long maxStorage;
 }

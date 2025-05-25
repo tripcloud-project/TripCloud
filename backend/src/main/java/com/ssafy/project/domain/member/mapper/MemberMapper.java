@@ -1,5 +1,6 @@
 package com.ssafy.project.domain.member.mapper;
 
+import com.ssafy.project.domain.member.dto.response.StorageResponseDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,4 +17,5 @@ public interface MemberMapper {
     Member selectById(Long id);
 	int update(Long memberId, @Param("requestDto") MemberUpdateRequestDto requestDto);
 	int delete(@NonNull Long memberId);
+    StorageResponseDto getStorageByMemberId(Long memberId);
 }

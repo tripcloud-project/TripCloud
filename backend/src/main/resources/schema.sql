@@ -30,12 +30,12 @@ CREATE TABLE `member` (
 	`role`	ENUM('USER', 'ADMIN')	NOT NULL	DEFAULT 'USER',
 	`name`	VARCHAR(255)	NOT NULL,
 	`profile_image`	VARCHAR(512)	NULL,
-	`used_storage`	INT	NOT NULL	DEFAULT 0,
+	`used_storage`	BIGINT 	NOT NULL	DEFAULT 0,
 	`created_at`	DATETIME	NOT NULL	DEFAULT NOW(),
 	`modified_at`	DATETIME	NOT NULL	DEFAULT NOW(),
 	`is_deleted`	BOOLEAN	NOT NULL	DEFAULT 0,
 	`main_badge_id`	BIGINT	NULL,
-	`max_stroage`	INT	NULL
+	`max_storage`	BIGINT 	NOT NULL DEFAULT 32212254720
 );
 
 CREATE TABLE `post_comment` (
@@ -195,3 +195,10 @@ ADD CONSTRAINT uq_member_email UNIQUE (email);
 
 ALTER TABLE file
 ADD CONSTRAINT uq_file_s3key UNIQUE (s3_key);
+
+-- cascade 추가
+ALTER TABLE thumbnail
+ADD CONSTRAINT fk_thumbnail_photo
+FOREIGN KEY (photo_id)
+REFERENCES file(file_id)
+ON DELETE CASCADE;

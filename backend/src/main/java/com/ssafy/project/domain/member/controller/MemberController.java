@@ -81,4 +81,11 @@ public class MemberController {
     	return ResponseEntity.status(200)
     			.body(createSuccessWithNoContent());
     }
+
+    // 유저 드라이브 사용량 조회
+    @GetMapping("/storage")
+    private ResponseEntity<?> getStorage(Authentication authentication) {
+        return ResponseEntity.status(200)
+                .body(createSuccess(memberService.getStorage(authentication)));
+    }
 }

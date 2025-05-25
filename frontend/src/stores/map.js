@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/map/mapApiResponseToItems'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
 import flattenDirectoryTree from '@/utils/map/flattenDirectoryTree'
-import { downloadFiles } from '@/utils/map/download.js'
-import { deleteFiles } from '@/utils/map/delete.js'
+import { downloadFiles } from '@/utils/drive/download.js'
+import { deleteFiles } from '@/utils/drive/delete.js'
 import { useRouter } from 'vue-router'
 import { setThumbnail } from '@/utils/map/thumbnail'
+import { getStorage } from '@/utils/drive/storage.js'
 
 export const useMapStore = defineStore(
   'map',
@@ -200,6 +201,7 @@ export const useMapStore = defineStore(
       }
     }
     const loadDirectoryTree = async () => {
+      fetchStorage()
       const { data } = await api.get('/gallery/photo') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result.directories)
     }
@@ -290,11 +292,26 @@ export const useMapStore = defineStore(
       options: [],
     })
 
+    const usedStorage = ref(0)
+    const maxStorage = ref(0)
+    const usagePercent = computed(() => {
+      if (!maxStorage.value) return 0
+      return (usedStorage.value / maxStorage.value) * 100
+    })
+    async function fetchStorage() {
+      const data = await getStorage()
+      if (data.status === 'success') {
+        usedStorage.value = Number(data.result.usedStorage)
+        maxStorage.value = Number(data.result.maxStorage)
+      }
+    }
+
     const selectedSido = ref('전국')
     const shouldShowMap = computed(() => {
       const parts = prefix.value.split('/').filter(Boolean)
       return parts.length <= 1
     })
+
     return {
       prefix,
       setPrefix,
@@ -333,6 +350,10 @@ export const useMapStore = defineStore(
       showThumbnailDialog,
       selectedRegion,
       thumbnailCandidate,
+      usedStorage,
+      maxStorage,
+      fetchStorage,
+      usagePercent,
       selectedSido,
       shouldShowMap
     }

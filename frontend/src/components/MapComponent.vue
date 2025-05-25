@@ -411,13 +411,16 @@ async function loadTouristSpots(regionName) {
 // 이벤트 핸들러들
 const handleMapClick = (event) => {
   const id = event.target.id
-  if (id && selectedSido.value === '전국') {
-    // 시도
-    selectedSido.value = id
-    selectFolder(`/${id}/`)
-  } else {
-    // 시군구
-    selectFolder(`/${selectedSido.value}/${id}/`)
+
+  if(id){
+    if (selectedSido.value === '전국') {
+      // 시도
+      selectedSido.value = id
+      selectFolder(`/${id}/`)
+    }else{
+      // 시군구
+      selectFolder(`/${selectedSido.value}/${id}/`)
+    }
   }
 }
 

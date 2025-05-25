@@ -6,6 +6,7 @@ import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { downloadFiles } from '@/utils/drive/download.js'
 import { deleteFiles } from '@/utils/drive/delete.js'
 import { useRouter } from 'vue-router'
+import { getStorage } from '@/utils/drive/storage.js'
 
 export const useDriveStore = defineStore(
   'drive',
@@ -185,6 +186,8 @@ export const useDriveStore = defineStore(
       }
     }
     const loadDirectoryTree = async () => {
+      fetchStorage()
+      console.log("fet하자")
       const { data } = await api.get('/gallery') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result)
     }
@@ -264,6 +267,19 @@ export const useDriveStore = defineStore(
         selectedItems.value = []
       }
     }
+    const usedStorage = ref(0)
+    const maxStorage = ref(0)
+    const usagePercent = computed(() => {
+      if (!maxStorage.value) return 0
+      return (usedStorage.value / maxStorage.value) * 100
+    })
+    async function fetchStorage() {
+      const data = await getStorage()
+      if (data.status === 'success') {
+        usedStorage.value = Number(data.result.usedStorage)
+        maxStorage.value = Number(data.result.maxStorage)
+      }
+    }
     return {
       prefix,
       setPrefix,
@@ -298,6 +314,10 @@ export const useDriveStore = defineStore(
       deleteSelectedFiles,
       handleQuickAccessClick,
       visibleFolders,
+      usedStorage,
+      maxStorage,
+      fetchStorage,
+      usagePercent,
     }
   },
   {

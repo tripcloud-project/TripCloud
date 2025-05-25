@@ -2,6 +2,7 @@ package com.ssafy.project.domain.member.service;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.project.domain.member.dto.response.StorageResponseDto;
 import org.springframework.security.core.Authentication;
 
 import com.ssafy.project.common.response.CursorPageResponse;
@@ -19,4 +20,5 @@ public interface MemberService {
 	BadgeListResponseDto getCurrentMemberBadges(Authentication authentication);
     void putCurrentMemberInfo(MemberUpdateRequestDto requestDto, Authentication authentication);
 	void deleteCurrentMember(Authentication authentication);
+    StorageResponseDto getStorage(Authentication authentication);
 }
