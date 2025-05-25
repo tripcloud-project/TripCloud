@@ -11,6 +11,8 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink to="/board">게시판</RouterLink>
       <RouterLink to="/posts/new">새 글 쓰기</RouterLink>
       <RouterLink to="/drive/map">지도 보기</RouterLink>
+      <RouterLink to="/profile">마이페이지</RouterLink>
+      <RouterLink to="/profile/edit">내 정보 수정</RouterLink>
     </nav>
   </header>
   <RouterView />

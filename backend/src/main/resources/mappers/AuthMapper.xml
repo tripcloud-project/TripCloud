@@ -8,7 +8,8 @@
             password,
             email,
             name,
-            role
+            role,
+            is_deleted as isDeleted
         FROM member
         WHERE email = #{email}
     </select>
