@@ -51,7 +51,7 @@ public class JWTFilter extends OncePerRequestFilter {
     
     static {
     	EXCLUDE_URL.put("GET", Arrays.asList(
-    			"/api/v1/refresh-token",
+    			"/api/v1/auth/refresh-token",
     			"/api/v1/members/checkEmail",
     			"/index.html"
     	));
