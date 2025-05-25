@@ -2,10 +2,7 @@ package com.ssafy.project.domain.gallery.repository;
 
 import java.util.List;
 
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
-import com.ssafy.project.domain.gallery.dto.internal.FileDto;
-import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
+import com.ssafy.project.domain.gallery.dto.internal.*;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
@@ -31,4 +28,6 @@ public interface FileRepository {
 	List<FilePreviewResponseDto> searchFilesWithKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> findFilesWithHashtag(Long memberId, String hashtag);
     List<FilePreviewResponseDto> findFilesWithDescription(Long memberId, String description);
+	List<ThumbnailDto> findThumbnailsByMemberId(Long memberId);
+	Long findFileIdByS3KeyAndMemberId(String s3Key, Long memberId);
 }

@@ -2,12 +2,9 @@ package com.ssafy.project.domain.gallery.mapper;
 
 import java.util.List;
 
+import com.ssafy.project.domain.gallery.dto.internal.*;
 import org.apache.ibatis.annotations.Mapper;
 
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
-import com.ssafy.project.domain.gallery.dto.internal.FileDto;
-import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
@@ -34,4 +31,6 @@ public interface FileMapper {
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndHashtag(Long memberId, String hashtag);
     List<FilePreviewResponseDto> selectAllFilesByMemberIdAndDescription(Long memberId, String description);
+    List<ThumbnailDto> findThumbnailsByMemberId(Long memberId);
+	Long findFileIdByS3KeyAndMemberId(String s3Key, Long memberId);
 }
