@@ -228,13 +228,10 @@ import api from '@/lib/api'
 import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
 const mapStore = useMapStore()
-const {
-  selectedSido, 
-} = storeToRefs(mapStore)
+const { selectedSido } = storeToRefs(mapStore)
 
 // 함수 꺼내 쓰기
 const { selectFolder } = mapStore
-
 
 // 반응형 상태
 const selectedMap = ref(null)
@@ -294,30 +291,56 @@ async function loadMap(name) {
   }
 }
 
-// SVG 처리 함수 (분리됨)
+function normalizeId(id) {
+  return id.replace(/\s+/g, '-')
+}
+
+function deNormalizedId(id) {
+  return id.replace(/-/g, ' ')
+}
+
+const idMap = {}
 function processSvg(rawSvg, imageMap) {
+  // 0. ID 매핑 생성 (원본 id → 새 id)
+  for (const key of Object.keys(imageMap)) {
+    idMap[key] = normalizeId(key)
+  }
+
   // 1. 기존 크기 및 스타일 제거
   let processedSvg = rawSvg.replace(/(width|height)="[^"]*"/g, '').replace(/style="[^"]*"/g, '')
 
-  // 2. SVG 태그에 스타일 추가
+  // 2. id 값과 참조값 치환
+  Object.entries(idMap).forEach(([originalId, newId]) => {
+    const escOriginalId = originalId.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') // 정규표현식 escape
+    const idPattern = new RegExp(`id=["']${escOriginalId}["']`, 'g')
+    const hrefPattern = new RegExp(`href=["']#${escOriginalId}["']`, 'g')
+    const clipPathPattern = new RegExp(`clip-path=["']url\\(#${escOriginalId}\\)["']`, 'g')
+
+    processedSvg = processedSvg
+      .replace(idPattern, `id="${newId}"`)
+      .replace(hrefPattern, `href="#${newId}"`)
+      .replace(clipPathPattern, `clip-path="url(#${newId})"`)
+  })
+
+  // 3. SVG 태그에 스타일 추가
   processedSvg = processedSvg.replace(
     /<svg([^>]+)>/,
     `<svg$1 style="width: 100%; height: 100%;" preserveAspectRatio="xMidYMid meet">`,
   )
 
-  // 3. 기본 스타일 추가
+  // 4. 기본 스타일 추가
   processedSvg = processedSvg.replace(
     /<svg([^>]*)>/,
     `<svg$1>
           <style>
-            path, polygon, g { 
-              fill: white; 
-              stroke: #374151; 
+            path, polygon, g {
+              fill: white;
+              stroke: #374151;
               stroke-width: 1;
               transition: all 0.2s ease;
             }
-            path:hover, polygon:hover { 
-              stroke: #3B82F6; 
+            path:hover, polygon:hover {
+              stroke: #3B82F6;
               stroke-width: 2;
               filter: brightness(1.05);
             }
@@ -327,36 +350,37 @@ function processSvg(rawSvg, imageMap) {
           </style>`,
   )
 
-  // 4. 클립패스 정의 추가
+  // 5. 클립패스 정의 추가
   const clipPaths = Object.keys(imageMap)
-    .map(
-      (regionId) => `
-          <clipPath id="clip-${regionId}">
-            <use href="#${regionId}" />
+    .map((regionId) => {
+      const normalizedId = idMap[regionId]
+      return `
+          <clipPath id="clip-${normalizedId}">
+            <use href="#${normalizedId}" />
           </clipPath>
-        `,
-    )
+        `
+    })
     .join('')
 
   processedSvg = processedSvg.replace(/<svg([^>]*)>/, `<svg$1><defs>${clipPaths}</defs>`)
 
-  // 5. 이미지 요소 추가
+  // 6. 이미지 요소 추가
   const imageElements = Object.entries(imageMap)
-    .map(
-      ([regionId, imageUrl]) => `
-          <image 
-            href="${imageUrl}" 
-            clip-path="url(#clip-${regionId})" 
+    .map(([regionId, imageUrl]) => {
+      const normalizedId = idMap[regionId]
+      return `
+          <image
+            href="${imageUrl}"
+            clip-path="url(#clip-${normalizedId})"
             preserveAspectRatio="xMidYMid slice"
             width="100%" height="100%"
-            style="pointer-events: none; opacity: 0.8;" 
+            style="pointer-events: none; opacity: 0.8;"
           />
-        `,
-    )
+        `
+    })
     .join('\n')
 
   processedSvg = processedSvg.replace('</svg>', `${imageElements}</svg>`)
-
   return processedSvg
 }
 
@@ -391,7 +415,7 @@ const handleMapClick = (event) => {
     // 시도
     selectedSido.value = id
     selectFolder(`/${id}/`)
-  }else{
+  } else {
     // 시군구
     selectFolder(`/${selectedSido.value}/${id}/`)
   }
@@ -411,7 +435,7 @@ const handleRightClick = (event) => {
 const handleMouseOver = (event) => {
   const id = event.target.id
   if (id) {
-    hoveredRegion.value = id
+    hoveredRegion.value = deNormalizedId(id)
   }
 }
 
