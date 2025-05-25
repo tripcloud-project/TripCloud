@@ -6,7 +6,6 @@
       <DriveToolbar />
       <ContentGrid />
     </div>
-    <MetadataPanel />
     <ContextMenu />
   </div>
 </template>
@@ -14,23 +13,22 @@
 <script setup>
 import { onMounted, watch } from 'vue'
 
-import { useDriveStore } from '@/stores/drive.js'
+import { useTrashStore } from '@/stores/trash.js'
 import { storeToRefs } from 'pinia'
 
-import DriveSidebar from '@/components/drive/DriveSidebar.vue'
-import MetadataPanel from '@/components/drive/MetadataPanel.vue'
-import ContextMenu from '@/components/drive/ContextMenu.vue'
-import DriveToolbar from '@/components/drive/DriveToolbar.vue'
-import DriveHeader from '@/components/drive/DriveHeader.vue'
-import ContentGrid from '@/components/drive/ContentGrid.vue'
+import DriveSidebar from '@/components/trash/DriveSidebar.vue'
+import ContextMenu from '@/components/trash/ContextMenu.vue'
+import DriveToolbar from '@/components/trash/DriveToolbar.vue'
+import DriveHeader from '@/components/trash/DriveHeader.vue'
+import ContentGrid from '@/components/trash/ContentGrid.vue'
 
-const driveStore = useDriveStore()
+const trashStore = useTrashStore()
 
 // ref 꺼내 쓰기
-const { folders, selectedFolder, expandedFolders, contextMenu } = storeToRefs(driveStore)
+const { folders, selectedFolder, expandedFolders, contextMenu } = storeToRefs(trashStore)
 
 // 함수 꺼내 쓰기
-const { fetchItems, loadDirectoryTree, closeContextMenu } = driveStore
+const { fetchItems, loadDirectoryTree, closeContextMenu } = trashStore
 
 onMounted(() => {
   loadDirectoryTree()

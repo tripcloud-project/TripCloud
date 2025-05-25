@@ -28,12 +28,12 @@
 </template>
 
 <script setup>
-import { useDriveStore } from '@/stores/drive.js'
+import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
-const driveStore = useDriveStore()
-const { selectedItems } = storeToRefs(driveStore)
+const mapStore = useMapStore()
+const { selectedItems } = storeToRefs(mapStore)
 
-const { downloadSelectedFiles, deleteSelectedFiles, clearSelection } = driveStore
+const { downloadSelectedFiles, deleteSelectedFiles, clearSelection } = mapStore
 </script>
 
 <style scoped></style>

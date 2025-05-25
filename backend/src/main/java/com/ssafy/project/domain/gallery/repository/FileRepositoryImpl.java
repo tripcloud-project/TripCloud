@@ -96,8 +96,8 @@ public class FileRepositoryImpl implements FileRepository{
 	}
 	
 	@Override
-	public List<String> findDirectoriesByPrefixAndMemberId(String prefix, Long memberId){
-		return fileMapper.findDirectoriesByPrefixAndMemberId(prefix, memberId);
+	public List<String> findDirectoriesByPrefixAndMemberIdAndIsDeleted(String prefix, Long memberId, boolean isDeleted){
+		return fileMapper.findDirectoriesByPrefixAndMemberIdAndIsDeleted(prefix, memberId, isDeleted);
 	}
 
 	@Override

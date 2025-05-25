@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
-import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
-import { downloadFiles } from '@/utils/drive/download.js'
-import { deleteFiles } from '@/utils/drive/delete.js'
+import mapApiResponseToItems from '@/utils/trash/mapApiResponseToItems'
+import flattenDirectoryTree from '@/utils/trash/flattenDirectoryTree'
+import { restoreFiles } from '@/utils/trash/restore.js'
+import { deleteFiles } from '@/utils/trash/delete.js'
 import { useRouter } from 'vue-router'
 
-export const useDriveStore = defineStore(
-  'drive',
+export const useTrashStore = defineStore(
+  'trash',
   () => {
     // ref properties
     const prefix = ref('/') // 기본 경로
+
     const selectedFolder = ref('/')
     const expandedFolders = ref(['/'])
     const selectedItems = ref([])
@@ -32,7 +33,6 @@ export const useDriveStore = defineStore(
       { id: 'trash', name: '휴지통', icon: 'fas fa-trash-alt', color: 'text-red-500' },
       { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' }
     ])
-
 
     const router = useRouter()
     const handleQuickAccessClick = (id) => {
@@ -81,9 +81,6 @@ export const useDriveStore = defineStore(
       return result
     })
 
-
-
-
     const currentFolderName = computed(() => {
       const folder = folders.value.find((f) => f.id === selectedFolder.value)
       return folder ? folder.name : 'My Files'
@@ -131,20 +128,12 @@ export const useDriveStore = defineStore(
       const item = contextMenu.value.item
       if (!item) return []
 
-      const isFolder = item.type === 'folder'
-
       const baseItems = [
-        {
-          label: isFolder ? '열기' : '미리보기',
-          icon: isFolder ? 'fa-folder-open' : 'fa-eye',
-          action: 'open',
-        },
-        { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
+        { label: '복원', icon: 'fa-trash-restore', action: 'restore' },
         { type: 'divider' },
-        { label: '다운로드', icon: 'fa-download', action: 'download' },
-        { type: 'divider' },
-        { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
+        { label: 'Delete', icon: 'fa-trash-alt', action: 'delete', danger: true },
       ]
+
 
       return baseItems
     })
@@ -173,7 +162,7 @@ export const useDriveStore = defineStore(
     }
     const fetchItems = async () => {
       try {
-        const res = await api.get(`/gallery/list`, {
+        const res = await api.get(`/gallery/trash/list`, {
           params: { prefix: prefix.value },
         })
         if (res.data.status === 'success') {
@@ -185,7 +174,7 @@ export const useDriveStore = defineStore(
       }
     }
     const loadDirectoryTree = async () => {
-      const { data } = await api.get('/gallery') // 백엔드 API
+      const { data } = await api.get('/gallery/trash') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result)
     }
     const clearFileSelection = () => {
@@ -230,8 +219,8 @@ export const useDriveStore = defineStore(
       window.removeEventListener('click', closeContextMenu)
     }
 
-    // [다중 다운로드]
-    const downloadSelectedFiles = async () => {
+    // [다중 복원]
+    const restoreSelectedFiles = async () => {
       const prefixList = selectedItems.value
         .map((id) => filteredItems.value.find((i) => i.id === id && i.type === 'folder')?.id)
         .filter(Boolean)
@@ -240,11 +229,13 @@ export const useDriveStore = defineStore(
         .map((id) => filteredItems.value.find((i) => i.id === id && i.type !== 'folder')?.id)
         .filter(Boolean)
 
-      await downloadFiles({
-        prefixList,
-        fileIdList,
-        currentPrefix: prefix.value,
-      })
+      const result = await restoreFiles({ prefixList, fileIdList })
+
+      if (result.status === 'success') {
+        await fetchItems()
+        await loadDirectoryTree()
+        selectedItems.value = []
+      }
     }
 
     const deleteSelectedFiles = async () => {
@@ -294,10 +285,10 @@ export const useDriveStore = defineStore(
       toggleItemSelection,
       showContextMenu,
       closeContextMenu,
-      downloadSelectedFiles,
+      restoreSelectedFiles,
       deleteSelectedFiles,
       handleQuickAccessClick,
-      visibleFolders,
+      visibleFolders
     }
   },
   {

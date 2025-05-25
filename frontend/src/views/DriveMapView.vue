@@ -8,29 +8,31 @@
     </div>
     <MetadataPanel />
     <ContextMenu />
+    <ThumbnailModal v-if="showThumbnailDialog"/>
   </div>
 </template>
 
 <script setup>
 import { onMounted, watch } from 'vue'
 
-import { useDriveStore } from '@/stores/drive.js'
+import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
 
-import DriveSidebar from '@/components/drive/DriveSidebar.vue'
-import MetadataPanel from '@/components/drive/MetadataPanel.vue'
-import ContextMenu from '@/components/drive/ContextMenu.vue'
-import DriveToolbar from '@/components/drive/DriveToolbar.vue'
-import DriveHeader from '@/components/drive/DriveHeader.vue'
-import ContentGrid from '@/components/drive/ContentGrid.vue'
+import DriveSidebar from '@/components/map/DriveSidebar.vue'
+import ContextMenu from '@/components/map/ContextMenu.vue'
+import DriveToolbar from '@/components/map/DriveToolbar.vue'
+import DriveHeader from '@/components/map/DriveHeader.vue'
+import ContentGrid from '@/components/map/ContentGrid.vue'
+import MetadataPanel from '@/components/map/MetadataPanel.vue'
+import ThumbnailModal from '@/components/map/ThumbnailModal.vue'
 
-const driveStore = useDriveStore()
+const mapStore = useMapStore()
 
 // ref 꺼내 쓰기
-const { folders, selectedFolder, expandedFolders, contextMenu } = storeToRefs(driveStore)
+const { folders, selectedFolder, expandedFolders, contextMenu, showThumbnailDialog } = storeToRefs(mapStore)
 
 // 함수 꺼내 쓰기
-const { fetchItems, loadDirectoryTree, closeContextMenu } = driveStore
+const { fetchItems, loadDirectoryTree, closeContextMenu } = mapStore
 
 onMounted(() => {
   loadDirectoryTree()

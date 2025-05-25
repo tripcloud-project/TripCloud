@@ -71,14 +71,13 @@
 </template>
 
 <script setup>
-import { useDriveStore } from '@/stores/drive.js'
+import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
-// import { useRouter } from 'vue-router'
-const driveStore = useDriveStore()
+const mapStore = useMapStore()
 const { selectedFolder, expandedFolders, searchQuery, visibleFolders, quickAccess } =
-  storeToRefs(driveStore)
+  storeToRefs(mapStore)
 
-const { toggleFolder, selectFolder, handleQuickAccessClick } = driveStore
+const { toggleFolder, selectFolder, handleQuickAccessClick } = mapStore
 </script>
 
 <style scoped></style>

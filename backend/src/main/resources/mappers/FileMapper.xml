@@ -196,7 +196,7 @@
     </foreach>
   </update>
   
-	<select id="findDirectoriesByPrefixAndMemberId">
+	<select id="findDirectoriesByPrefixAndMemberIdAndIsDeleted">
 		SELECT DISTINCT
 		LEFT(
 		    SUBSTRING_INDEX(s3_key, '/', - (CHAR_LENGTH(s3_key) - CHAR_LENGTH(REPLACE(s3_key, '/', '')))),
@@ -205,7 +205,7 @@
 		  ) AS prefix
 		FROM file
 		WHERE member_id=#{memberId}
-        AND is_deleted = false;
+        AND is_deleted = #{isDeleted};
 	</select>
 
   

@@ -29,7 +29,7 @@ public interface FileMapper {
 	void restoreFilesByPrefixes(List<String> prefixList, Long memberId);
 	void deleteFilesByIds(List<Long> fileIdList, Long memberId);
 	void deleteFilesByPrefixes(List<String> prefixList, Long memberId);
-	List<String> findDirectoriesByPrefixAndMemberId(String prefix, Long memberId);
+	List<String> findDirectoriesByPrefixAndMemberIdAndIsDeleted(String prefix, Long memberId, boolean isDeleted);
 	List<DirectoryPreviewResponseDto> selectAllDirectoriesByMemberIdAndKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndKeyword(Long memberId, String keyword);
 	List<FilePreviewResponseDto> selectAllFilesByMemberIdAndHashtag(Long memberId, String hashtag);

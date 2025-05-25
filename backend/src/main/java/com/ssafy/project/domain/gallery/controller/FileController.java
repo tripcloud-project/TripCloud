@@ -90,9 +90,9 @@ public class FileController {
 	}
 
 	@GetMapping("/trash/list")
-	public ResponseEntity<?> trashList() {
+	public ResponseEntity<?> trashList(@RequestParam String prefix) {
 		return ResponseEntity.status(200)
-				.body(createSuccess(fileService.listDirectory("/", true)));
+				.body(createSuccess(fileService.listDirectory(prefix, true)));
 	}
 
 	@PutMapping("/trash/restore")
@@ -112,8 +112,14 @@ public class FileController {
     @GetMapping
     public ResponseEntity<?> getDirectoryStructure(){
     	return ResponseEntity.status(200)
-    			.body(createSuccess(fileService.getDirectoryStructure()));
+    			.body(createSuccess(fileService.getDirectoryStructure(false)));
     }
+
+	@GetMapping("/trash")
+	public ResponseEntity<?> getTrashDirectoryStructure(){
+		return ResponseEntity.status(200)
+				.body(createSuccess(fileService.getDirectoryStructure(true)));
+	}
     
 	// TODO: 파일 이름 검색 endpoint 추가
 

@@ -147,18 +147,18 @@
 </template>
 
 <script setup>
-import { useDriveStore } from '@/stores/drive.js'
+import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
-import { downloadFiles } from '@/utils/drive/download.js'
-import { deleteFiles } from '@/utils/drive/delete.js'
-import { renameSingleFile } from '@/utils/drive/rename.js'
+import { downloadFiles } from '@/utils/map/download.js'
+import { deleteFiles } from '@/utils/map/delete.js'
+import { renameSingleFile } from '@/utils/map/rename.js'
 import { formatDateTime, formatSize } from '@/utils/format'
-import { descriptionSingleFile } from '@/utils/drive/description.js'
+import { descriptionSingleFile } from '@/utils/map/description.js'
 
-const driveStore = useDriveStore()
-const { prefix, selectedFile, selectedItems } = storeToRefs(driveStore)
+const mapStore = useMapStore()
+const { prefix, selectedFile, selectedItems } = storeToRefs(mapStore)
 
-const { clearFileSelection, fetchItems, loadDirectoryTree } = driveStore
+const { clearFileSelection, fetchItems, loadDirectoryTree } = mapStore
 
 // [단건 다운로드]
 const downloadSingleFile = async () => {
@@ -219,6 +219,7 @@ const handleDescriptionSingleFile = async () => {
     await fetchItems()
   }
 }
+
 </script>
 
 <style scoped></style>

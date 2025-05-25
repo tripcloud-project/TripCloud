@@ -1,17 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
-import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
-import { downloadFiles } from '@/utils/drive/download.js'
-import { deleteFiles } from '@/utils/drive/delete.js'
+import mapApiResponseToItems from '@/utils/map/mapApiResponseToItems'
+import flattenDirectoryTree from '@/utils/map/flattenDirectoryTree'
+import { downloadFiles } from '@/utils/map/download.js'
+import { deleteFiles } from '@/utils/map/delete.js'
 import { useRouter } from 'vue-router'
+import { setThumbnail } from '@/utils/map/thumbnail'
 
-export const useDriveStore = defineStore(
-  'drive',
+export const useMapStore = defineStore(
+  'map',
   () => {
     // ref properties
     const prefix = ref('/') // 기본 경로
+
     const selectedFolder = ref('/')
     const expandedFolders = ref(['/'])
     const selectedItems = ref([])
@@ -33,6 +35,7 @@ export const useDriveStore = defineStore(
       { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' }
     ])
 
+    const showThumbnailDialog = ref(false)
 
     const router = useRouter()
     const handleQuickAccessClick = (id) => {
@@ -81,9 +84,6 @@ export const useDriveStore = defineStore(
       return result
     })
 
-
-
-
     const currentFolderName = computed(() => {
       const folder = folders.value.find((f) => f.id === selectedFolder.value)
       return folder ? folder.name : 'My Files'
@@ -107,8 +107,11 @@ export const useDriveStore = defineStore(
         let valueA, valueB
 
         if (sortBy.value === 'name') {
-          valueA = a.name.toLowerCase()
-          valueB = b.name.toLowerCase()
+          // valueA = a.name.toLowerCase()
+          // valueB = b.name.toLowerCase()
+          valueA = (a.name ?? '').toLowerCase()
+          valueB = (b.name ?? '').toLowerCase()
+
         } else if (sortBy.value === 'modified') {
           valueA = new Date(a.modified).getTime()
           valueB = new Date(b.modified).getTime()
@@ -142,8 +145,11 @@ export const useDriveStore = defineStore(
         { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
         { type: 'divider' },
         { label: '다운로드', icon: 'fa-download', action: 'download' },
+        // { label: 'Share', icon: 'fa-share-alt', action: 'share' },
         { type: 'divider' },
         { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
+        { type: 'divider' },
+        { label: '썸네일 설정', icon: 'fa-cut', action: 'thumbnail' },
       ]
 
       return baseItems
@@ -173,20 +179,19 @@ export const useDriveStore = defineStore(
     }
     const fetchItems = async () => {
       try {
-        const res = await api.get(`/gallery/list`, {
+        const res = await api.get(`/gallery/photo`, {
           params: { prefix: prefix.value },
         })
         if (res.data.status === 'success') {
           items.value = mapApiResponseToItems(res.data.result, prefix.value)
-          console.log(items.value)
         }
       } catch (err) {
         console.error('[fetchItems] 오류:', err)
       }
     }
     const loadDirectoryTree = async () => {
-      const { data } = await api.get('/gallery') // 백엔드 API
-      folders.value = flattenDirectoryTree(data.result)
+      const { data } = await api.get('/gallery/photo') // 백엔드 API
+      folders.value = flattenDirectoryTree(data.result.directories)
     }
     const clearFileSelection = () => {
       selectedFile.value = null
@@ -264,6 +269,16 @@ export const useDriveStore = defineStore(
         selectedItems.value = []
       }
     }
+
+    const setThumbnailFile = async (fileId, region) => {
+      setThumbnail(fileId, region)
+    }
+    const selectedRegion = ref('')
+
+    const thumbnailCandidate = ref({
+      id: null,
+      options: [],
+    })
     return {
       prefix,
       setPrefix,
@@ -298,6 +313,10 @@ export const useDriveStore = defineStore(
       deleteSelectedFiles,
       handleQuickAccessClick,
       visibleFolders,
+      setThumbnailFile,
+      showThumbnailDialog,
+      selectedRegion,
+      thumbnailCandidate,
     }
   },
   {

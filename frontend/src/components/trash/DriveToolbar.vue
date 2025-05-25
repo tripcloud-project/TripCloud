@@ -7,15 +7,15 @@
     <div class="flex space-x-2">
       <button
         class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 cursor-pointer !rounded-button whitespace-nowrap"
-        @click="downloadSelectedFiles"
+        @click="restoreSelectedFiles"
       >
-        <i class="fas fa-download mr-1"></i> 다운로드
+        <i class="fas fa-download mr-1"></i> 복원
       </button>
       <button
         class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 cursor-pointer !rounded-button whitespace-nowrap"
         @click="deleteSelectedFiles"
       >
-        <i class="fas fa-trash-alt mr-1"></i> 삭제
+        <i class="fas fa-trash-alt mr-1"></i> 영구삭제
       </button>
     </div>
     <button
@@ -28,12 +28,12 @@
 </template>
 
 <script setup>
-import { useDriveStore } from '@/stores/drive.js'
+import { useTrashStore } from '@/stores/trash.js'
 import { storeToRefs } from 'pinia'
-const driveStore = useDriveStore()
-const { selectedItems } = storeToRefs(driveStore)
+const trashStore = useTrashStore()
+const { selectedItems } = storeToRefs(trashStore)
 
-const { downloadSelectedFiles, deleteSelectedFiles, clearSelection } = driveStore
+const { restoreSelectedFiles, deleteSelectedFiles, clearSelection } = trashStore
 </script>
 
 <style scoped></style>

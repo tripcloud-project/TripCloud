@@ -71,14 +71,13 @@
 </template>
 
 <script setup>
-import { useDriveStore } from '@/stores/drive.js'
+import { useTrashStore } from '@/stores/trash.js'
 import { storeToRefs } from 'pinia'
-// import { useRouter } from 'vue-router'
-const driveStore = useDriveStore()
+const trashStore = useTrashStore()
 const { selectedFolder, expandedFolders, searchQuery, visibleFolders, quickAccess } =
-  storeToRefs(driveStore)
+  storeToRefs(trashStore)
 
-const { toggleFolder, selectFolder, handleQuickAccessClick } = driveStore
+const { toggleFolder, selectFolder, handleQuickAccessClick } = trashStore
 </script>
 
 <style scoped></style>
