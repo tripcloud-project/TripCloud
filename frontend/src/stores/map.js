@@ -7,6 +7,8 @@ import { downloadFiles } from '@/utils/map/download.js'
 import { deleteFiles } from '@/utils/map/delete.js'
 import { useRouter } from 'vue-router'
 import { setThumbnail } from '@/utils/map/thumbnail'
+import { getStorage } from '@/utils/map/storage.js'
+import { useCommonStore } from '@/stores/common.js'
 
 export const useMapStore = defineStore(
   'map',
@@ -190,6 +192,7 @@ export const useMapStore = defineStore(
       }
     }
     const loadDirectoryTree = async () => {
+      fetchStorage()
       const { data } = await api.get('/gallery/photo') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result.directories)
     }
@@ -279,6 +282,14 @@ export const useMapStore = defineStore(
       id: null,
       options: [],
     })
+    const commonStore = useCommonStore()
+    async function fetchStorage() {
+      const data = await getStorage()
+      if (data.status === 'success') {
+        commonStore.usedStorage = data.result.usedStorage
+        commonStore.maxStorage = data.result.maxStorage
+      }
+    }
     return {
       prefix,
       setPrefix,
@@ -317,6 +328,7 @@ export const useMapStore = defineStore(
       showThumbnailDialog,
       selectedRegion,
       thumbnailCandidate,
+      fetchStorage,
     }
   },
   {
