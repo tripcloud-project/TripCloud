@@ -9,10 +9,16 @@ import DriveTrashView from '@/views/DriveTrashView.vue'
 import MapView from '@/views/MapView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import ProfileEditView from '@/views/ProfileEditView.vue'
+import MainView from '@/views/MainView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      name: 'main',
+      component: MainView,
+    },
     {
       path: '/login',
       name: 'login',
