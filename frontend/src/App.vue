@@ -1,20 +1,10 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import HeaderCompnent from './components/HeaderCompnent.vue'
 </script>
 
 <template>
-  <header>
-    <nav>
-      <RouterLink to="/login">로그인</RouterLink>
-      <RouterLink to="/register">회원가입</RouterLink>
-      <RouterLink to="/drive">드라이브</RouterLink>
-      <RouterLink to="/board">게시판</RouterLink>
-      <RouterLink to="/posts/new">새 글 쓰기</RouterLink>
-      <RouterLink to="/drive/map">지도 보기</RouterLink>
-      <RouterLink to="/profile">마이페이지</RouterLink>
-      <RouterLink to="/profile/edit">내 정보 수정</RouterLink>
-    </nav>
-  </header>
+  <HeaderCompnent />
   <RouterView />
 </template>
 
