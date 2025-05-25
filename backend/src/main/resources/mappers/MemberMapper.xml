@@ -29,19 +29,23 @@
         FROM member
         WHERE member_id = #{id}
     </select>
-    
+
     <update id="update">
- 		UPDATE member
- 		SET
- 			password = #{requestDto.password},
- 			name = #{requestDto.name},
- 			profile_image = #{requestDto.profileImage},
- 			main_badge_id = #{requestDto.mainBadgeId}
- 		WHERE
- 			member_id = #{memberId}
- 	</update>
- 	
- 	<update id="delete">
+        UPDATE
+            member
+        SET
+            <if test="requestDto.password != null and requestDto.password != ''">
+                password = #{requestDto.password},
+            </if>
+            name = #{requestDto.name},
+            profile_image = #{requestDto.profileImage},
+            main_badge_id = #{requestDto.mainBadgeId}
+        WHERE
+            member_id = #{memberId}
+    </update>
+
+
+    <update id="delete">
  		UPDATE member
  		SET
  			is_deleted = TRUE
