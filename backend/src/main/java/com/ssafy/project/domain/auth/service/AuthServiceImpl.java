@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${jwt.refresh-token.expiration}")
     private long jwtRefreshTokenExpiration;
-    
+
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
 
     private boolean isValid(String rawPassword) {
 
-        if(rawPassword == null || rawPassword.isBlank()) {
+        if (rawPassword == null || rawPassword.isBlank()) {
             return false;
         }
 
@@ -54,85 +54,85 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-    	LoginResponseDto loginResponseDto = authRepository.findByEmail(loginRequestDto.getEmail());
-    	
-    	// 이메일에 맞는 회원 정보가 없거나 비밀번호 불일치
-        if(loginResponseDto == null || !passwordEncoder.matches(loginRequestDto.getPassword(), loginResponseDto.getPassword())) {
+        LoginResponseDto loginResponseDto = authRepository.findByEmail(loginRequestDto.getEmail());
+
+        // 이메일에 맞는 회원 정보가 없거나 비밀번호 불일치
+        if (loginResponseDto == null || loginResponseDto.isDeleted() || !passwordEncoder.matches(loginRequestDto.getPassword(), loginResponseDto.getPassword())) {
             throw new NotFoundMemberException();
         }
-        
+
         String accessToken = jwtUtil.generateAccessToken(
-        		loginResponseDto.getMemberId(),
-        		loginResponseDto.getEmail(),
+                loginResponseDto.getMemberId(),
+                loginResponseDto.getEmail(),
                 loginResponseDto.getName(),
                 loginResponseDto.getRole()
         );
-        
+
         String refreshToken = jwtUtil.generateRefreshToken(
-        		loginResponseDto.getMemberId(),
-        		loginResponseDto.getEmail()
+                loginResponseDto.getMemberId(),
+                loginResponseDto.getEmail()
         );
-        
+
         loginResponseDto.setAccessToken(accessToken);
         loginResponseDto.setRefreshToken(refreshToken);
         String memberId = String.valueOf(loginResponseDto.getMemberId());
-        
+
         redisRepository.delete("refresh: " + memberId);
         redisRepository.save("refresh: " + memberId, refreshToken, jwtRefreshTokenExpiration);
-  
+
         return loginResponseDto;
     }
 
-	@Override
-	public void logout(String authorization, String refreshToken) {
-		String accessToken = jwtUtil.resolveToken(authorization);
-		String memberId = jwtUtil.extractId(accessToken);
-		
-		// refreshToken 삭제
-		redisRepository.delete("refresh: " + memberId);
-		
-		// accessToken 블랙리스트 등록, 7일간
-		redisRepository.save("logout: " + accessToken, "logout", 604800000L);
-	}
+    @Override
+    public void logout(String authorization, String refreshToken) {
+        String accessToken = jwtUtil.resolveToken(authorization);
+        String memberId = jwtUtil.extractId(accessToken);
 
-	@Transactional
-	@Override
-	public TokenResponseDto reissueToken(String refreshToken) {
-		// 리프레시 토큰 검증
-		jwtUtil.validateToken(refreshToken);
-		Claims claim = jwtUtil.extractAllClaims(refreshToken);
-		
-		Long memberId = claim.get("id", Long.class);
-		String email = claim.get("email", String.class);
-		
-		// 리프레시 토큰이 redis에 있는지 확인
-		if(!redisRepository.exists("refresh: " + memberId))
-			throw new InvalidTokenException();
-		
-		// 리프레시 토큰이 유효하다면 redis에서 삭제
-		redisRepository.delete("refresh: " + memberId);
-		
-		// 리프레시 토큰을 재발급하여 redis에 추가
-		refreshToken = jwtUtil.generateRefreshToken(memberId, email);
-		redisRepository.save("refresh: " + memberId, refreshToken, jwtRefreshTokenExpiration);
-		
-		// 엑세스 토큰 재발급
-    	LoginResponseDto loginResponseDto = authRepository.findByEmail(email);
-    	
-    	if(loginResponseDto == null)
-    		throw new NotFoundMemberException();
-    	
-    	String accessToken = jwtUtil.generateAccessToken(
-        		loginResponseDto.getMemberId(),
-        		loginResponseDto.getEmail(),
+        // refreshToken 삭제
+        redisRepository.delete("refresh: " + memberId);
+
+        // accessToken 블랙리스트 등록, 7일간
+        redisRepository.save("logout: " + accessToken, "logout", 604800000L);
+    }
+
+    @Transactional
+    @Override
+    public TokenResponseDto reissueToken(String refreshToken) {
+        // 리프레시 토큰 검증
+        jwtUtil.validateToken(refreshToken);
+        Claims claim = jwtUtil.extractAllClaims(refreshToken);
+
+        Long memberId = claim.get("id", Long.class);
+        String email = claim.get("email", String.class);
+
+        // 리프레시 토큰이 redis에 있는지 확인
+        if (!redisRepository.exists("refresh: " + memberId))
+            throw new InvalidTokenException();
+
+        // 리프레시 토큰이 유효하다면 redis에서 삭제
+        redisRepository.delete("refresh: " + memberId);
+
+        // 리프레시 토큰을 재발급하여 redis에 추가
+        refreshToken = jwtUtil.generateRefreshToken(memberId, email);
+        redisRepository.save("refresh: " + memberId, refreshToken, jwtRefreshTokenExpiration);
+
+        // 엑세스 토큰 재발급
+        LoginResponseDto loginResponseDto = authRepository.findByEmail(email);
+
+        if (loginResponseDto == null)
+            throw new NotFoundMemberException();
+
+        String accessToken = jwtUtil.generateAccessToken(
+                loginResponseDto.getMemberId(),
+                loginResponseDto.getEmail(),
                 loginResponseDto.getName(),
                 loginResponseDto.getRole()
         );
-		
-		// 반환
-    	return TokenResponseDto.builder()
-    			.accessToken(accessToken)
-    			.refreshToken(refreshToken)
-    			.build();
-	}
+
+        // 반환
+        return TokenResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }
