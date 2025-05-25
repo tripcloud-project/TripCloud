@@ -18,22 +18,23 @@ import okhttp3.Response;
 public class KakaoSearchService {
     @Value("${kakao.rest-api-key}")
     private String kakaoRestApiKey;
-    
+
     private final OkHttpClient client = new OkHttpClient();
 
-	public List<AttractionResponseDto> SearchRecommendedSpots(String sido, String sigungu) {
+    public List<AttractionResponseDto> SearchRecommendedSpots(String sido, String sigungu) {
+        if (sigungu == null) sigungu = "";
         String url = String.format(
-        	"https://dapi.kakao.com/v2/local/search/keyword.json?query=%s %s의 관광명소",
-        	sido, sigungu
+                "https://dapi.kakao.com/v2/local/search/keyword.json?query=%s %s의 관광명소",
+                sido, sigungu
         );
 
         Request request = new Request.Builder()
-            .url(url)
-            .addHeader("Authorization", kakaoRestApiKey)
-            .build();
+                .url(url)
+                .addHeader("Authorization", kakaoRestApiKey)
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
-        	if (!response.isSuccessful()) {
+            if (!response.isSuccessful()) {
                 System.err.println("❌ 요청 실패! 응답 코드: " + response.code());
                 System.err.println("❌ 응답 메시지: " + response.message());
                 System.err.println("❌ 응답 본문: " + response.body().string());
@@ -44,19 +45,19 @@ public class KakaoSearchService {
             JSONArray documents = json.getJSONArray("documents");
 
             List<AttractionResponseDto> attractionList = new ArrayList<>();
-            for(int i=0; i<Math.min(documents.length(), 5); i++) {
-            	JSONObject attraction = documents.getJSONObject(i);
-            	
-            	AttractionResponseDto responseDto = AttractionResponseDto.builder()
-            			.name(attraction.getString("place_name"))
-            			.category(attraction.getString("category_name"))
-            			.address(attraction.getString("address_name"))
-            			.placeURL(attraction.getString("place_url"))
-            			.build();
-            	
-            	attractionList.add(responseDto);
+            for (int i = 0; i < Math.min(documents.length(), 5); i++) {
+                JSONObject attraction = documents.getJSONObject(i);
+
+                AttractionResponseDto responseDto = AttractionResponseDto.builder()
+                        .name(attraction.getString("place_name"))
+                        .category(attraction.getString("category_name"))
+                        .address(attraction.getString("address_name"))
+                        .placeURL(attraction.getString("place_url"))
+                        .build();
+
+                attractionList.add(responseDto);
             }
-            
+
             return attractionList;
         } catch (Exception e) {
             e.printStackTrace();
