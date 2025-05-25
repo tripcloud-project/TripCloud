@@ -13,12 +13,15 @@
 
     <!-- File Preview -->
     <div class="p-4 border-b border-gray-200">
-      <div class="bg-gray-100 rounded-lg h-40 flex items-center justify-center overflow-hidden">
+      <div
+        class="bg-gray-100 rounded-lg h-40 flex items-center justify-center overflow-hidden cursor-pointer"
+      >
         <img
           v-if="selectedFile.type === 'image'"
           :src="selectedFile.preview"
           alt="File preview"
           class="max-w-full max-h-full object-contain"
+          @click="showPreviewModal = true"
         />
         <i
           v-else-if="selectedFile.type === 'document'"
@@ -29,6 +32,25 @@
           class="fas fa-file-video text-6xl text-purple-400"
         ></i>
         <i v-else class="fas fa-file text-6xl text-gray-400"></i>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div
+      v-if="showPreviewModal"
+      class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+    >
+      <div class="relative">
+        <button
+          class="absolute top-0 right-0 m-2 text-white text-xl font-bold"
+          @click="showPreviewModal = false"
+        >
+          &times;
+        </button>
+        <img
+          :src="selectedFile.preview"
+          alt="Full preview"
+          class="max-w-[90vw] max-h-[90vh] rounded shadow-lg"
+        />
       </div>
     </div>
 
@@ -45,6 +67,16 @@
           <p class="text-sm text-gray-800">{{ selectedFile.contentType }}</p>
         </div>
 
+        <div>
+          <h4 class="text-sm font-medium text-gray-500 mb-1">크기</h4>
+          <p class="text-sm text-gray-800">{{ formatSize(selectedFile.size) }}</p>
+        </div>
+
+        <div v-if="selectedFile.taken">
+          <h4 class="text-sm font-medium text-gray-500 mb-1">촬영일</h4>
+          <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.taken) }}</p>
+        </div>
+
         <div v-if="selectedFile.sido">
           <h4 class="text-sm font-medium text-gray-500 mb-1">위치</h4>
           <p class="text-sm text-gray-800">
@@ -52,34 +84,10 @@
           </p>
         </div>
 
-        <div v-if="selectedFile.latitude">
-          <h4 class="text-sm font-medium text-gray-500 mb-1">위도</h4>
+        <div v-if="selectedFile.latitude && selectedFile.longitude">
+          <h4 class="text-sm font-medium text-gray-500 mb-1">위경도</h4>
           <p class="text-sm text-gray-800">{{ selectedFile.latitude }}</p>
-        </div>
-
-        <div v-if="selectedFile.longitude">
-          <h4 class="text-sm font-medium text-gray-500 mb-1">경도</h4>
           <p class="text-sm text-gray-800">{{ selectedFile.longitude }}</p>
-        </div>
-
-        <div>
-          <h4 class="text-sm font-medium text-gray-500 mb-1">크기</h4>
-          <p class="text-sm text-gray-800">{{ formatSize(selectedFile.size) }}</p>
-        </div>
-
-        <div>
-          <h4 class="text-sm font-medium text-gray-500 mb-1">생성일</h4>
-          <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.created) }}</p>
-        </div>
-
-        <div>
-          <h4 class="text-sm font-medium text-gray-500 mb-1">수정일</h4>
-          <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.modified) }}</p>
-        </div>
-
-        <div v-if="selectedFile.taken">
-          <h4 class="text-sm font-medium text-gray-500 mb-1">촬영일</h4>
-          <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.taken) }}</p>
         </div>
 
         <div v-if="selectedFile.hashtags && selectedFile.hashtags.length > 0">
@@ -210,7 +218,7 @@ const handleDescriptionSingleFile = async () => {
 
   const result = await descriptionSingleFile({
     fileId,
-    description: newDescription
+    description: newDescription,
   })
 
   if (result.status === 'success') {
@@ -219,6 +227,10 @@ const handleDescriptionSingleFile = async () => {
     await fetchItems()
   }
 }
+
+import { ref } from 'vue'
+
+const showPreviewModal = ref(false)
 </script>
 
 <style scoped></style>
