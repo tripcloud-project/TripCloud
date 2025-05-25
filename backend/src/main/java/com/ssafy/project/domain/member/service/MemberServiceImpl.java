@@ -132,15 +132,17 @@ public class MemberServiceImpl implements MemberService {
         if(isValid(requestDto.getPassword())) {
             throw new InvalidPasswordException("비밀번호는 8~24자의 영문, 숫자, 특수문자를 포함해야 합니다.");
         }
-        
+
         Boolean hasBadge = badgeRepository.existsByMemberIdAndBadgeId(member.getMemberId(), requestDto.getMainBadgeId());
         
         // 보유하지 않은 칭호로 변경 시도
-        if(!hasBadge) {
+        if(!hasBadge && requestDto.getMainBadgeId() != null) {
         	throw new BadgeNotFoundException("해당 칭호를 보유하지 않았습니다.");
         }
         
-        requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        if(requestDto.getPassword() != null)
+            requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+
         memberRepository.updateMember(member.getMemberId(), requestDto);
 	}
 
