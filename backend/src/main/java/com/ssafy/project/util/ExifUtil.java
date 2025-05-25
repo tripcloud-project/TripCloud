@@ -42,7 +42,7 @@ public class ExifUtil {
 	        }
 
 	    } catch (Exception e) {
-	    	log.error("❌ GPS 추출 실패: {}", e.getMessage(), e);
+			return null;
 	    }
 
 	    return null;
@@ -61,7 +61,7 @@ public class ExifUtil {
 				}
 			}
 		} catch (Exception e) {
-			log.error("❌ 촬영일 추출 실패: {}", e.getMessage(), e);
+			return null;
 		}
 		return null;
 	}
