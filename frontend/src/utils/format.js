@@ -21,7 +21,7 @@ export const formatDateTime = (dateString) => {
 }
 
 export const formatSize = (bytes) => {
-  if (!bytes) return '—'
+  if (!bytes) return '0'
 
   const units = ['B', 'KB', 'MB', 'GB', 'TB']
   let size = bytes

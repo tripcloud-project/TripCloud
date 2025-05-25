@@ -195,3 +195,10 @@ ADD CONSTRAINT uq_member_email UNIQUE (email);
 
 ALTER TABLE file
 ADD CONSTRAINT uq_file_s3key UNIQUE (s3_key);
+
+-- cascade 추가
+ALTER TABLE thumbnail
+ADD CONSTRAINT fk_thumbnail_photo
+FOREIGN KEY (photo_id)
+REFERENCES file(file_id)
+ON DELETE CASCADE;

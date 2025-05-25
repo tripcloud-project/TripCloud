@@ -7,7 +7,6 @@ import { downloadFiles } from '@/utils/drive/download.js'
 import { deleteFiles } from '@/utils/drive/delete.js'
 import { useRouter } from 'vue-router'
 import { getStorage } from '@/utils/drive/storage.js'
-import { useCommonStore } from '@/stores/common.js'
 
 export const useDriveStore = defineStore(
   'drive',
@@ -188,6 +187,7 @@ export const useDriveStore = defineStore(
     }
     const loadDirectoryTree = async () => {
       fetchStorage()
+      console.log("fet하자")
       const { data } = await api.get('/gallery') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result)
     }
@@ -267,13 +267,17 @@ export const useDriveStore = defineStore(
         selectedItems.value = []
       }
     }
-
-    const commonStore = useCommonStore()
+    const usedStorage = ref(0)
+    const maxStorage = ref(0)
+    const usagePercent = computed(() => {
+      if (!maxStorage.value) return 0
+      return (usedStorage.value / maxStorage.value) * 100
+    })
     async function fetchStorage() {
       const data = await getStorage()
       if (data.status === 'success') {
-        commonStore.usedStorage = data.result.usedStorage
-        commonStore.maxStorage = data.result.maxStorage
+        usedStorage.value = Number(data.result.usedStorage)
+        maxStorage.value = Number(data.result.maxStorage)
       }
     }
     return {
@@ -310,10 +314,10 @@ export const useDriveStore = defineStore(
       deleteSelectedFiles,
       handleQuickAccessClick,
       visibleFolders,
-      // usedStorage,
-      // maxStorage,
+      usedStorage,
+      maxStorage,
       fetchStorage,
-      // usagePercent,
+      usagePercent,
     }
   },
   {

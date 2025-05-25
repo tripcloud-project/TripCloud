@@ -262,4 +262,18 @@
             member_id = #{memberId}
           AND description LIKE CONCAT('%', #{description}, '%')
     </select>
+
+    <select id="findThumbnailsByMemberId">
+        SELECT sido, sigungu
+        FROM thumbnail
+        WHERE member_id = #{memberId};
+    </select>
+
+    <select id="findFileIdByS3KeyAndMemberId">
+        SELECT file_id
+        FROM file
+        WHERE
+            s3_key = #{s3Key}
+            AND member_id = #{memberId};
+    </select>
 </mapper>

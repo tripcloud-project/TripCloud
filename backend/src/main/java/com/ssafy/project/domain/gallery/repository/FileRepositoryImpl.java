@@ -2,12 +2,9 @@ package com.ssafy.project.domain.gallery.repository;
 
 import java.util.List;
 
+import com.ssafy.project.domain.gallery.dto.internal.*;
 import org.springframework.stereotype.Repository;
 
-import com.ssafy.project.domain.gallery.dto.internal.DirectoryEntry;
-import com.ssafy.project.domain.gallery.dto.internal.FileDto;
-import com.ssafy.project.domain.gallery.dto.internal.FileEntry;
-import com.ssafy.project.domain.gallery.dto.internal.S3KeyOriginalFilenameDto;
 import com.ssafy.project.domain.gallery.dto.response.DirectoryPreviewResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FileDetailResponseDto;
 import com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto;
@@ -118,5 +115,15 @@ public class FileRepositoryImpl implements FileRepository{
 	@Override
 	public List<FilePreviewResponseDto> findFilesWithDescription(Long memberId, String description) {
 		return fileMapper.selectAllFilesByMemberIdAndDescription(memberId, description);
+	}
+
+	@Override
+	public List<ThumbnailDto> findThumbnailsByMemberId(Long memberId){
+		return fileMapper.findThumbnailsByMemberId(memberId);
+	}
+
+	@Override
+	public Long findFileIdByS3KeyAndMemberId(String s3Key, Long memberId){
+		return fileMapper.findFileIdByS3KeyAndMemberId(s3Key, memberId);
 	}
 }

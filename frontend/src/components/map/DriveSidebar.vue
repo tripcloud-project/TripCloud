@@ -83,7 +83,6 @@
 
 <script setup>
 import { useMapStore } from '@/stores/map.js'
-import { useCommonStore } from '@/stores/common.js'
 import { storeToRefs } from 'pinia'
 import { formatSize } from '@/utils/format'
 const mapStore = useMapStore()
@@ -93,12 +92,12 @@ const {
   searchQuery,
   visibleFolders,
   quickAccess,
+  usedStorage,
+  maxStorage,
+  usagePercent,
 } = storeToRefs(mapStore)
 
 const { toggleFolder, selectFolder, handleQuickAccessClick } = mapStore
-
-const commonStore = useCommonStore()
-const { usedStorage, maxStorage, usagePercent } = storeToRefs(commonStore)
 </script>
 
 <style scoped></style>

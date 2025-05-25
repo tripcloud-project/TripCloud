@@ -83,7 +83,6 @@
 
 <script setup>
 import { useTrashStore } from '@/stores/trash.js'
-import { useCommonStore } from '@/stores/common.js'
 import { storeToRefs } from 'pinia'
 import { formatSize } from '@/utils/format'
 const trashStore = useTrashStore()
@@ -93,12 +92,13 @@ const {
   searchQuery,
   visibleFolders,
   quickAccess,
+  usedStorage,
+  maxStorage,
+  usagePercent,
 } = storeToRefs(trashStore)
 
 const { toggleFolder, selectFolder, handleQuickAccessClick } = trashStore
 
-const commonStore = useCommonStore()
-const { usedStorage, maxStorage, usagePercent } = storeToRefs(commonStore)
 </script>
 
 <style scoped></style>

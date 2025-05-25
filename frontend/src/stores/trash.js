@@ -7,7 +7,6 @@ import { restoreFiles } from '@/utils/trash/restore.js'
 import { deleteFiles } from '@/utils/trash/delete.js'
 import { useRouter } from 'vue-router'
 import { getStorage } from '@/utils/drive/storage.js'
-import { useCommonStore } from '@/stores/common.js'
 
 export const useTrashStore = defineStore(
   'trash',
@@ -258,12 +257,18 @@ export const useTrashStore = defineStore(
         selectedItems.value = []
       }
     }
-    const commonStore = useCommonStore()
+    const usedStorage = ref(0)
+    const maxStorage = ref(0)
+    const usagePercent = computed(() => {
+      if (!maxStorage.value) return 0
+      return (usedStorage.value / maxStorage.value) * 100
+    })
+    // const commonStore = useCommonStore()
     async function fetchStorage() {
       const data = await getStorage()
       if (data.status === 'success') {
-        commonStore.usedStorage = data.result.usedStorage
-        commonStore.maxStorage = data.result.maxStorage
+        usedStorage.value = Number(data.result.usedStorage)
+        maxStorage.value = Number(data.result.maxStorage)
       }
     }
     return {
@@ -300,7 +305,10 @@ export const useTrashStore = defineStore(
       deleteSelectedFiles,
       handleQuickAccessClick,
       visibleFolders,
+      usedStorage,
+      maxStorage,
       fetchStorage,
+      usagePercent,
     }
   },
   {
