@@ -43,4 +43,7 @@ public class MemberRepositoryImpl implements MemberRepository {
 
     @Override
     public StorageResponseDto getStorageByMemberId(Long memberId) { return memberMapper.getStorageByMemberId(memberId); }
+
+    @Override
+    public void updateStorageByMemberId(Long memberId) { memberMapper.updateStorageByMemberId(memberId); }
 }

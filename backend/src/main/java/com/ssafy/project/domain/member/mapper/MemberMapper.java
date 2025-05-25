@@ -18,4 +18,5 @@ public interface MemberMapper {
 	int update(Long memberId, @Param("requestDto") MemberUpdateRequestDto requestDto);
 	int delete(@NonNull Long memberId);
     StorageResponseDto getStorageByMemberId(Long memberId);
+    void updateStorageByMemberId(Long memberId);
 }

@@ -21,4 +21,5 @@ public interface MemberService {
     void putCurrentMemberInfo(MemberUpdateRequestDto requestDto, Authentication authentication);
 	void deleteCurrentMember(Authentication authentication);
     StorageResponseDto getStorage(Authentication authentication);
+    void updateStorageByMemberId(Long memberId);
 }
