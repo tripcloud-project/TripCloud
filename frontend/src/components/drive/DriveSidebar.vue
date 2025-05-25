@@ -83,17 +83,21 @@
 
 <script setup>
 import { useDriveStore } from '@/stores/drive.js'
-import { useCommonStore } from '@/stores/common.js'
 import { storeToRefs } from 'pinia'
 import { formatSize } from '@/utils/format'
 const driveStore = useDriveStore()
-const { selectedFolder, expandedFolders, searchQuery, visibleFolders, quickAccess } =
-  storeToRefs(driveStore)
+const {
+  selectedFolder,
+  expandedFolders,
+  searchQuery,
+  visibleFolders,
+  quickAccess,
+  usedStorage,
+  maxStorage,
+  usagePercent,
+} = storeToRefs(driveStore)
 
 const { toggleFolder, selectFolder, handleQuickAccessClick } = driveStore
-
-const commonStore = useCommonStore()
-const { usedStorage, maxStorage, usagePercent } = storeToRefs(commonStore)
 </script>
 
 <style scoped></style>

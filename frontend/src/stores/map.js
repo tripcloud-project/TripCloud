@@ -8,7 +8,6 @@ import { deleteFiles } from '@/utils/drive/delete.js'
 import { useRouter } from 'vue-router'
 import { setThumbnail } from '@/utils/map/thumbnail'
 import { getStorage } from '@/utils/drive/storage.js'
-import { useCommonStore } from '@/stores/common.js'
 
 export const useMapStore = defineStore(
   'map',
@@ -293,12 +292,17 @@ export const useMapStore = defineStore(
       options: [],
     })
 
-    const commonStore = useCommonStore()
+    const usedStorage = ref(0)
+    const maxStorage = ref(0)
+    const usagePercent = computed(() => {
+      if (!maxStorage.value) return 0
+      return (usedStorage.value / maxStorage.value) * 100
+    })
     async function fetchStorage() {
       const data = await getStorage()
       if (data.status === 'success') {
-        commonStore.usedStorage = data.result.usedStorage
-        commonStore.maxStorage = data.result.maxStorage
+        usedStorage.value = Number(data.result.usedStorage)
+        maxStorage.value = Number(data.result.maxStorage)
       }
     }
 
@@ -346,7 +350,10 @@ export const useMapStore = defineStore(
       showThumbnailDialog,
       selectedRegion,
       thumbnailCandidate,
+      usedStorage,
+      maxStorage,
       fetchStorage,
+      usagePercent,
       selectedSido,
       shouldShowMap
     }
