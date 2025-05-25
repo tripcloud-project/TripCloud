@@ -25,7 +25,7 @@
                modified_at,
                is_deleted,
                main_badge_id,
-               max_stroage
+               max_storage
         FROM member
         WHERE member_id = #{id}
     </select>
@@ -48,5 +48,14 @@
  		WHERE
  			member_id = #{memberId}
  	</update>
- 	
+
+    <select id="getStorageByMemberId">
+        SELECT
+            m.max_storage,
+            COALESCE(SUM(f.size), 0) AS used_storage
+        FROM member m
+            LEFT JOIN file f ON m.member_id = f.member_id
+        WHERE m.member_id = #{memberId}
+        GROUP BY m.max_storage;
+    </select>
 </mapper>
