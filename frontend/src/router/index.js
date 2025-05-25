@@ -7,6 +7,8 @@ import PostDetailView from '@/views/PostDetailView.vue'
 import NewPostView from '@/views/NewPostView.vue'
 import DriveTrashView from '@/views/DriveTrashView.vue'
 import MapView from '@/views/MapView.vue'
+import ProfileView from '@/views/ProfileView.vue'
+import ProfileEditView from '@/views/ProfileEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,12 +47,22 @@ const router = createRouter({
     {
       path: '/drive/trash',
       name: 'trash',
-      component: DriveTrashView
+      component: DriveTrashView,
     },
     {
       path: '/drive/map',
       name: 'map',
       component: MapView,
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
+    },
+    {
+      path: '/profile/edit',
+      name: 'profileEdit',
+      component: ProfileEditView,
     },
   ],
 })
