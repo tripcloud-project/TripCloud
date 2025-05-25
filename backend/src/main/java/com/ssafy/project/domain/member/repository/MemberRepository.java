@@ -2,6 +2,7 @@ package com.ssafy.project.domain.member.repository;
 
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.dto.request.MemberUpdateRequestDto;
+import com.ssafy.project.domain.member.dto.response.StorageResponseDto;
 import com.ssafy.project.domain.member.entity.Member;
 
 import lombok.NonNull;
@@ -12,4 +13,5 @@ public interface MemberRepository {
     Member selectById(@NonNull Long id);
 	void updateMember(Long memberId, MemberUpdateRequestDto requestDto);
 	void deleteMember(@NonNull Long memberId);
+    StorageResponseDto getStorageByMemberId(Long memberId);
 }

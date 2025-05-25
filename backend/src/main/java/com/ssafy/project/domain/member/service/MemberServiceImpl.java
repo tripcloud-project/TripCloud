@@ -3,6 +3,7 @@ package com.ssafy.project.domain.member.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.ssafy.project.domain.member.dto.response.*;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,11 +15,6 @@ import com.ssafy.project.common.response.CursorPageResponse;
 import com.ssafy.project.domain.auth.service.MemberDetails;
 import com.ssafy.project.domain.member.dto.request.MemberRegisterDto;
 import com.ssafy.project.domain.member.dto.request.MemberUpdateRequestDto;
-import com.ssafy.project.domain.member.dto.response.ActivityResponseDto;
-import com.ssafy.project.domain.member.dto.response.BadgeListResponseDto;
-import com.ssafy.project.domain.member.dto.response.BadgeResponseDto;
-import com.ssafy.project.domain.member.dto.response.MemberResponseDto;
-import com.ssafy.project.domain.member.dto.response.ValidateEmailResponseDto;
 import com.ssafy.project.domain.member.entity.Member;
 import com.ssafy.project.domain.member.exception.BadgeNotFoundException;
 import com.ssafy.project.domain.member.exception.DuplicateMemberException;
@@ -150,4 +146,11 @@ public class MemberServiceImpl implements MemberService {
         Member member = ((MemberDetails) authentication.getPrincipal()).member();
         memberRepository.deleteMember(member.getMemberId());
 	}
+
+    @Transactional
+    @Override
+    public StorageResponseDto getStorage(Authentication authentication) {
+        Member member = ((MemberDetails) authentication.getPrincipal()).member();
+        return memberRepository.getStorageByMemberId(member.getMemberId());
+    }
 }

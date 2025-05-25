@@ -49,7 +49,18 @@
         </div>
       </div>
     </div>
-
+    <!-- 용량 표시 + 프로그레스바 -->
+    <div class="px-4 py-3">
+      <div class="mb-1 text-sm text-gray-700 font-medium">
+        {{ formatSize(maxStorage) }} 중 {{ formatSize(usedStorage) }} 사용
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5">
+        <div
+          class="bg-green-500 h-2.5 rounded-full transition-all duration-300"
+          :style="{ width: usagePercent + '%' }"
+        ></div>
+      </div>
+    </div>
     <!-- Quick Access -->
     <div class="p-3 border-t border-gray-200">
       <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
@@ -72,12 +83,22 @@
 
 <script setup>
 import { useTrashStore } from '@/stores/trash.js'
+import { useCommonStore } from '@/stores/common.js'
 import { storeToRefs } from 'pinia'
+import { formatSize } from '@/utils/format'
 const trashStore = useTrashStore()
-const { selectedFolder, expandedFolders, searchQuery, visibleFolders, quickAccess } =
-  storeToRefs(trashStore)
+const {
+  selectedFolder,
+  expandedFolders,
+  searchQuery,
+  visibleFolders,
+  quickAccess,
+} = storeToRefs(trashStore)
 
 const { toggleFolder, selectFolder, handleQuickAccessClick } = trashStore
+
+const commonStore = useCommonStore()
+const { usedStorage, maxStorage, usagePercent } = storeToRefs(commonStore)
 </script>
 
 <style scoped></style>

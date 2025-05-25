@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/lib/api'
-import mapApiResponseToItems from '@/utils/trash/mapApiResponseToItems'
-import flattenDirectoryTree from '@/utils/trash/flattenDirectoryTree'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
+import flattenDirectoryTree from '@/utils/drive/flattenDirectoryTree'
 import { restoreFiles } from '@/utils/trash/restore.js'
 import { deleteFiles } from '@/utils/trash/delete.js'
 import { useRouter } from 'vue-router'
+import { getStorage } from '@/utils/drive/storage.js'
+import { useCommonStore } from '@/stores/common.js'
 
 export const useTrashStore = defineStore(
   'trash',
@@ -174,6 +176,7 @@ export const useTrashStore = defineStore(
       }
     }
     const loadDirectoryTree = async () => {
+      fetchStorage()
       const { data } = await api.get('/gallery/trash') // 백엔드 API
       folders.value = flattenDirectoryTree(data.result)
     }
@@ -255,6 +258,14 @@ export const useTrashStore = defineStore(
         selectedItems.value = []
       }
     }
+    const commonStore = useCommonStore()
+    async function fetchStorage() {
+      const data = await getStorage()
+      if (data.status === 'success') {
+        commonStore.usedStorage = data.result.usedStorage
+        commonStore.maxStorage = data.result.maxStorage
+      }
+    }
     return {
       prefix,
       setPrefix,
@@ -288,7 +299,8 @@ export const useTrashStore = defineStore(
       restoreSelectedFiles,
       deleteSelectedFiles,
       handleQuickAccessClick,
-      visibleFolders
+      visibleFolders,
+      fetchStorage,
     }
   },
   {
