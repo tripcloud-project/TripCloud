@@ -270,7 +270,9 @@ public class FileServiceImpl implements FileService {
         List<DirectoryEntry> directories = fileRepository.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
         List<FileEntry> files = fileRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
         for (FileEntry file : files) {
-            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
                 file.setLatitude(aesUtil.decrypt(file.getLatitude()));
@@ -439,7 +441,9 @@ public class FileServiceImpl implements FileService {
         if (files == null) files = new ArrayList<>();
         
         for (FilePreviewResponseDto file : files) {
-            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
                 file.setLatitude(aesUtil.decrypt(file.getLatitude()));
@@ -466,7 +470,9 @@ public class FileServiceImpl implements FileService {
         if (files == null) files = new ArrayList<>();
         
         for (FilePreviewResponseDto file : files) {
-            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
                 file.setLatitude(aesUtil.decrypt(file.getLatitude()));
@@ -492,7 +498,9 @@ public class FileServiceImpl implements FileService {
         System.out.println("files: "+files);
         
         for (FilePreviewResponseDto file : files) {
-            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
                 file.setLatitude(aesUtil.decrypt(file.getLatitude()));
@@ -505,6 +513,6 @@ public class FileServiceImpl implements FileService {
         return SearchResultResponseDto.builder()
         		.directories(Collections.emptyList())
                 .files(files)
-                .build();
-    }
+				.build();
+	}
 }
