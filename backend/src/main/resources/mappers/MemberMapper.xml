@@ -64,6 +64,7 @@
     </select>
 
     <update id="updateStorageByMemberId">
+    	UPDATE member
         SET used_storage = (
             SELECT COALESCE(SUM(size), 0)
             FROM file
