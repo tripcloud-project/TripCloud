@@ -126,4 +126,14 @@ public class FileRepositoryImpl implements FileRepository{
 	public Long findFileIdByS3KeyAndMemberId(String s3Key, Long memberId){
 		return fileMapper.findFileIdByS3KeyAndMemberId(s3Key, memberId);
 	}
+	
+	@Override
+	public List<String> findS3KeysByFileIds(List<Long> fileIdList, Long memberId){
+		return fileMapper.findS3KeysByFileIds(fileIdList, memberId);
+	}
+	
+	@Override
+	public List<String> findS3KeysByPrefixes(List<String> prefixList, Long memberId){
+		return fileMapper.findS3KeysByPrefixes(prefixList, memberId);
+	}
 }
