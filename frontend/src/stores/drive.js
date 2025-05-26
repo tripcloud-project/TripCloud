@@ -31,9 +31,8 @@ export const useDriveStore = defineStore(
     const quickAccess = ref([
       { id: 'drive', name: '드라이브', icon: 'fas fa-clock', color: 'text-blue-500' },
       { id: 'trash', name: '휴지통', icon: 'fas fa-trash-alt', color: 'text-red-500' },
-      { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' }
+      { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' },
     ])
-
 
     const router = useRouter()
     const handleQuickAccessClick = (id) => {
@@ -45,7 +44,6 @@ export const useDriveStore = defineStore(
         router.push({ name: 'drive' })
       }
     }
-
 
     const fileInput = ref(null)
     const folderInput = ref(null)
@@ -81,9 +79,6 @@ export const useDriveStore = defineStore(
 
       return result
     })
-
-
-
 
     const currentFolderName = computed(() => {
       const folder = folders.value.find((f) => f.id === selectedFolder.value)
@@ -140,11 +135,19 @@ export const useDriveStore = defineStore(
           action: 'open',
         },
         { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
+      ]
+
+      // 폴더인 경우 '설명 추가' 항목 삽입
+      if (!isFolder) {
+        baseItems.push({ label: '설명 추가', icon: 'fa-comment-dots', action: 'addDescription' })
+      }
+
+      baseItems.push(
         { type: 'divider' },
         { label: '다운로드', icon: 'fa-download', action: 'download' },
         { type: 'divider' },
         { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
-      ]
+      )
 
       return baseItems
     })
@@ -319,5 +322,5 @@ export const useDriveStore = defineStore(
   },
   {
     persist: { storage: sessionStorage }, // 새로고침해도 유지
-  }
+  },
 )
