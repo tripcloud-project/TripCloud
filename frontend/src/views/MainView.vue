@@ -8,18 +8,19 @@
           <div>
             <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-snug">
               TripCloud와 함께<br />
-              소중한 사진, 자료를 한 곳에서
+              소중한 사진을 이 곳에서
             </h1>
             <p class="text-lg text-white/90 mb-8 leading-relaxed">
-              국내 최대 무료 용량 30GB로 시작하세요.<br />
-              사진과 문서 자료를 안전하게 보관하고 언제든 꺼내보세요.<br />
-              강력한 사진 정리, 검색, 문서 편집, 공유 기능까지 모두 제공합니다.
+              <br />
+              추억을 안전하게 보관하고 언제든 꺼내보세요.<br />
+              나만의 지도를 만들고 사람들과 공유해보세요.
             </p>
           </div>
 
           <!-- 이미지 목업 -->
+          <!-- 이미지 목업 -->
           <div
-            class="relative bg-white border-[10px] border-white rounded-3xl shadow-2xl overflow-hidden"
+            class="relative bg-[#f6f1e7] rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_25px_50px_rgba(0,0,0,0.1)] transition duration-300"
           >
             <img
               src="@/assets/image/mockup.png"
