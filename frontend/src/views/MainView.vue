@@ -1,80 +1,268 @@
 <template>
   <div class="min-h-screen bg-soft-white">
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-sage-green to-deep-sage text-white py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="mb-8">
+    <div class="bg-gradient-to-br from-sage-green to-sky-200 min-h-[600px] py-20">
+      <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <!-- 텍스트 영역 -->
+          <div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-snug">
+              TripCloud와 함께<br />
+              소중한 사진, 자료를 한 곳에서
+            </h1>
+            <p class="text-lg text-white/90 mb-8 leading-relaxed">
+              국내 최대 무료 용량 30GB로 시작하세요.<br />
+              사진과 문서 자료를 안전하게 보관하고 언제든 꺼내보세요.<br />
+              강력한 사진 정리, 검색, 문서 편집, 공유 기능까지 모두 제공합니다.
+            </p>
+          </div>
+
+          <!-- 이미지 목업 -->
           <div
-            class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="relative bg-white border-[10px] border-white rounded-3xl shadow-2xl overflow-hidden"
           >
-            <i class="fas fa-cloud text-white text-4xl"></i>
+            <img
+              src="@/assets/image/mockup.png"
+              alt="TripCloud Interface"
+              class="w-full h-auto object-cover"
+            />
           </div>
-          <h1 class="text-5xl font-bold mb-4">TripCloud</h1>
-          <p class="text-xl mb-8 opacity-90">여행의 모든 순간을 클라우드에 담다</p>
-          <p class="text-lg opacity-80 max-w-2xl mx-auto">
-            여행 사진부터 추억까지, 모든 여행 기록을 안전하게 보관하고 언제 어디서든 다시
-            만나보세요. <br />당신의 여행 지도를 완성해 나가세요.
-          </p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Services Section -->
-    <section class="py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gray-50">
+      <div class="container mx-auto px-6">
         <div class="text-center mb-16">
-          <h2 class="text-3xl font-bold text-deep-sage mb-4">TripCloud 서비스</h2>
-          <p class="text-lg text-gray-600">여행의 새로운 경험을 시작하세요</p>
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">여행의 추억을 안전하게 보관하세요.</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <!-- Feature 1 -->
+          <div class="flex flex-col items-center">
+            <div class="mb-6">
+              <img
+                src="@/assets/image/cloud.png"
+                alt="자동 백업 및 동기화"
+                class="w-32 h-32 object-contain"
+              />
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2">언제 어디서나 접근</h3>
+            <p class="text-gray-600">
+              스마트폰, 태블릿, 컴퓨터에서 언제 어디서든 접근하고 사용하세요.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="flex flex-col items-center">
+            <div class="mb-6">
+              <img
+                src="@/assets/image/AI.png"
+                alt="온라인 어디서나 접근"
+                class="w-32 h-32 object-contain"
+              />
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2">해시태그</h3>
+            <p class="text-gray-600">AI를 이용해 자동으로 해시태그를 부착합니다.</p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="flex flex-col items-center">
+            <div class="mb-6">
+              <img
+                src="@/assets/image/typing.png"
+                alt="어떤 파일이든 보관"
+                class="w-32 h-32 object-contain"
+              />
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2">추억을 공유해보세요.</h3>
+            <p class="text-gray-600">게시판을 통해 여행의 추억을 공유해보세요.</p>
+          </div>
         </div>
 
-        <div
-          class="bg-white rounded-xl shadow-md border border-sage-green flex flex-col lg:flex-row overflow-hidden"
-        >
-          <!-- 이미지 영역 -->
-          <div class="lg:w-1/2 h-64 lg:h-auto">
-            <img alt="여행 사진 드라이브" class="w-full h-full object-cover" />
+        <div class="mt-20 text-center">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">나만의 지도를 만들어 보세요.</h2>
+          <div class="max-w-4xl mx-auto relative">
+            <img
+              src="@/assets/image/지도.gif"
+              alt="TripCloud 모바일 앱 스크린샷"
+              class="w-full h-auto rounded-lg shadow-xl"
+            />
           </div>
-
-          <!-- 내용 영역 -->
-          <div class="lg:w-1/2 p-8 flex flex-col justify-center">
-            <h3 class="text-2xl font-semibold text-deep-sage mb-4">여행 사진 드라이브</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              소중한 여행 사진을 안전한 클라우드에 저장하고, 언제 어디서든 다운로드하여 추억을
-              되살려보세요.
-            </p>
-            <button
-              @click="goToPhotoDrive"
-              class="w-full bg-sage-green text-white py-3 rounded-lg font-medium hover:bg-deep-sage transition duration-300"
-            >
-              사진 업로드하기
-            </button>
-          </div>
-        </div>
-        <div class="h-12"></div>
-        <div
-          class="bg-white rounded-xl shadow-md border border-sage-green flex flex-col lg:flex-row-reverse overflow-hidden"
-        >
-          <!-- 이미지 영역 -->
-          <div class="lg:w-1/2 h-64 lg:h-auto">
-            <img alt="나만의 여행 지도 만들기" class="w-full h-full object-cover" />
-          </div>
-
-          <!-- 내용 영역 -->
-          <div class="lg:w-1/2 p-8 flex flex-col justify-center">
-            <h3 class="text-2xl font-semibold text-deep-sage mb-4">나만의 여행 지도 만들기</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              나만의 여행 지도를 자동으로 만들고, 아직 가지 못한 여행지를 추천받아보세요.
-            </p>
-            <button
-              @click="goToTravleMap"
-              class="w-full bg-sage-green text-white py-3 rounded-lg font-medium hover:bg-deep-sage transition duration-300"
-            >
-              지도 보러가기
-            </button>
-          </div>
+          <h3 class="text-2xl font-medium text-gray-800 mt-8 mb-2"></h3>
+          <p class="text-gray-600 max-w-2xl mx-auto">추억이 담긴 지도를 만들어 드려요.</p>
         </div>
       </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+      <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+          <div>
+            <h3 class="text-xl font-bold mb-4">TripCloud</h3>
+            <p class="text-gray-400 mb-6">Your travel memories, securely stored in the cloud.</p>
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Company</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Press</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Blog</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#contact"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Resources</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Travel Guides</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Photography Tips</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >API Documentation</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Status</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Legal</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Terms of Service</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Privacy Policy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Cookie Policy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >GDPR Compliance</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >Security</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
+        >
+          <p class="text-gray-400 mb-4 md:mb-0">© 2025 TripCloud. All rights reserved.</p>
+          <div class="flex space-x-6">
+            <i class="fab fa-cc-visa text-2xl text-gray-400"></i>
+            <i class="fab fa-cc-mastercard text-2xl text-gray-400"></i>
+            <i class="fab fa-cc-amex text-2xl text-gray-400"></i>
+            <i class="fab fa-cc-paypal text-2xl text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
