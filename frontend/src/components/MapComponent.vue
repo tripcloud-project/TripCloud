@@ -35,7 +35,10 @@
       </div>
 
       <!-- 지도 컨테이너 -->
-      <div v-else class="bg-white rounded-lg shadow-md overflow-hidden p-4 h-full">
+      <div
+        v-else
+        class="bg-white rounded-lg shadow-md overflow-hidden p-4 h-full bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200"
+      >
         <!-- 지도 -->
         <div class="relative">
           <!-- 뒤로가기 버튼 (지도 내부 좌상단) -->
