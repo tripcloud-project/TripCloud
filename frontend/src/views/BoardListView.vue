@@ -8,7 +8,6 @@
       <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h2 class="text-3xl font-bold text-deep-sage mb-2">자유게시판</h2>
-          <p class="text-gray-600">Discover and share nature experiences with our community</p>
         </div>
 
         <button
@@ -55,7 +54,7 @@
               <i class="fas fa-comment text-sky-blue mr-1"></i>
               {{ post.comments }}
             </div>
-            <div class="col-span-2 text-gray-500 text-sm">{{ post.time }}</div>
+            <div class="col-span-2 text-gray-500 text-sm">{{ formatDate(post.time) }}</div>
           </div>
         </div>
 
@@ -224,6 +223,33 @@ const goToDetail = (id) => {
 
 const goToNewPost = () => {
   router.push('/posts/new')
+}
+
+// Format date to readable format
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffTime = Math.abs(now.getTime() - date.getTime())
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) {
+    // Today - show hours
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    return `Today at ${hours}:${minutes < 10 ? '0' + minutes : minutes}`
+  } else if (diffDays === 1) {
+    return 'Yesterday'
+  } else if (diffDays < 7) {
+    return `${diffDays} days ago`
+  } else {
+    // Format as date
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }
+    return date.toLocaleDateString('en-US', options)
+  }
 }
 </script>
 
