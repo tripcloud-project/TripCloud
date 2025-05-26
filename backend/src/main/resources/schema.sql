@@ -35,7 +35,7 @@ CREATE TABLE `member` (
 	`modified_at`	DATETIME	NOT NULL	DEFAULT NOW(),
 	`is_deleted`	BOOLEAN	NOT NULL	DEFAULT 0,
 	`main_badge_id`	BIGINT	NULL,
-	`max_storage`	BIGINT 	NOT NULL DEFAULT 32212254720
+	`max_storage`	BIGINT 	NOT NULL DEFAULT 10737418240
 );
 
 CREATE TABLE `post_comment` (
