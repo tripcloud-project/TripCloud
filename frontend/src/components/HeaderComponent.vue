@@ -51,7 +51,7 @@
 
         <!-- 오른쪽: 사용자 메뉴 -->
         <div class="flex-1 flex justify-end items-center">
-          <div v-if="isLoggedIn" class="relative">
+          <div v-if="isLoggedIn" class="relative flex items-center space-x-2">
             <button
               @click="handleMyPage"
               class="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-sage-green hover:bg-sage-green/10 rounded-lg transition-all duration-200"
@@ -78,6 +78,14 @@
                 </svg>
               </div>
               <span class="hidden sm:block font-medium">{{ user.name }}</span>
+            </button>
+
+            <!-- 로그아웃 버튼 -->
+            <button
+              @click="handleLogout"
+              class="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-sage-green hover:bg-sage-green/10 rounded-lg transition-all duration-200"
+            >
+              <span class="hidden sm:block font-medium">로그아웃</span>
             </button>
           </div>
           <button
@@ -132,16 +140,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 로그인 상태 토글 버튼 (데모용) -->
-    <div class="fixed bottom-4 right-4 z-50">
-      <button
-        @click="toggleLoginStatus"
-        class="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors duration-200"
-      >
-        {{ isLoggedIn ? '로그아웃' : '로그인' }} 상태 토글
-      </button>
-    </div>
   </header>
 </template>
 
@@ -149,6 +147,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore'
+import api from '@/lib/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -183,9 +182,11 @@ const handleMyPage = () => {
   console.log('마이페이지로 이동')
 }
 
-// 데모용 로그인 상태 토글
-const toggleLoginStatus = () => {
-  isLoggedIn.value = !isLoggedIn.value
+const handleLogout = () => {
+  api.post('/auth/logout')
+  authStore.clearToken()
+  window.location.href = '/'
+  console.log('로그아웃 완료, 메인 페이지로 이동')
 }
 
 onMounted(() => {
