@@ -13,6 +13,7 @@
 
         <button
           class="bg-sage-green hover:bg-deep-sage text-white px-4 py-2 rounded-lg transition-colors cursor-pointer !rounded-button whitespace-nowrap"
+          @click="goToNewPost"
         >
           <i class="fas fa-plus mr-1"></i>
           <span>New Post</span>
@@ -294,6 +295,10 @@ const visiblePageNumbers = computed(() => {
 
 const goToDetail = (id) => {
   router.push(`/posts/${id}`)
+}
+
+const goToNewPost = () => {
+  router.push('/posts/new')
 }
 </script>
 
