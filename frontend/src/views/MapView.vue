@@ -1,16 +1,16 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-full w-full">
     <DriveSidebar />
-    <div v-if="shouldShowMap" class="flex-1 overflow-auto">
-      <MapComponent/>
+    <div v-if="shouldShowMap" class="flex-1 h-full w-full overflow-auto">
+      <MapComponent />
     </div>
-    <div v-if="!shouldShowMap" class="flex-1 flex flex-col h-screen overflow-hidden">
+    <div v-if="!shouldShowMap" class="flex-1 flex flex-col overflow-hidden">
       <DriveHeader />
       <DriveToolbar />
       <ContentGrid />
     </div>
-    <MetadataPanel v-if="!shouldShowMap"/>
-    <ContextMenu v-if="!shouldShowMap"/>
+    <MetadataPanel v-if="!shouldShowMap" />
+    <ContextMenu v-if="!shouldShowMap" />
     <ThumbnailModal v-if="showThumbnailDialog" />
   </div>
 </template>
@@ -33,8 +33,14 @@ import ThumbnailModal from '@/components/map/ThumbnailModal.vue'
 const mapStore = useMapStore()
 
 // ref 꺼내 쓰기
-const { folders, selectedFolder, expandedFolders, contextMenu, showThumbnailDialog, shouldShowMap } =
-  storeToRefs(mapStore)
+const {
+  folders,
+  selectedFolder,
+  expandedFolders,
+  contextMenu,
+  showThumbnailDialog,
+  shouldShowMap,
+} = storeToRefs(mapStore)
 
 // 함수 꺼내 쓰기
 const { fetchItems, loadDirectoryTree, closeContextMenu } = mapStore
@@ -65,7 +71,6 @@ watch(selectedFolder, (newFolderId) => {
     }
   }
 })
-
 </script>
 
 <style scoped>

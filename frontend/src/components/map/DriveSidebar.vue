@@ -1,6 +1,6 @@
 <!-- Left Sidebar -->
 <template>
-  <div class="w-[250px] bg-white border-r border-gray-200 flex flex-col h-screen">
+  <div class="w-[250px] bg-white border-r border-gray-200 flex flex-col">
     <div class="p-4 border-b border-gray-200">
       <h1 class="text-xl font-semibold text-gray-800">CloudStorage</h1>
     </div>
