@@ -1,16 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col">
-    <!-- 헤더 -->
-    <header class="bg-white shadow-sm border-b">
-      <div class="container mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <h1 class="text-2xl font-bold text-gray-800">지역별 사진 지도</h1>
-        </div>
-      </div>
-    </header>
-
+  <div class="bg-gray-50 flex flex-col h-full">
     <!-- 메인 컨텐츠 -->
-    <main class="flex-grow container mx-auto px-6 py-8">
+    <main class="flex-grow container mx-auto px-6 py-8 h-full">
       <!-- 로딩 상태 -->
       <div v-if="loading" class="flex justify-center items-center h-96">
         <div class="text-center">
@@ -44,7 +35,7 @@
       </div>
 
       <!-- 지도 컨테이너 -->
-      <div v-else class="bg-white rounded-lg shadow-md overflow-hidden p-4">
+      <div v-else class="bg-white rounded-lg shadow-md overflow-hidden p-4 h-full">
         <!-- 지도 -->
         <div class="relative">
           <!-- 뒤로가기 버튼 (지도 내부 좌상단) -->
@@ -75,7 +66,7 @@
           <!-- SVG 지도 -->
           <div
             class="w-full select-none cursor-pointer"
-            style="height: 600px"
+            style="height: 100%; max-height: 800px"
             @click="handleMapClick"
             @contextmenu="handleRightClick"
             @mouseover="handleMouseOver"
@@ -325,29 +316,46 @@ function processSvg(rawSvg, imageMap) {
   // 3. SVG 태그에 스타일 추가
   processedSvg = processedSvg.replace(
     /<svg([^>]+)>/,
-    `<svg$1 style="width: 100%; height: 100%;" preserveAspectRatio="xMidYMid meet">`,
+    `<svg$1 style="width: 100%; height: 100%; max-height: 1000px " preserveAspectRatio="xMidYMid meet">`,
   )
 
   // 4. 기본 스타일 추가
   processedSvg = processedSvg.replace(
     /<svg([^>]*)>/,
     `<svg$1>
-          <style>
-            path, polygon, g {
-              fill: white;
-              stroke: #374151;
-              stroke-width: 1;
-              transition: all 0.2s ease;
-            }
-            path:hover, polygon:hover {
-              stroke: #3B82F6;
-              stroke-width: 2;
-              filter: brightness(1.05);
-            }
-            .has-image {
-              fill: url(#imagePattern);
-            }
-          </style>`,
+    <defs>
+      <linearGradient id="subtleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#f1f5f9;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+      </linearGradient>
+
+      <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:0.8" />
+        <stop offset="100%" style="stop-color:#0284c7;stop-opacity:0.9" />
+      </linearGradient>
+    </defs>
+    <style>
+      path, polygon, g {
+        fill: url(#subtleGradient);
+        stroke: #94a3b8 
+        stroke-width: 1.5; /* 두께 증가 */
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        filter: drop-shadow(2px 3px 4px rgba(148, 163, 184, 0.4)); /* 그림자 강화 */
+      }
+
+      path:hover, polygon:hover {
+        fill: #8ba888;
+        stroke: #5a7157;
+        stroke-width: 2.5; /* 호버시 더 두껍게 */
+        filter: drop-shadow(3px 5px 8px rgba(3, 105, 161, 0.5));
+        transform: translateY(-1px);
+      }
+
+      .has-image {
+        fill: url(#imagePattern);
+        filter: drop-shadow(3px 4px 6px rgba(0,0,0,0.2));
+      }
+    </style>`,
   )
 
   // 5. 클립패스 정의 추가
@@ -364,28 +372,136 @@ function processSvg(rawSvg, imageMap) {
 
   processedSvg = processedSvg.replace(/<svg([^>]*)>/, `<svg$1><defs>${clipPaths}</defs>`)
 
-  // 6. 이미지 요소 추가
+  // 6. 이미지 요소 추가 - SVG 문자열에서 직접 파싱
   const imageElements = Object.entries(imageMap)
     .map(([regionId, imageUrl]) => {
       const normalizedId = idMap[regionId]
-      return `
+      const bounds = calculateRegionBoundsFromString(processedSvg, normalizedId)
+
+      if (bounds) {
+        const imageSize = Math.max(bounds.width, bounds.height)
+        const imageX = bounds.centerX - imageSize / 2
+        const imageY = bounds.centerY - imageSize / 2
+
+        return `
           <image
             href="${imageUrl}"
+            x="${imageX}"
+            y="${imageY}"
+            width="${imageSize}"
+            height="${imageSize}"
             clip-path="url(#clip-${normalizedId})"
             preserveAspectRatio="xMidYMid slice"
-            width="100%" height="100%"
             style="pointer-events: none; opacity: 0.8;"
           />
         `
+      }
+
+      return ''
     })
     .join('\n')
 
+  // 7. 이미지 요소를 SVG에 삽입
   processedSvg = processedSvg.replace('</svg>', `${imageElements}</svg>`)
+
   return processedSvg
 }
 
+// SVG 문자열에서 특정 요소의 경계박스를 계산하는 함수
+function calculateRegionBoundsFromString(svgString, elementId) {
+  // 해당 ID를 가진 요소 찾기
+  const elementRegex = new RegExp(
+    `<(path|polygon|circle|rect|ellipse)([^>]*id=["']${elementId}["'][^>]*)>`,
+    'i',
+  )
+  const match = svgString.match(elementRegex)
+
+  if (!match) return null
+  const attributes = match[2]
+  return calculatePathBounds(attributes)
+}
+
+// Path 요소의 경계박스 계산 (간단한 버전)
+function calculatePathBounds(attributes) {
+  const dMatch = attributes.match(/d=["']([^"']+)["']/)
+  if (!dMatch) return null
+
+  const pathData = dMatch[1]
+  const coords = extractCoordsFromPath(pathData)
+
+  if (coords.length === 0) return null
+
+  const xCoords = coords.map((c) => c.x).filter((x) => !isNaN(x))
+  const yCoords = coords.map((c) => c.y).filter((y) => !isNaN(y))
+
+  const minX = Math.min(...xCoords)
+  const maxX = Math.max(...xCoords)
+  const minY = Math.min(...yCoords)
+  const maxY = Math.max(...yCoords)
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+    centerX: (minX + maxX) / 2,
+    centerY: (minY + maxY) / 2,
+  }
+}
+function extractCoordsFromPath(pathData) {
+  const coords = []
+  const commands = pathData.match(/[MLHVCSQTAZ][^MLHVCSQTAZ]*/gi) || []
+
+  let currentX = 0,
+    currentY = 0
+
+  commands.forEach((command) => {
+    const type = command[0].toUpperCase()
+    const args = command
+      .slice(1)
+      .trim()
+      .split(/[\s,]+/)
+      .map(parseFloat)
+      .filter((n) => !isNaN(n))
+
+    switch (type) {
+      case 'M':
+      case 'L':
+        for (let i = 0; i < args.length; i += 2) {
+          currentX = args[i]
+          currentY = args[i + 1]
+          coords.push({ x: currentX, y: currentY })
+        }
+        break
+      case 'H':
+        args.forEach((x) => {
+          currentX = x
+          coords.push({ x: currentX, y: currentY })
+        })
+        break
+      case 'V':
+        args.forEach((y) => {
+          currentY = y
+          coords.push({ x: currentX, y: currentY })
+        })
+        break
+      case 'C':
+        for (let i = 0; i < args.length; i += 6) {
+          coords.push({ x: args[i], y: args[i + 1] })
+          coords.push({ x: args[i + 2], y: args[i + 3] })
+          currentX = args[i + 4]
+          currentY = args[i + 5]
+          coords.push({ x: currentX, y: currentY })
+        }
+        break
+    }
+  })
+
+  return coords
+}
+
 // 관광 명소 데이터 로드 함수
-async function loadTouristSpots(regionName) {
+async function loadTouristSpots() {
   touristLoading.value = true
   touristError.value = null
   touristSpots.value = []
@@ -412,13 +528,13 @@ async function loadTouristSpots(regionName) {
 const handleMapClick = (event) => {
   let id = event.target.id
 
-  if(id){
+  if (id) {
     id = id.replace(/-/g, ' ')
     if (selectedSido.value === '전국') {
       // 시도
       selectedSido.value = id
       selectFolder(`/${id}/`)
-    }else{
+    } else {
       // 시군구
       selectFolder(`/${selectedSido.value}/${id}/`)
     }
