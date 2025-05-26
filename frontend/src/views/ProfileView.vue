@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-soft-white">
+  <div class="flex flex-col items-center justify-center bg-soft-white">
     <!-- Header Section -->
     <div class="flex flex-col items-center mb-8">
       <div class="w-16 h-16 mb-4 flex items-center justify-center bg-sage-green rounded-full">
@@ -101,22 +101,6 @@
           <i class="fas fa-sign-out-alt mr-2"></i>
           회원 탈퇴
         </button>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="mt-8 text-center text-gray-500 text-sm">
-      <p>© 2025 TripCloud. All rights reserved.</p>
-      <div class="flex justify-center mt-2 space-x-4">
-        <a href="#" class="hover:text-sage-green transition duration-300 cursor-pointer"
-          >Privacy Policy</a
-        >
-        <a href="#" class="hover:text-sage-green transition duration-300 cursor-pointer"
-          >Terms of Service</a
-        >
-        <a href="#" class="hover:text-sage-green transition duration-300 cursor-pointer"
-          >Contact Us</a
-        >
       </div>
     </div>
   </div>

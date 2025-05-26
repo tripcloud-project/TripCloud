@@ -4,8 +4,20 @@
 
 /* Custom colors */
 
+body {
+  font-family: 'Freesentation-9Black'
+}
+
+@font-face {
+  font-family: 'Freesentation-9Black';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
+
 .ql-editor {
-  font-size: 16px; /* 기본값은 약 13px이므로 크게 지정 */
+  font-size: 16px;
+  /* 기본값은 약 13px이므로 크게 지정 */
 }
 
 :root {

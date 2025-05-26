@@ -176,7 +176,7 @@ const handleSubmit = async () => {
       content: editor.value,
     })
     alert('게시글 업로드 완료')
-    router.push('/board')
+    window.location.href = '/board'
   } catch (error) {
     console.error('Error creating post:', error)
     alert('Failed to create post. Please try again.')
