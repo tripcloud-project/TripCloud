@@ -14,4 +14,5 @@ public interface MemberRepository {
 	void updateMember(Long memberId, MemberUpdateRequestDto requestDto);
 	void deleteMember(@NonNull Long memberId);
     StorageResponseDto getStorageByMemberId(Long memberId);
+    void updateStorageByMemberId(Long memberId);
 }

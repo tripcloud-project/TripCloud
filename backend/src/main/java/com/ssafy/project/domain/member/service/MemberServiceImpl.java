@@ -155,4 +155,10 @@ public class MemberServiceImpl implements MemberService {
         Member member = ((MemberDetails) authentication.getPrincipal()).member();
         return memberRepository.getStorageByMemberId(member.getMemberId());
     }
+
+    @Transactional
+    @Override
+    public void updateStorageByMemberId(Long memberId){
+        memberRepository.updateStorageByMemberId(memberId);
+    }
 }

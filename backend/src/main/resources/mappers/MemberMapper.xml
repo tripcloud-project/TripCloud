@@ -62,4 +62,13 @@
         WHERE m.member_id = #{memberId}
         GROUP BY m.max_storage;
     </select>
+
+    <update id="updateStorageByMemberId">
+        SET used_storage = (
+            SELECT COALESCE(SUM(size), 0)
+            FROM file
+            WHERE member_id = #{memberId}
+        )
+        WHERE member_id = #{memberId};
+    </update>
 </mapper>

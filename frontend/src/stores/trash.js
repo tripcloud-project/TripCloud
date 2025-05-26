@@ -107,9 +107,9 @@ export const useTrashStore = defineStore(
         if (sortBy.value === 'name') {
           valueA = a.name.toLowerCase()
           valueB = b.name.toLowerCase()
-        } else if (sortBy.value === 'modified') {
-          valueA = new Date(a.modified).getTime()
-          valueB = new Date(b.modified).getTime()
+        } else if (sortBy.value === 'taken') {
+          valueA = new Date(a.taken).getTime()
+          valueB = new Date(b.taken).getTime()
         } else if (sortBy.value === 'size') {
           valueA = a.size || 0
           valueB = b.size || 0
