@@ -1,38 +1,6 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 <template>
   <div class="min-h-screen flex flex-col bg-soft-white">
-    <!-- Header -->
-    <header class="bg-white shadow-sm py-4 border-b border-sage-green/20">
-      <div class="container mx-auto px-4 flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="w-10 h-10 flex items-center justify-center bg-sage-green rounded-full mr-3">
-            <i class="fas fa-leaf text-white text-lg"></i>
-          </div>
-          <h1 class="text-2xl font-bold text-deep-sage">TripCloud</h1>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button
-            class="text-sage-green hover:text-deep-sage transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-bell mr-1"></i>
-            <span class="hidden md:inline">Notifications</span>
-          </button>
-          <button
-            class="text-sage-green hover:text-deep-sage transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-user-circle mr-1"></i>
-            <span class="hidden md:inline">Profile</span>
-          </button>
-          <button
-            class="bg-sage-green hover:bg-deep-sage text-white px-4 py-2 rounded-lg transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-plus mr-1"></i>
-            <span>New Post</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
       <!-- Back Button -->

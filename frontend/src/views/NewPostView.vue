@@ -1,26 +1,6 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 <template>
   <div class="min-h-screen flex flex-col bg-soft-white">
-    <!-- Header -->
-    <header class="bg-white shadow-sm py-4 border-b border-sage-green/20">
-      <div class="container mx-auto px-4 flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="w-10 h-10 flex items-center justify-center bg-sage-green rounded-full mr-3">
-            <i class="fas fa-leaf text-white text-lg"></i>
-          </div>
-          <h1 class="text-2xl font-bold text-deep-sage">NatureBoard</h1>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button
-            class="text-sage-green hover:text-deep-sage transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-arrow-left mr-1"></i>
-            <span>Back to Board</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
       <div class="max-w-4xl mx-auto">
