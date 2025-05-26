@@ -1,7 +1,7 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 
 <template>
-  <div class="min-h-screen flex flex-col bg-soft-white">
+  <div class="flex flex-col bg-soft-white">
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
       <!-- Page Title and Filters -->
@@ -113,81 +113,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-sage-green/20 py-6">
-      <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="mb-4 md:mb-0">
-            <div class="flex items-center">
-              <div class="w-8 h-8 flex items-center justify-center bg-sage-green rounded-full mr-2">
-                <i class="fas fa-leaf text-white text-sm"></i>
-              </div>
-              <span class="text-lg font-bold text-deep-sage">TripCloud</span>
-            </div>
-            <p class="text-gray-500 text-sm mt-2">Connect with nature enthusiasts worldwide</p>
-          </div>
-
-          <div class="flex space-x-6">
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-facebook-f"></i>
-            </a>
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-instagram"></i>
-            </a>
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-pinterest"></i>
-            </a>
-          </div>
-        </div>
-
-        <div
-          class="mt-6 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center"
-        >
-          <div class="text-gray-500 text-sm mb-4 md:mb-0">
-            © 2025 TripCloud. All rights reserved.
-          </div>
-
-          <div class="flex flex-wrap justify-center gap-4">
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Privacy Policy</a
-            >
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Terms of Service</a
-            >
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Community Guidelines</a
-            >
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Contact Us</a
-            >
-          </div>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
