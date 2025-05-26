@@ -231,7 +231,8 @@
   	<select id="selectAllFilesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">	
 		SELECT
 			file_id as fileId,
-			original_filename as name
+			original_filename as name,
+			s3_key, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description 
 		FROM
 			file
 		WHERE
@@ -242,20 +243,22 @@
 	<select id="selectAllFilesByMemberIdAndHashtag" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
 		SELECT
 			f.file_id as fileId,
-			f.original_filename as name
+			f.original_filename as name,
+			s3_key, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description
 		FROM
 			file f, file_hashtag fh, hashtag h
 		WHERE
 			f.member_id = #{memberId}
 			AND f.file_id = fh.file_id
 			AND fh.hashtag_id = h.hashtag_id
-			AND h.word = #{hashtag}
+			AND h.keyword = #{hashtag}
 	</select>
 
     <select id="selectAllFilesByMemberIdAndDescription" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
         SELECT
             file_id as fileId,
-            original_filename as name
+            original_filename as name,
+            s3_key, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description
         FROM
             file
         WHERE
