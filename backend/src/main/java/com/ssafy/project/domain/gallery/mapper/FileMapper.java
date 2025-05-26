@@ -33,4 +33,6 @@ public interface FileMapper {
     List<FilePreviewResponseDto> selectAllFilesByMemberIdAndDescription(Long memberId, String description);
     List<ThumbnailDto> findThumbnailsByMemberId(Long memberId);
 	Long findFileIdByS3KeyAndMemberId(String s3Key, Long memberId);
+	List<String> findS3KeysByFileIds(List<Long> fileIdList, Long memberId);
+	List<String> findS3KeysByPrefixes(List<String> prefixList, Long memberId);
 }

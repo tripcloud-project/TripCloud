@@ -271,7 +271,7 @@ public class FileServiceImpl implements FileService {
         List<FileEntry> files = fileRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
         for (FileEntry file : files) {
         	if(file.getContentType().startsWith("image")) {
-        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        		file.setPresignedUrl(s3Service.generateThumbnailPresignedUrl(file.getS3Key()));        		
         	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
@@ -380,13 +380,22 @@ public class FileServiceImpl implements FileService {
         List<String> prefixList = deleteRequestDto.getPrefixList().stream()
                 .map(this::makeMemberPrefix)
                 .toList();
+        List<String> s3KeyList = new ArrayList<>();
         if (!fileIdList.isEmpty()) {
+        	s3KeyList.addAll(fileRepository.findS3KeysByFileIds(fileIdList, memberId));
             fileRepository.deleteFilesByIds(fileIdList, memberId);
         }
         if (!prefixList.isEmpty()) {
+        	s3KeyList.addAll(fileRepository.findS3KeysByPrefixes(prefixList, memberId));
             fileRepository.deleteFilesByPrefixes(prefixList, memberId);
         }
 
+        // S3에서 파일을 삭제합니다.
+        for(String s3Key : s3KeyList) {
+        	s3Service.deleteFile(s3Key);
+        	s3Service.deleteThumbnailFile(s3Key);
+        }
+        
         // 멤버의 usedStorage를 업데이트합니다.
         memberService.updateStorageByMemberId(memberId);
     }
@@ -442,7 +451,7 @@ public class FileServiceImpl implements FileService {
         
         for (FilePreviewResponseDto file : files) {
         	if(file.getContentType().startsWith("image")) {
-        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        		file.setPresignedUrl(s3Service.generateThumbnailPresignedUrl(file.getS3Key()));        		
         	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
@@ -471,7 +480,7 @@ public class FileServiceImpl implements FileService {
         
         for (FilePreviewResponseDto file : files) {
         	if(file.getContentType().startsWith("image")) {
-        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        		file.setPresignedUrl(s3Service.generateThumbnailPresignedUrl(file.getS3Key()));        		
         	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
@@ -499,7 +508,7 @@ public class FileServiceImpl implements FileService {
         
         for (FilePreviewResponseDto file : files) {
         	if(file.getContentType().startsWith("image")) {
-        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        		file.setPresignedUrl(s3Service.generateThumbnailPresignedUrl(file.getS3Key()));        		
         	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){

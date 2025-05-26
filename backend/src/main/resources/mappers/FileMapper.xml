@@ -176,7 +176,7 @@
     </foreach>
   </update>
 
-  <update id="deleteFilesByIds">
+  <delete id="deleteFilesByIds">
     DELETE FROM file
     WHERE member_id = #{memberId}
     AND is_deleted = true
@@ -184,9 +184,9 @@
     <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
       #{id}
     </foreach>
-  </update>
+  </delete>
 
-  <update id="deleteFilesByPrefixes">
+  <delete id="deleteFilesByPrefixes">
     DELETE FROM file
     WHERE member_id = #{memberId}
     AND
@@ -194,7 +194,7 @@
       s3_key LIKE CONCAT(#{prefix}, '%')
       AND is_deleted = true
     </foreach>
-  </update>
+  </delete>
   
 	<select id="findDirectoriesByPrefixAndMemberIdAndIsDeleted">
 		SELECT DISTINCT
@@ -279,4 +279,26 @@
             s3_key = #{s3Key}
             AND member_id = #{memberId};
     </select>
+    
+  <select id="findS3KeysByFileIds">
+    SELECT s3_key
+    FROM file
+    WHERE member_id = #{memberId}
+    AND is_deleted = true
+    AND file_id IN
+    <foreach item="fileId" collection="fileIdList" open="(" separator="," close=")">
+      #{fileId}
+    </foreach>
+  </select>
+
+  <select id="findS3KeysByPrefixes">
+    SELECT s3_key
+    FROM file
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+      AND is_deleted = true
+    </foreach>
+  </select>
 </mapper>

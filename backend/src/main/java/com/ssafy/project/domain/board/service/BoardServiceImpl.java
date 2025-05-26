@@ -65,7 +65,7 @@ public class BoardServiceImpl implements BoardService {
             String originalFilename = image.getOriginalFilename();
             String s3Key = UploadHelper.generateUuidS3Key("board/" + originalFilename);
             s3Service.uploadObject(image, s3Key);
-            return s3Service.generatePresignedUrl(s3Key);
+            return s3Service.generateThumbnailPresignedUrl(s3Key);
         } catch (IOException e) {
             throw new UploadFailException("잘못된 업로드 요청입니다.");
         }
@@ -99,7 +99,7 @@ public class BoardServiceImpl implements BoardService {
         for(PostPreviewResponseDto postResponse : postResponseList) {
             if(postResponse.getProfilePresignedURL() == null)
                 continue;
-            postResponse.setProfilePresignedURL(s3Service.generatePresignedUrl(postResponse.getProfilePresignedURL()));
+            postResponse.setProfilePresignedURL(s3Service.generateThumbnailPresignedUrl(postResponse.getProfilePresignedURL()));
         }
 
         Boolean hasNext = postResponseList.size() == size + 1;
