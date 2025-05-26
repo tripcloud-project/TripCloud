@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+  <header class="bg-white border-b border-gray-200 shadow-sm top-0 z-50">
     <div class="mx-auto px-4 sm:px-6 lg:px-8 w-full">
       <div class="flex justify-between items-center h-16">
         <!-- 왼쪽: 로고 -->
