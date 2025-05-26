@@ -2,38 +2,6 @@
 
 <template>
   <div class="min-h-screen flex flex-col bg-soft-white">
-    <!-- Header -->
-    <header class="bg-white shadow-sm py-4 border-b border-sage-green/20">
-      <div class="container mx-auto px-4 flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="w-10 h-10 flex items-center justify-center bg-sage-green rounded-full mr-3">
-            <i class="fas fa-leaf text-white text-lg"></i>
-          </div>
-          <h1 class="text-2xl font-bold text-deep-sage">TripCloud</h1>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button
-            class="text-sage-green hover:text-deep-sage transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-bell mr-1"></i>
-            <span class="hidden md:inline">Notifications</span>
-          </button>
-          <button
-            class="text-sage-green hover:text-deep-sage transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-user-circle mr-1"></i>
-            <span class="hidden md:inline">Profile</span>
-          </button>
-          <button
-            class="bg-sage-green hover:bg-deep-sage text-white px-4 py-2 rounded-lg transition-colors cursor-pointer !rounded-button whitespace-nowrap"
-          >
-            <i class="fas fa-plus mr-1"></i>
-            <span>New Post</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
       <!-- Page Title and Filters -->
@@ -43,19 +11,13 @@
           <p class="text-gray-600">Discover and share nature experiences with our community</p>
         </div>
 
-        <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-          <div class="relative">
-            <input
-              type="text"
-              placeholder="Search posts..."
-              class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-green focus:border-transparent w-full sm:w-64"
-              v-model="searchQuery"
-            />
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i class="fas fa-search text-gray-400"></i>
-            </div>
-          </div>
-        </div>
+        <button
+          class="bg-sage-green hover:bg-deep-sage text-white px-4 py-2 rounded-lg transition-colors cursor-pointer !rounded-button whitespace-nowrap"
+          @click="goToNewPost"
+        >
+          <i class="fas fa-plus mr-1"></i>
+          <span>New Post</span>
+        </button>
       </div>
 
       <!-- Posts List -->
@@ -333,6 +295,10 @@ const visiblePageNumbers = computed(() => {
 
 const goToDetail = (id) => {
   router.push(`/posts/${id}`)
+}
+
+const goToNewPost = () => {
+  router.push('/posts/new')
 }
 </script>
 
