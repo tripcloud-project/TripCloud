@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.ssafy.project.domain.gallery.dto.internal.*;
+import com.ssafy.project.domain.member.service.MemberService;
 import com.ssafy.project.util.AesUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class FileServiceImpl implements FileService {
     private final HashtagService hashtagService;
     private final AesUtil aesUtil;
     private final PhotoService photoService;
+    private final MemberService memberService;
 
     // [/upload]
     @Override
@@ -75,6 +77,8 @@ public class FileServiceImpl implements FileService {
         Long memberId = SecurityUtil.getCurrentMemberId();
         fileRepository.insertFiles(fileList, memberId);
 
+        // 멤버의 usedStorage를 업데이트합니다.
+        memberService.updateStorageByMemberId(memberId);
 
         // 썸네일에 대표 이미지가 없다면, 첫 번째 사진을 추가합니다.
         List<ThumbnailDto> existingThumbnails = fileRepository.findThumbnailsByMemberId(memberId);
@@ -89,18 +93,13 @@ public class FileServiceImpl implements FileService {
             String sidoKey = file.getSido() + "::";
             String sigunguKey = file.getSido() + "::" + file.getSigungu();
 
-            System.out.println(sidoKey);
-            System.out.println(sigunguKey);
-
             // 썸네일이 없으면 이 파일을 썸네일로 설정
             if (!thumbnailKeySet.contains(sidoKey)) {
-                System.out.println("시도 넣자");
                 Long fileId = fileRepository.findFileIdByS3KeyAndMemberId(file.getS3Key(), memberId);
                 photoService.setThumbnail(fileId, "sido");
                 thumbnailKeySet.add(sidoKey);
             }
             if (!thumbnailKeySet.contains(sigunguKey)) {
-                System.out.println("시군구 넣자");
                 Long fileId = fileRepository.findFileIdByS3KeyAndMemberId(file.getS3Key(), memberId);
                 photoService.setThumbnail(fileId, "sigungu");
                 thumbnailKeySet.add(sigunguKey);
@@ -385,6 +384,9 @@ public class FileServiceImpl implements FileService {
         if (!prefixList.isEmpty()) {
             fileRepository.deleteFilesByPrefixes(prefixList, memberId);
         }
+
+        // 멤버의 usedStorage를 업데이트합니다.
+        memberService.updateStorageByMemberId(memberId);
     }
 
     public Map<String, Object> getDirectoryStructure(boolean isDeleted) {

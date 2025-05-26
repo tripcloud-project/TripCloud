@@ -1,10 +1,10 @@
 <template>
   <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
     <div class="flex items-center space-x-2">
-    </div>
-    <div class="flex items-center">
-      <h2 class="text-lg font-medium text-gray-800">{{ currentFolderName }}</h2>
-      <span class="text-gray-500 ml-2">({{ filteredItems.length }} items)</span>
+      <div class="flex items-center">
+        <h2 class="text-lg font-medium text-gray-800">{{ currentFolderName }}</h2>
+        <span class="text-gray-500 ml-2">({{ filteredItems.length }} items)</span>
+      </div>
     </div>
     <!-- Sort Options -->
     <div class="flex items-center space-x-2">
@@ -14,7 +14,7 @@
         class="text-sm border-none bg-gray-100 rounded-lg py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="name">이름</option>
-        <option value="modified">수정일</option>
+        <option value="taken">촬영일</option>
         <option value="size">크기</option>
       </select>
       <button
@@ -42,13 +42,11 @@
 import { useTrashStore } from '@/stores/trash.js'
 import { storeToRefs } from 'pinia'
 const trashStore = useTrashStore()
-const {sortBy, sortDirection, currentFolderName, filteredItems } =
-  storeToRefs(trashStore)
+const { sortBy, sortDirection, currentFolderName, filteredItems } = storeToRefs(trashStore)
 
 const toggleSortDirection = () => {
   sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
 }
-
 </script>
 
 <style scoped></style>

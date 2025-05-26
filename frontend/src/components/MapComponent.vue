@@ -410,9 +410,10 @@ async function loadTouristSpots(regionName) {
 
 // 이벤트 핸들러들
 const handleMapClick = (event) => {
-  const id = event.target.id
+  let id = event.target.id
 
   if(id){
+    id = id.replace(/-/g, ' ')
     if (selectedSido.value === '전국') {
       // 시도
       selectedSido.value = id
