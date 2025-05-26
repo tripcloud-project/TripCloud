@@ -33,7 +33,7 @@ export const useMapStore = defineStore(
     const quickAccess = ref([
       { id: 'drive', name: '드라이브', icon: 'fas fa-clock', color: 'text-blue-500' },
       { id: 'trash', name: '휴지통', icon: 'fas fa-trash-alt', color: 'text-red-500' },
-      { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' }
+      { id: 'map', name: '지도', icon: 'fas fa-map', color: 'text-green-500' },
     ])
 
     const showThumbnailDialog = ref(false)
@@ -48,7 +48,6 @@ export const useMapStore = defineStore(
         router.push({ name: 'drive' })
       }
     }
-
 
     const fileInput = ref(null)
     const folderInput = ref(null)
@@ -112,7 +111,6 @@ export const useMapStore = defineStore(
           // valueB = b.name.toLowerCase()
           valueA = (a.name ?? '').toLowerCase()
           valueB = (b.name ?? '').toLowerCase()
-
         } else if (sortBy.value === 'taken') {
           valueA = new Date(a.taken).getTime()
           valueB = new Date(b.taken).getTime()
@@ -144,14 +142,15 @@ export const useMapStore = defineStore(
           action: 'open',
         },
         { label: '이름 바꾸기', icon: 'fa-edit', action: 'rename' },
-        { type: 'divider' },
-        { label: '다운로드', icon: 'fa-download', action: 'download' },
-        // { label: 'Share', icon: 'fa-share-alt', action: 'share' },
-        { type: 'divider' },
-        { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
-        { type: 'divider' },
-        { label: '썸네일 설정', icon: 'fa-cut', action: 'thumbnail' },
       ]
+      if (!isFolder) {
+        baseItems.push({ label: '설명 추가', icon: 'fa-comment-dots', action: 'addDescription' })
+      }
+      baseItems.push(
+        { label: '다운로드', icon: 'fa-download', action: 'download' },
+        { label: '썸네일 설정', icon: 'fa-cut', action: 'thumbnail' },
+        { label: '삭제', icon: 'fa-trash-alt', action: 'delete', danger: true },
+      )
 
       return baseItems
     })
@@ -355,10 +354,10 @@ export const useMapStore = defineStore(
       fetchStorage,
       usagePercent,
       selectedSido,
-      shouldShowMap
+      shouldShowMap,
     }
   },
   {
     persist: { storage: sessionStorage }, // 새로고침해도 유지
-  }
+  },
 )

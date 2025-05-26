@@ -26,6 +26,7 @@
 import { useMapStore } from '@/stores/map.js'
 import { storeToRefs } from 'pinia'
 import { renameFile, renameDirectory } from '@/utils/drive/rename'
+import { descriptionSingleFile } from '@/utils/drive/description.js'
 const mapStore = useMapStore()
 const {
   contextMenu,
@@ -81,14 +82,6 @@ const handleContextMenuAction = async (action) => {
       }
       break
     }
-    case 'copy':
-      // Implement copy functionality
-      console.log('Copy', item.name)
-      break
-    case 'move':
-      // Implement move functionality
-      console.log('Move', item.name)
-      break
     case 'download':
       // Implement download functionality
       if (!selectedItems.value.includes(item.id)) {
@@ -120,6 +113,9 @@ const handleContextMenuAction = async (action) => {
       showThumbnailDialog.value = true
       break
     }
+    case 'addDescription':
+      handleDescriptionSingleFile()
+      break
   }
 
   closeContextMenu()
@@ -144,6 +140,25 @@ const handleRenameDirectory = async (oldPrefix, newPrefix) => {
     await loadDirectoryTree()
   } else {
     console.warn('디렉토리 이름 변경 실패:', result)
+  }
+}
+
+// [파일 설명 추가]
+const handleDescriptionSingleFile = async () => {
+  const fileId = contextMenu.value.item.id
+  const newDescription = prompt('설명을 입력하세요:', contextMenu.value.item.description || '')
+
+  if (!newDescription) return
+
+  const result = await descriptionSingleFile({
+    fileId,
+    description: newDescription,
+  })
+
+  if (result.status === 'success') {
+    alert('설명이 수정되었습니다.')
+    contextMenu.value.item.description = newDescription
+    await fetchItems()
   }
 }
 </script>

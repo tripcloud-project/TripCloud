@@ -270,7 +270,9 @@ public class FileServiceImpl implements FileService {
         List<DirectoryEntry> directories = fileRepository.findDirectoriesByPrefixAndIsDeleted(prefix, isDeleted);
         List<FileEntry> files = fileRepository.findFilesByPrefixAndIsDeleted(prefix, isDeleted);
         for (FileEntry file : files) {
-            file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
             file.setS3Key(null);
             if(file.getLatitude()!=null && file.getLongitude()!=null){
                 file.setLatitude(aesUtil.decrypt(file.getLatitude()));
@@ -432,13 +434,28 @@ public class FileServiceImpl implements FileService {
     public SearchResultResponseDto searchByKeyWord(String keyword) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         // 해당 키워드를 갖는 디렉토리 검색
-        List<DirectoryPreviewResponseDto> directories = fileRepository.searchDirectoriesWithKeyword(memberId, keyword);
+//        List<DirectoryPreviewResponseDto> directories = fileRepository.searchDirectoriesWithKeyword(memberId, keyword);
 
         // 해당 키워드를 갖는 파일 검색
         List<FilePreviewResponseDto> files = fileRepository.searchFilesWithKeyword(memberId, keyword);
+        if (files == null) files = new ArrayList<>();
+        
+        for (FilePreviewResponseDto file : files) {
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
+            file.setS3Key(null);
+            if(file.getLatitude()!=null && file.getLongitude()!=null){
+                file.setLatitude(aesUtil.decrypt(file.getLatitude()));
+                file.setLongitude(aesUtil.decrypt(file.getLongitude()));
+            }
+
+            // 해시태그 추가
+            file.setHashtags(hashtagService.getHashtags(file.getFileId()));
+        }
 
         return SearchResultResponseDto.builder()
-                .directories(directories)
+                .directories(Collections.emptyList())
                 .files(files)
                 .build();
     }
@@ -450,8 +467,23 @@ public class FileServiceImpl implements FileService {
 
         // 해당 해시태그를 갖는 파일 검색
         List<FilePreviewResponseDto> files = fileRepository.findFilesWithHashtag(memberId, hashtag);
+        if (files == null) files = new ArrayList<>();
+        
+        for (FilePreviewResponseDto file : files) {
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
+            file.setS3Key(null);
+            if(file.getLatitude()!=null && file.getLongitude()!=null){
+                file.setLatitude(aesUtil.decrypt(file.getLatitude()));
+                file.setLongitude(aesUtil.decrypt(file.getLongitude()));
+            }
 
+            // 해시태그 추가
+            file.setHashtags(hashtagService.getHashtags(file.getFileId()));
+        }
         return SearchResultResponseDto.builder()
+        		.directories(Collections.emptyList())
                 .files(files)
                 .build();
     }
@@ -462,9 +494,25 @@ public class FileServiceImpl implements FileService {
 
         // 해당 설명을 갖는 파일 탐색
         List<FilePreviewResponseDto> files = fileRepository.findFilesWithDescription(memberId, description);
+        if (files == null) files = new ArrayList<>();
+        System.out.println("files: "+files);
+        
+        for (FilePreviewResponseDto file : files) {
+        	if(file.getContentType().startsWith("image")) {
+        		file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));        		
+        	}
+            file.setS3Key(null);
+            if(file.getLatitude()!=null && file.getLongitude()!=null){
+                file.setLatitude(aesUtil.decrypt(file.getLatitude()));
+                file.setLongitude(aesUtil.decrypt(file.getLongitude()));
+            }
 
+            // 해시태그 추가
+            file.setHashtags(hashtagService.getHashtags(file.getFileId()));
+        }
         return SearchResultResponseDto.builder()
+        		.directories(Collections.emptyList())
                 .files(files)
-                .build();
-    }
+				.build();
+	}
 }

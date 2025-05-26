@@ -35,8 +35,33 @@
       </div>
     </div>
 
-    <!-- Sort Options -->
     <div class="flex items-center space-x-2">
+      <!-- 검색 타입 선택과 검색창 -->
+      <div class="relative flex items-center space-x-2">
+        <!-- 검색 타입 드롭다운 -->
+        <select
+          v-model="searchType"
+          class="text-sm border-none bg-gray-100 rounded-lg py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="file">파일/디렉토리</option>
+          <option value="hashtag">해시태그</option>
+          <option value="description">설명</option>
+        </select>
+
+        <!-- 검색 입력창 -->
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="검색어 입력..."
+            class="text-sm border-none bg-gray-100 rounded-lg py-1 pl-2 pr-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @keyup.enter="handleSearch"
+          />
+          <i class="fas fa-search absolute right-2 top-2 text-gray-500"></i>
+        </div>
+      </div>
+
+      <!-- 정렬창 -->
       <span class="text-sm text-gray-500">정렬: </span>
       <select
         v-model="sortBy"
@@ -72,7 +97,7 @@ import { useDriveStore } from '@/stores/drive.js'
 import { storeToRefs } from 'pinia'
 import { uploadToServer } from '@/utils/drive/upload'
 const driveStore = useDriveStore()
-const { prefix, fileInput, folderInput, sortBy, sortDirection, currentFolderName, filteredItems } =
+const { prefix, fileInput, folderInput, sortBy, sortDirection, currentFolderName, filteredItems, items, selectedFolder } =
   storeToRefs(driveStore)
 
 const { fetchItems, loadDirectoryTree } = driveStore
@@ -134,6 +159,36 @@ const handleFolderUpload = async () => {
   }
 
   folderInput.value.value = null
+}
+
+import { ref } from 'vue'
+import {searchFiles} from '@/utils/drive/search.js'
+import mapApiResponseToItems from '@/utils/drive/mapApiResponseToItems'
+
+// 검색 관련 상태
+const searchType = ref('file') // 기본값은 파일/디렉토리
+const searchQuery = ref('')
+
+// 검색 실행 함수
+const handleSearch = async () => {
+  if (!searchQuery.value.trim()) {
+    return
+  }
+
+    try {
+    const data = await searchFiles(searchType.value, searchQuery.value)
+
+    if (data.status === 'success') {
+      selectedFolder.value = '/'
+      prefix.value = '/'
+      items.value = mapApiResponseToItems(data.result, '/')
+      searchQuery.value = ''
+    } else {
+      console.error('검색 실패:', error)
+    }
+  } catch (error) {
+    console.error('검색 오류:', error)
+  }
 }
 </script>
 

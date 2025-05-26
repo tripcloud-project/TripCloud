@@ -71,6 +71,11 @@
           <h4 class="text-sm font-medium text-gray-500 mb-1">크기</h4>
           <p class="text-sm text-gray-800">{{ formatSize(selectedFile.size) }}</p>
         </div>
+        
+        <div v-if="selectedFile.created">
+          <h4 class="text-sm font-medium text-gray-500 mb-1">등록일</h4>
+          <p class="text-sm text-gray-800">{{ formatDateTime(selectedFile.created) }}</p>
+        </div>
 
         <div v-if="selectedFile.taken">
           <h4 class="text-sm font-medium text-gray-500 mb-1">촬영일</h4>
