@@ -30,9 +30,9 @@
 
           <div class="flex items-center mb-4">
             <div
-              class="w-10 h-10 rounded-full bg-light-brown flex items-center justify-center mr-3"
+              class="w-10 h-10 rounded-full overflow-hidden bg-light-brown flex items-center justify-center mr-3"
             >
-              <i class="fas fa-user text-white"></i>
+              <img :src="post.profile" alt="Profile" class="w-full h-full object-cover" />
             </div>
             <div>
               <div class="font-medium text-gray-800">{{ post.author }}</div>
@@ -67,7 +67,7 @@
         <!-- Comments Section -->
         <div class="bg-gray-50 p-6">
           <h3 class="text-lg font-semibold text-deep-sage mb-4">
-            Comments ({{ post.comments.length }})
+            댓글 ({{ post.comments.length }})
           </h3>
 
           <!-- Comment List -->
@@ -80,9 +80,9 @@
               <div class="flex justify-between">
                 <div class="flex items-center mb-2">
                   <div
-                    class="w-8 h-8 rounded-full bg-light-brown flex items-center justify-center mr-2"
+                    class="w-8 h-8 rounded-full overflow-hidden bg-light-brown flex items-center justify-center mr-2"
                   >
-                    <i class="fas fa-user text-white text-xs"></i>
+                    <img :src="comment.profile" alt="Profile" class="w-full h-full object-cover" />
                   </div>
                   <div>
                     <div class="font-medium text-gray-800">
@@ -107,17 +107,11 @@
 
           <!-- Add Comment Form -->
           <div class="bg-white p-4 rounded-lg border border-gray-200">
-            <h4 class="text-md font-medium text-deep-sage mb-3">Add a comment</h4>
             <div class="flex items-start space-x-3">
-              <div
-                class="w-8 h-8 rounded-full bg-sage-green flex-shrink-0 flex items-center justify-center"
-              >
-                <i class="fas fa-user text-white text-xs"></i>
-              </div>
               <div class="flex-grow">
                 <textarea
                   v-model="newComment"
-                  placeholder="Write your comment here..."
+                  placeholder="댓글을 입력하세요."
                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-green focus:border-transparent resize-none"
                   rows="3"
                 ></textarea>
@@ -129,7 +123,7 @@
                     class="bg-sage-green hover:bg-deep-sage text-white px-4 py-2 rounded-lg transition-colors cursor-pointer !rounded-button whitespace-nowrap"
                   >
                     <i class="fas fa-paper-plane mr-1"></i>
-                    <span>Post Comment</span>
+                    <span>댓글 등록하기</span>
                   </button>
                 </div>
               </div>
@@ -183,6 +177,7 @@ const getPost = async () => {
     isLiked: result.liked,
     comments: [...result.comments],
     isMyPost: result.myPost,
+    profile: result.profile,
   }
 }
 
