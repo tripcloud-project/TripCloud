@@ -49,8 +49,10 @@
           />
         </div>
         <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
+        <p v-if="loginError" class="mt-1 text-sm text-red-500">
+          {{ loginError }}
+        </p>
       </div>
-
       <div class="flex items-center mb-6">
         <label class="inline-flex items-center cursor-pointer">
           <input
@@ -137,6 +139,7 @@ const isLoading = ref(false)
 // Error states
 const emailError = ref('')
 const passwordError = ref('')
+const loginError = ref('')
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -193,7 +196,10 @@ const handleLogin = () => {
         router.push('/')
       } catch (error) {
         console.log('Login failed: ', error)
-        alert('이메일와 비밀번호를 확인해주세요.')
+        // alert('이메일와 비밀번호를 확인해주세요.')
+        // 알려주긴 해야하는데...
+        // alert용 모달이 필요?
+        loginError.value = '이메일 또는 비밀번호가 올바르지 않습니다.'
       } finally {
         isLoading.value = false
       }
