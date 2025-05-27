@@ -45,7 +45,7 @@
 		    m.name AS author,
 		    p.created_at as createdAt,
 		    p.modified_at as modifiedAt,
-		    m.profile_image as profilePresignedImage,
+		    m.profile_image as profilePresignedURL,
 		    COUNT(c.post_comment_id) as commentCount
 	  	FROM
 	    	post p
@@ -76,7 +76,8 @@
                 WHEN m.member_id = #{memberId} THEN TRUE
                 ELSE false
             END
-            as isMyPost
+            as isMyPost,
+            m.profile_image as profile
         FROM
             post p, member m
         WHERE p.post_id = #{postId} AND p.member_id = m.member_id
