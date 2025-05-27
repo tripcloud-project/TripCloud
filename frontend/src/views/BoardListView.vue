@@ -44,9 +44,9 @@
             <div class="col-span-5 font-medium text-gray-800 truncate">{{ post.title }}</div>
             <div class="col-span-2 flex items-center">
               <div
-                class="w-6 h-6 rounded-full bg-light-brown flex items-center justify-center mr-2"
+                class="w-6 h-6 rounded-full overflow-hidden bg-light-brown flex items-center justify-center mr-2"
               >
-                <i class="fas fa-user text-xs text-white"></i>
+                <img :src="post.profile" alt="Profile" class="w-full h-full object-cover" />
               </div>
               <span class="text-gray-700 truncate">{{ post.author }}</span>
             </div>
@@ -147,6 +147,7 @@ const getPostList = async () => {
       author: content[i].author,
       comments: content[i].commentCount,
       time: content[i].createdAt,
+      profile: content[i].profilePresignedURL,
     })
   }
 
