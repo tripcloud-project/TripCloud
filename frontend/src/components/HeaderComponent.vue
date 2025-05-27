@@ -182,11 +182,10 @@ const handleMyPage = () => {
   console.log('마이페이지로 이동')
 }
 
-const handleLogout = () => {
-  api.post('/auth/logout')
+const handleLogout = async () => {
+  await api.post('/auth/logout')
   authStore.clearToken()
   window.location.href = '/'
-  console.log('로그아웃 완료, 메인 페이지로 이동')
 }
 
 onMounted(() => {
