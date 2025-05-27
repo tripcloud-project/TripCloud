@@ -96,11 +96,6 @@ public class BoardServiceImpl implements BoardService {
     public OffsetPageResponse<?> getPagedPostList(Integer page, Integer size) {
         List<PostPreviewResponseDto> postResponseList = postRepository.selectByPageAndSize(page, size);
         Integer totalCount = postRepository.getTotalCount();
-        for(PostPreviewResponseDto postResponse : postResponseList) {
-            if(postResponse.getProfilePresignedURL() == null)
-                continue;
-            postResponse.setProfilePresignedURL(s3Service.generateThumbnailPresignedUrl(postResponse.getProfilePresignedURL()));
-        }
 
         Boolean hasNext = postResponseList.size() == size + 1;
         List<PostPreviewResponseDto> content = hasNext ? postResponseList.subList(0, size) : postResponseList;
