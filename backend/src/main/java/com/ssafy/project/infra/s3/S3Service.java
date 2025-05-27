@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
+import net.coobird.thumbnailator.Thumbnails;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,31 @@ public class S3Service{
     			.build(),
     			RequestBody.fromInputStream(file.getInputStream(), file.getSize())
     			);
+    	
+        ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+        Thumbnails.of(file.getInputStream())
+            .size(1280, 1280)
+            .outputFormat("jpg")  // 썸네일은 jpg로 저장
+            .outputQuality(0.8)
+            .toOutputStream(thumbnailOutputStream);
+
+        byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
+
+        // 3. 썸네일 S3 업로드
+        String thumbnailKey = "thumbnail/" + s3Key.replaceAll("\\.[^.]+$", ".jpg"); // 확장자 jpg로 통일
+        s3Client.putObject(
+            PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(thumbnailKey)
+                .contentType("image/jpeg")
+                .build(),
+            RequestBody.fromBytes(thumbnailBytes)
+        );
+    }
+	
+	public String generateThumbnailPresignedUrl(String key) {
+		String thumbnailKey = "thumbnail/" + key.replaceAll("\\.[^.]+$", ".jpg");
+		return generatePresignedUrl(thumbnailKey);
     }
 	
 	public String generatePresignedUrl(String key) {
@@ -55,7 +81,7 @@ public class S3Service{
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(30))
+                .signatureDuration(Duration.ofMinutes(5))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
@@ -74,9 +100,18 @@ public class S3Service{
     // [rename]
     public void directoryKeyUpdate(String oldPrefix, String newPrefix) {
     	for (S3Object obj : getContents(oldPrefix)) {
+    		String originalKey = obj.key();
     		String relativePath = obj.key().substring(oldPrefix.length());
     		String destinationKey = newPrefix + relativePath;
     		keyUpdate(obj.key(), destinationKey);
+    		
+    		// 2. 썸네일도 이동
+            String oldThumbKey = "thumbnail/" + originalKey.replaceAll("\\.[^.]+$", ".jpg");
+            String newThumbKey = "thumbnail/" + destinationKey.replaceAll("\\.[^.]+$", ".jpg");
+
+            if (objectExists(oldThumbKey)) {
+                keyUpdate(oldThumbKey, newThumbKey);
+            }
     	}
     }
     
@@ -99,7 +134,24 @@ public class S3Service{
                 .key(key)
                 .build());
     }
-
+    
+    public void deleteThumbnailFile(String key){
+    	String thumbnailKey = "thumbnail/" + key.replaceAll("\\.[^.]+$", ".jpg");
+    	if (objectExists(thumbnailKey)) {
+    		deleteFile(thumbnailKey);    		
+    	}
+    }
+    private boolean objectExists(String key) {
+        try {
+            s3Client.headObject(HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build());
+            return true;
+        } catch (S3Exception e) {
+            return false;
+        }
+    }
     // [download]
     public Resource createZipResource(String prefix, List<S3KeyOriginalFilenameDto> s3KeyOriginalFilenames){
         try{

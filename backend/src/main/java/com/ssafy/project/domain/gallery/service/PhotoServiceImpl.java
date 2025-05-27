@@ -56,7 +56,7 @@ public class PhotoServiceImpl implements PhotoService{
             String city = parts[1];
             files.addAll(photoRepository.findPhotosBySidoAndSigunguAndMemberId(province, city, memberId));
             for(FileEntry file : files){
-                file.setPresignedUrl(s3Service.generatePresignedUrl(file.getS3Key()));
+                file.setPresignedUrl(s3Service.generateThumbnailPresignedUrl(file.getS3Key()));
                 file.setS3Key(null);
 				if(file.getLatitude()!=null && file.getLongitude()!=null){
 					file.setLatitude(aesUtil.decrypt(file.getLatitude()));
@@ -156,7 +156,7 @@ public class PhotoServiceImpl implements PhotoService{
 			thumbnailList = photoRepository.findSigunguThumbnails(memberId, sido);
 		
 		for(ThumbnailResponseDto thumbnail : thumbnailList) {
-			thumbnail.setPresignedURL(s3Service.generatePresignedUrl(thumbnail.getPresignedURL()));
+			thumbnail.setPresignedURL(s3Service.generateThumbnailPresignedUrl(thumbnail.getPresignedURL()));
 		}
 		
 		return thumbnailList;	

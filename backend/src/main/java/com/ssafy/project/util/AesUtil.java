@@ -26,7 +26,6 @@ public class AesUtil {
             String base64Key = new String(is.readAllBytes()).trim();
             byte[] keyBytes = Base64.getDecoder().decode(base64Key);
             this.secretKey = new SecretKeySpec(keyBytes, "AES");
-            System.out.println("✅ AES 키 초기화 완료 (리소스 로드)");
         } catch (Exception e) {
             throw new IllegalStateException("AES 키 초기화 실패", e);
         }

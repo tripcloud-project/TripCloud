@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
+  <div class="bg-gray-50 flex">
     <DriveSidebar />
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
       <DriveHeader />
       <DriveToolbar />
       <ContentGrid />

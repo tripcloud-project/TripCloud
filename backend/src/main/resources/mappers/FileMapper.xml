@@ -176,7 +176,7 @@
     </foreach>
   </update>
 
-  <update id="deleteFilesByIds">
+  <delete id="deleteFilesByIds">
     DELETE FROM file
     WHERE member_id = #{memberId}
     AND is_deleted = true
@@ -184,9 +184,9 @@
     <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
       #{id}
     </foreach>
-  </update>
+  </delete>
 
-  <update id="deleteFilesByPrefixes">
+  <delete id="deleteFilesByPrefixes">
     DELETE FROM file
     WHERE member_id = #{memberId}
     AND
@@ -194,7 +194,7 @@
       s3_key LIKE CONCAT(#{prefix}, '%')
       AND is_deleted = true
     </foreach>
-  </update>
+  </delete>
   
 	<select id="findDirectoriesByPrefixAndMemberIdAndIsDeleted">
 		SELECT DISTINCT
@@ -231,7 +231,8 @@
   	<select id="selectAllFilesByMemberIdAndKeyword" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">	
 		SELECT
 			file_id as fileId,
-			original_filename as name
+			original_filename as name,
+			s3_key, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description 
 		FROM
 			file
 		WHERE
@@ -242,20 +243,22 @@
 	<select id="selectAllFilesByMemberIdAndHashtag" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
 		SELECT
 			f.file_id as fileId,
-			f.original_filename as name
+			f.original_filename as name,
+			s3_key, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description
 		FROM
 			file f, file_hashtag fh, hashtag h
 		WHERE
 			f.member_id = #{memberId}
 			AND f.file_id = fh.file_id
 			AND fh.hashtag_id = h.hashtag_id
-			AND h.word = #{hashtag}
+			AND h.keyword = #{hashtag}
 	</select>
 
     <select id="selectAllFilesByMemberIdAndDescription" resultType="com.ssafy.project.domain.gallery.dto.response.FilePreviewResponseDto">
         SELECT
             file_id as fileId,
-            original_filename as name
+            original_filename as name,
+            s3_key, size, created_at, modified_at, taken_at, content_type, sido, sigungu, eupmyeondong, latitude, longitude, description
         FROM
             file
         WHERE
@@ -276,4 +279,26 @@
             s3_key = #{s3Key}
             AND member_id = #{memberId};
     </select>
+    
+  <select id="findS3KeysByFileIds">
+    SELECT s3_key
+    FROM file
+    WHERE member_id = #{memberId}
+    AND is_deleted = true
+    AND file_id IN
+    <foreach item="fileId" collection="fileIdList" open="(" separator="," close=")">
+      #{fileId}
+    </foreach>
+  </select>
+
+  <select id="findS3KeysByPrefixes">
+    SELECT s3_key
+    FROM file
+    WHERE member_id = #{memberId}
+    AND
+    <foreach item="prefix" collection="prefixList" separator="OR">
+      s3_key LIKE CONCAT(#{prefix}, '%')
+      AND is_deleted = true
+    </foreach>
+  </select>
 </mapper>
