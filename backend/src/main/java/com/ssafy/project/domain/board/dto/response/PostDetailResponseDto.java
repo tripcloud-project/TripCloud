@@ -20,6 +20,7 @@ public class PostDetailResponseDto {
 	private @NonNull String author;
 	private @NonNull LocalDateTime createdAt;
 	private @NonNull LocalDateTime modifiedAt;
+	private String profile;
 	private @NonNull Integer likeCount;
 	private boolean isMyPost;
 	private boolean isLiked;

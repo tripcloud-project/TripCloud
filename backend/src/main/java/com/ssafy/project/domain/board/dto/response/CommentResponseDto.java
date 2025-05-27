@@ -13,5 +13,6 @@ public class CommentResponseDto {
     private @NonNull String author;
     private @NonNull String content;
     private @NonNull Boolean isMyComment;
+    private String profile;
     private @NonNull LocalDateTime createdAt;
 }
