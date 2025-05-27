@@ -175,11 +175,11 @@ const handleSubmit = async () => {
       title: postTitle.value,
       content: editor.value,
     })
-    alert('게시글 업로드 완료')
+    // alert('게시글 업로드 완료')
     window.location.href = '/board'
   } catch (error) {
     console.error('Error creating post:', error)
-    alert('Failed to create post. Please try again.')
+    // alert('Failed to create post. Please try again.')
   } finally {
     isSubmitting.value = false
   }

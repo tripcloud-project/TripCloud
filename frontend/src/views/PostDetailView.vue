@@ -250,7 +250,7 @@ const deletePost = () => {
   if (confirm('게시글을 삭제하시겠습니까?')) {
     api.delete(`/posts/${postId}`)
     // In a real app, this would call an API to delete the post
-    alert('삭제 완료!')
+    // alert('삭제 완료!')
     goBack()
   }
 }
