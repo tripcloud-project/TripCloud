@@ -311,6 +311,11 @@ export const useMapStore = defineStore(
       return parts.length <= 1
     })
 
+    const showInputModal = ref(false)
+    const inputModalTitle = ref('')
+    const inputModalInitialValue = ref('')
+    const onInputSubmit = ref(null)
+
     return {
       prefix,
       setPrefix,
@@ -355,6 +360,10 @@ export const useMapStore = defineStore(
       usagePercent,
       selectedSido,
       shouldShowMap,
+      showInputModal,
+      inputModalTitle,
+      inputModalInitialValue,
+      onInputSubmit,
     }
   },
   {

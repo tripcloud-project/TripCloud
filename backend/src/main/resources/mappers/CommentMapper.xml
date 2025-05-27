@@ -17,7 +17,8 @@
             CASE
                 WHEN m.member_id = #{memberId} THEN TRUE
                 ELSE FALSE
-            END as isMyComment
+            END as isMyComment,
+            m.profile_image as profile
         FROM
             post_comment pc, member m
         WHERE pc.post_id = #{postId} AND pc.member_id = m.member_id

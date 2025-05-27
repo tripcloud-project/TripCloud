@@ -1,17 +1,25 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-full w-full">
     <DriveSidebar />
-    <div v-if="shouldShowMap" class="flex-1 overflow-auto">
-      <MapComponent/>
+    <div v-if="shouldShowMap" class="flex-1 h-full w-full overflow-auto">
+      <MapComponent />
     </div>
-    <div v-if="!shouldShowMap" class="flex-1 flex flex-col h-screen overflow-hidden">
+    <div v-if="!shouldShowMap" class="flex-1 flex flex-col overflow-hidden">
       <DriveHeader />
       <DriveToolbar />
       <ContentGrid />
     </div>
-    <MetadataPanel v-if="!shouldShowMap"/>
-    <ContextMenu v-if="!shouldShowMap"/>
+    <MetadataPanel v-if="!shouldShowMap" />
+    <ContextMenu v-if="!shouldShowMap" />
     <ThumbnailModal v-if="showThumbnailDialog" />
+    <!-- 템플릿에 모달 -->
+    <InputModal
+      v-if="showInputModal"
+      :title="inputModalTitle"
+      :model-value="inputModalInitialValue"
+      @submit="handleInputSubmit"
+      @cancel="() => (showInputModal = false)"
+    />
   </div>
 </template>
 
@@ -29,12 +37,23 @@ import DriveHeader from '@/components/map/DriveHeader.vue'
 import ContentGrid from '@/components/map/ContentGrid.vue'
 import MetadataPanel from '@/components/map/MetadataPanel.vue'
 import ThumbnailModal from '@/components/map/ThumbnailModal.vue'
+import InputModal from '@/components/InputModal.vue'
 
 const mapStore = useMapStore()
 
 // ref 꺼내 쓰기
-const { folders, selectedFolder, expandedFolders, contextMenu, showThumbnailDialog, shouldShowMap } =
-  storeToRefs(mapStore)
+const {
+  folders,
+  selectedFolder,
+  expandedFolders,
+  contextMenu,
+  showThumbnailDialog,
+  shouldShowMap,
+  showInputModal,
+  inputModalTitle,
+  inputModalInitialValue,
+  onInputSubmit,
+} = storeToRefs(mapStore)
 
 // 함수 꺼내 쓰기
 const { fetchItems, loadDirectoryTree, closeContextMenu } = mapStore
@@ -66,6 +85,15 @@ watch(selectedFolder, (newFolderId) => {
   }
 })
 
+
+
+const handleInputSubmit = async (value) => {
+  if (typeof onInputSubmit.value === 'function') {
+    await onInputSubmit.value(value)
+    onInputSubmit.value = null
+  }
+  showInputModal.value = false
+}
 </script>
 
 <style scoped>

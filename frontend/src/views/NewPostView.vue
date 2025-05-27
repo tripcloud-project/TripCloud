@@ -1,13 +1,12 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 <template>
-  <div class="min-h-screen flex flex-col bg-soft-white">
+  <div class="flex flex-col bg-soft-white">
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8">
       <div class="max-w-4xl mx-auto">
         <!-- Page Title -->
         <div class="mb-8">
-          <h2 class="text-3xl font-bold text-deep-sage mb-2">Create New Post</h2>
-          <p class="text-gray-600">Share your nature experience with the community</p>
+          <h2 class="text-3xl font-bold text-deep-sage mb-2">글 작성하기</h2>
         </div>
 
         <!-- Post Form -->
@@ -20,7 +19,7 @@
                 type="text"
                 id="title"
                 v-model="postTitle"
-                placeholder="Enter your post title"
+                placeholder="제목을 입력해주세요."
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-green focus:border-transparent"
                 :maxlength="100"
                 required
@@ -40,7 +39,6 @@
               />
               <div class="mt-1 text-sm text-gray-500 flex justify-between">
                 <span>{{ characterCount }}/1000 characters</span>
-                <span>Supports basic formatting</span>
               </div>
             </div>
 
@@ -52,10 +50,10 @@
                 :class="{ 'opacity-50 cursor-not-allowed': !isFormValid || isSubmitting }"
                 class="bg-sage-green hover:bg-deep-sage text-white px-8 py-3 rounded-lg transition-colors !rounded-button whitespace-nowrap"
               >
-                <span v-if="!isSubmitting">Create Post</span>
+                <span v-if="!isSubmitting">업로드하기</span>
                 <span v-else class="flex items-center">
                   <i class="fas fa-spinner fa-spin mr-2"></i>
-                  Publishing...
+                  업로드 중...
                 </span>
               </button>
             </div>
@@ -63,77 +61,6 @@
         </div>
       </div>
     </main>
-    <!-- Footer -->
-    <footer class="bg-white border-t border-sage-green/20 py-6">
-      <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="mb-4 md:mb-0">
-            <div class="flex items-center">
-              <div class="w-8 h-8 flex items-center justify-center bg-sage-green rounded-full mr-2">
-                <i class="fas fa-leaf text-white text-sm"></i>
-              </div>
-              <span class="text-lg font-bold text-deep-sage">NatureBoard</span>
-            </div>
-            <p class="text-gray-500 text-sm mt-2">Connect with nature enthusiasts worldwide</p>
-          </div>
-          <div class="flex space-x-6">
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-facebook-f"></i>
-            </a>
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-instagram"></i>
-            </a>
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green transition-colors cursor-pointer"
-            >
-              <i class="fab fa-pinterest"></i>
-            </a>
-          </div>
-        </div>
-        <div
-          class="mt-6 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center"
-        >
-          <div class="text-gray-500 text-sm mb-4 md:mb-0">
-            © 2025 NatureBoard. All rights reserved.
-          </div>
-          <div class="flex flex-wrap justify-center gap-4">
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Privacy Policy</a
-            >
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Terms of Service</a
-            >
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Community Guidelines</a
-            >
-            <a
-              href="#"
-              class="text-gray-500 hover:text-sage-green text-sm transition-colors cursor-pointer"
-              >Contact Us</a
-            >
-          </div>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
@@ -175,11 +102,11 @@ const handleSubmit = async () => {
       title: postTitle.value,
       content: editor.value,
     })
-    alert('게시글 업로드 완료')
-    router.push('/board')
+    // alert('게시글 업로드 완료')
+    window.location.href = '/board'
   } catch (error) {
     console.error('Error creating post:', error)
-    alert('Failed to create post. Please try again.')
+    // alert('Failed to create post. Please try again.')
   } finally {
     isSubmitting.value = false
   }

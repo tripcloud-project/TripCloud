@@ -1,9 +1,6 @@
 <!-- Right Metadata Panel -->
 <template>
-  <div
-    v-if="selectedFile"
-    class="w-[300px] bg-white border-l border-gray-200 flex flex-col h-screen"
-  >
+  <div v-if="selectedFile" class="w-[300px] bg-white border-l border-gray-200 flex flex-col">
     <div class="p-4 border-b border-gray-200 flex justify-between items-center">
       <h3 class="text-lg font-medium text-gray-800">파일 상세정보</h3>
       <button @click="clearFileSelection" class="text-gray-500 hover:text-gray-700 cursor-pointer">

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-soft-white">
+  <div class="flex flex-col items-center justify-center bg-soft-white">
     <!-- Header Section -->
     <div class="flex flex-col items-center mb-8">
       <div class="w-16 h-16 mb-4 flex items-center justify-center bg-sage-green rounded-full">
@@ -25,7 +25,7 @@
             id="email"
             v-model="email"
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Enter your email"
+            placeholder="이메일을 입력해 주세요"
             :class="{ 'border-red-300 focus:ring-red-300': emailError }"
           />
         </div>
@@ -44,13 +44,15 @@
             id="password"
             v-model="password"
             class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Enter your password"
+            placeholder="비밀번호를 입력해 주세요"
             :class="{ 'border-red-300 focus:ring-red-300': passwordError }"
           />
         </div>
         <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
+        <p v-if="loginError" class="mt-1 text-sm text-red-500">
+          {{ loginError }}
+        </p>
       </div>
-
       <div class="flex items-center mb-6">
         <label class="inline-flex items-center cursor-pointer">
           <input
@@ -58,7 +60,7 @@
             v-model="rememberMe"
             class="form-checkbox h-5 w-5 text-sage-green rounded border-gray-300 transition duration-300"
           />
-          <span class="ml-2 text-gray-700">Remember me</span>
+          <span class="ml-2 text-gray-700">이메일 저장</span>
         </label>
       </div>
 
@@ -137,6 +139,7 @@ const isLoading = ref(false)
 // Error states
 const emailError = ref('')
 const passwordError = ref('')
+const loginError = ref('')
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -193,7 +196,10 @@ const handleLogin = () => {
         router.push('/')
       } catch (error) {
         console.log('Login failed: ', error)
-        alert('이메일와 비밀번호를 확인해주세요.')
+        // alert('이메일와 비밀번호를 확인해주세요.')
+        // 알려주긴 해야하는데...
+        // alert용 모달이 필요?
+        loginError.value = '이메일 또는 비밀번호가 올바르지 않습니다.'
       } finally {
         isLoading.value = false
       }

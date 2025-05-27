@@ -1,7 +1,7 @@
 <!-- The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work. -->
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-soft-white">
+  <div class="flex flex-col items-center justify-center bg-soft-white">
     <!-- Header Section -->
     <div class="flex flex-col items-center mb-8">
       <div class="w-16 h-16 mb-4 flex items-center justify-center bg-sage-green rounded-full">
@@ -27,7 +27,7 @@
             id="name"
             v-model="name"
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Enter your full name"
+            placeholder="이름을 입력해 주세요"
             :class="{ 'border-red-300 focus:ring-red-300': nameError }"
           />
         </div>
@@ -46,7 +46,7 @@
             id="email"
             v-model="email"
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Enter your email"
+            placeholder="이메일을 입력해 주세요"
             :class="{
               'border-red-300 focus:ring-red-300': emailError,
             }"
@@ -70,7 +70,9 @@
 
       <!-- Password Input -->
       <div class="mb-5">
-        <label for="password" class="block text-gray-700 mb-2 font-medium">비밀번호</label>
+        <label for="password" class="block text-gray-700 mb-2 font-medium"
+          >비밀번호 (8자리 이상)</label
+        >
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <i class="fas fa-lock text-sage-green"></i>
@@ -80,7 +82,7 @@
             id="password"
             v-model="password"
             class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Create a password"
+            placeholder="비밀번호를 입력해 주세요"
             :class="{ 'border-red-300 focus:ring-red-300': passwordError }"
           />
         </div>
@@ -100,7 +102,7 @@
             id="confirmPassword"
             v-model="confirmPassword"
             class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Confirm your password"
+            placeholder="비밀번호를 입력해 주세요"
           />
         </div>
         <p v-if="confirmPasswordError" class="mt-1 text-sm text-red-500">
@@ -144,13 +146,12 @@
 
       <!-- Sign In Link -->
       <div class="text-center mt-6">
-        <p class="text-gray-700">
-          <a
-            @click="goToSignIn"
-            class="hover:text-deep-sky-blue transition duration-300 cursor-pointer"
-            >로그인하러가기</a
-          >
-        </p>
+        <a
+          @click="goToSignIn"
+          class="block w-full bg-light-brown py-3 rounded-lg font-medium mt-4 transition duration-300 border border-brown hover:bg-brown hover:border-[#a8937f] cursor-pointer whitespace-nowrap"
+        >
+          로그인하러가기
+        </a>
       </div>
     </div>
 
