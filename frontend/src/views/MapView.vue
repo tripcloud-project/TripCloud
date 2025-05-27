@@ -12,6 +12,14 @@
     <MetadataPanel v-if="!shouldShowMap" />
     <ContextMenu v-if="!shouldShowMap" />
     <ThumbnailModal v-if="showThumbnailDialog" />
+    <!-- 템플릿에 모달 -->
+    <InputModal
+      v-if="showInputModal"
+      :title="inputModalTitle"
+      :model-value="inputModalInitialValue"
+      @submit="handleInputSubmit"
+      @cancel="() => (showInputModal = false)"
+    />
   </div>
 </template>
 
@@ -29,6 +37,7 @@ import DriveHeader from '@/components/map/DriveHeader.vue'
 import ContentGrid from '@/components/map/ContentGrid.vue'
 import MetadataPanel from '@/components/map/MetadataPanel.vue'
 import ThumbnailModal from '@/components/map/ThumbnailModal.vue'
+import InputModal from '@/components/InputModal.vue'
 
 const mapStore = useMapStore()
 
@@ -40,6 +49,10 @@ const {
   contextMenu,
   showThumbnailDialog,
   shouldShowMap,
+  showInputModal,
+  inputModalTitle,
+  inputModalInitialValue,
+  onInputSubmit,
 } = storeToRefs(mapStore)
 
 // 함수 꺼내 쓰기
@@ -71,6 +84,16 @@ watch(selectedFolder, (newFolderId) => {
     }
   }
 })
+
+
+
+const handleInputSubmit = async (value) => {
+  if (typeof onInputSubmit.value === 'function') {
+    await onInputSubmit.value(value)
+    onInputSubmit.value = null
+  }
+  showInputModal.value = false
+}
 </script>
 
 <style scoped>

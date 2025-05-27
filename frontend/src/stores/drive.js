@@ -280,6 +280,11 @@ export const useDriveStore = defineStore(
         maxStorage.value = Number(data.result.maxStorage)
       }
     }
+
+    const showInputModal = ref(false)
+    const inputModalTitle = ref('')
+    const inputModalInitialValue = ref('')
+    const onInputSubmit = ref(null)
     return {
       prefix,
       setPrefix,
@@ -318,6 +323,10 @@ export const useDriveStore = defineStore(
       maxStorage,
       fetchStorage,
       usagePercent,
+      showInputModal,
+      inputModalTitle,
+      inputModalInitialValue,
+      onInputSubmit,
     }
   },
   {
