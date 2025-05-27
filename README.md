@@ -101,32 +101,31 @@ TripCloud의 데이터베이스는 다음과 같은 주요 엔티티들로 구�
 - post_comment: 게시글에 대한 댓글 저장
 - post_like: 사용자의 게시글 좋아요 기록 저장
 
-#### 🗺️ attraction, attraction_category (관광지 추천)
-- 지역 기반 관광지 정보 저장
-- 사용자의 미방문 지역을 기반으로 관광지 추천 기능 제공
-
 #### 📌 member_activity (유저 활동 로그)
 - 사용자의 주요 활동 기록을 저장하는 로그 테이블
 - 회원 가입, 사진 업로드, 게시글 작성 등 이벤트성 활동 저장
 
 
-
+---
 
 ## API 명세서
 ### 🧑‍💼 Member API
-회원가입, 로그인, 내 정보 조회 및 수정 등 사용자 인증 관련 API입니다.
+- 회원가입, 로그인, 내 정보 조회 및 수정 등 사용자 인증 관련 API입니다.
 ![API_Member](img/API_Member.png)
 
 ---
 ### 📁 Gallery API
+- 파일 업로드, 삭제, 정렬, 휴지통 처리, ZIP 다운로드 등 파일 관리 기능 관련 API입니다.
 ![API_Gallery](img/API_Gallery.png)
 
 ---
 ### 💬 Board API
+- 게시글 작성, 수정, 삭제, 댓글, 좋아요 등 커뮤니티 기능과 관련된 API입니다.
 ![API_Board](img/API_Board.png)
 
 ---
 ### 🗺️ Attraction API
+- 사용자의 위치 기반으로 관광지를 추천하고, 대표 이미지 등을 조회하는 기능의 API입니다.
 ![API_Attraction](img/API_Attraction.png)
 
 ---
@@ -167,6 +166,7 @@ TripCloud의 데이터베이스는 다음과 같은 주요 엔티티들로 구�
 - AWS S3 API 호환 → 로컬 개발과 클라우드 이전이 모두 유연
 - 썸네일, ZIP 다운로드, 폴더 업로드 등도 모두 객체 스토리지에서 처리
 
+---
 ## 실행 및 배포
 
 ### 🛠️ 개발 시
@@ -176,12 +176,13 @@ TripCloud의 데이터베이스는 다음과 같은 주요 엔티티들로 구�
 cd frontend
 npm install
 npm run dev
-
+```
+```bash
 # Backend
 cd backend
 ./mvnw spring-boot:run
 ```
-
+---
 ## 마무리
 
 TripCloud는 사용자 중심의 클라우드 파일 저장소를 지향합니다. 단순한 저장소를 넘어, 사진을 즐기고, 관리하고, 탐험할 수 있는 플랫폼으로 나아가고 있습니다.
