@@ -25,7 +25,7 @@
             id="email"
             v-model="email"
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Enter your email"
+            placeholder="이메일을 입력해 주세요"
             :class="{ 'border-red-300 focus:ring-red-300': emailError }"
           />
         </div>
@@ -44,7 +44,7 @@
             id="password"
             v-model="password"
             class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-green focus:border-transparent"
-            placeholder="Enter your password"
+            placeholder="비밀번호를 입력해 주세요"
             :class="{ 'border-red-300 focus:ring-red-300': passwordError }"
           />
         </div>
@@ -60,7 +60,7 @@
             v-model="rememberMe"
             class="form-checkbox h-5 w-5 text-sage-green rounded border-gray-300 transition duration-300"
           />
-          <span class="ml-2 text-gray-700">Remember me</span>
+          <span class="ml-2 text-gray-700">이메일 저장</span>
         </label>
       </div>
 
