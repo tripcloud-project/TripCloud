@@ -244,15 +244,13 @@ const deleteComment = (commentId) => {
 const deletePost = () => {
   if (confirm('게시글을 삭제하시겠습니까?')) {
     api.delete(`/posts/${postId}`)
-    // In a real app, this would call an API to delete the post
-    // alert('삭제 완료!')
     goBack()
   }
 }
 
 // Go back to posts list
 const goBack = () => {
-  router.push('/board')
+  window.location.href = '/board'
 }
 </script>
 
