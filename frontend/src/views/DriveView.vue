@@ -8,6 +8,13 @@
     </div>
     <MetadataPanel />
     <ContextMenu />
+    <InputModal
+      v-if="showInputModal"
+      :title="inputModalTitle"
+      :model-value="inputModalInitialValue"
+      @submit="handleInputSubmit"
+      @cancel="() => (showInputModal = false)"
+    />
   </div>
 </template>
 
@@ -23,11 +30,21 @@ import ContextMenu from '@/components/drive/ContextMenu.vue'
 import DriveToolbar from '@/components/drive/DriveToolbar.vue'
 import DriveHeader from '@/components/drive/DriveHeader.vue'
 import ContentGrid from '@/components/drive/ContentGrid.vue'
+import InputModal from '@/components/InputModal.vue'
 
 const driveStore = useDriveStore()
 
 // ref 꺼내 쓰기
-const { folders, selectedFolder, expandedFolders, contextMenu } = storeToRefs(driveStore)
+const {
+  folders,
+  selectedFolder,
+  expandedFolders,
+  contextMenu,
+  showInputModal,
+  inputModalTitle,
+  inputModalInitialValue,
+  onInputSubmit,
+} = storeToRefs(driveStore)
 
 // 함수 꺼내 쓰기
 const { fetchItems, loadDirectoryTree, closeContextMenu } = driveStore
@@ -58,6 +75,14 @@ watch(selectedFolder, (newFolderId) => {
     }
   }
 })
+
+const handleInputSubmit = async (value) => {
+  if (typeof onInputSubmit.value === 'function') {
+    await onInputSubmit.value(value)
+    onInputSubmit.value = null
+  }
+  showInputModal.value = false
+}
 </script>
 
 <style scoped>
