@@ -67,7 +67,7 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch (err) {
         processQueue(err, null)
-        alert('로그인이 필요합니다.')
+        // alert('로그인이 필요합니다.')
         // authStore.logout()
         router.push('/login')
         return Promise.reject(err)
