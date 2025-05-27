@@ -18,7 +18,7 @@
     		b.name,
     		b.description,
     		b.image
-    	FROM Member_Badge mb, Badge b
+    	FROM member_badge mb, Badge b
     	WHERE mb.member_id = #{memberId}
     			AND mb.badge_id = b.badge_id
     </select>
@@ -26,7 +26,7 @@
     <select id="existsByMemberIdAndBadgeId" resultType="boolean">
     	SELECT
     		COUNT(*) > 0
-    	FROM Member_Badge
+    	FROM member_badge
     	WHERE member_id = #{memberId}
     			AND badge_id = #{badgeId}
     </select>
