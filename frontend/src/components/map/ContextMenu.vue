@@ -36,6 +36,10 @@ const {
   showThumbnailDialog,
   selectedRegion,
   thumbnailCandidate,
+  showInputModal,
+  inputModalTitle,
+  inputModalInitialValue,
+  onInputSubmit,
 } = storeToRefs(mapStore)
 
 const {
@@ -66,19 +70,30 @@ const handleContextMenuAction = async (action) => {
         const dotIndex = currentName.lastIndexOf('.')
         const nameOnly = currentName.slice(0, dotIndex)
         const extension = currentName.slice(dotIndex)
-        const newNameOnly = prompt('새 이름을 입력하세요', nameOnly)
 
-        if (newNameOnly && newNameOnly !== nameOnly) {
+        inputModalTitle.value = '파일 이름 변경'
+        inputModalInitialValue.value = nameOnly
+        onInputSubmit.value = async (newNameOnly) => {
+          if (!newNameOnly || newNameOnly === nameOnly) return
           const newFullName = newNameOnly + extension
           await handleRenameFile(item.id, newFullName)
+          showInputModal.value = false
         }
+        showInputModal.value = true
       } else {
+        // 폴더 이름인 경우
         const oldPrefix = prefix.value + item.name
-        const newName = prompt('새 이름을 입력하세요', item.name.slice(0, -1))
-        const newPrefix = prefix.value + newName + '/'
-        if (oldPrefix && newPrefix) {
+        const nameOnly = item.name.slice(0, -1)
+
+        inputModalTitle.value = '폴더 이름 변경'
+        inputModalInitialValue.value = nameOnly
+        onInputSubmit.value = async (newNameOnly) => {
+          if (!newNameOnly || newNameOnly === nameOnly) return
+          const newPrefix = prefix.value + newNameOnly + '/'
           await handleRenameDirectory(oldPrefix, newPrefix)
+          showInputModal.value = false
         }
+        showInputModal.value = true
       }
       break
     }
@@ -98,10 +113,6 @@ const handleContextMenuAction = async (action) => {
       break
     // 예시 흐름
     case 'thumbnail': {
-      // thumbnailCandidate.value = {
-      //   id: item.id,
-      //   options: [item.sido, item.sigungu].filter(Boolean),
-      // }
       thumbnailCandidate.value = {
         id: item.id,
         options: [
@@ -113,9 +124,23 @@ const handleContextMenuAction = async (action) => {
       showThumbnailDialog.value = true
       break
     }
-    case 'addDescription':
-      handleDescriptionSingleFile()
+    case 'addDescription': {
+      const item = contextMenu.value.item
+
+      inputModalTitle.value = '설명 추가'
+      inputModalInitialValue.value = item.description || ''
+      onInputSubmit.value = async (desc) => {
+        if (!desc) return
+        const result = await descriptionSingleFile({ fileId: item.id, description: desc })
+        if (result.status === 'success') {
+          item.description = desc
+          await fetchItems()
+        }
+        showInputModal.value = false
+      }
+      showInputModal.value = true
       break
+    }
   }
 
   closeContextMenu()
@@ -140,25 +165,6 @@ const handleRenameDirectory = async (oldPrefix, newPrefix) => {
     await loadDirectoryTree()
   } else {
     console.warn('디렉토리 이름 변경 실패:', result)
-  }
-}
-
-// [파일 설명 추가]
-const handleDescriptionSingleFile = async () => {
-  const fileId = contextMenu.value.item.id
-  const newDescription = prompt('설명을 입력하세요:', contextMenu.value.item.description || '')
-
-  if (!newDescription) return
-
-  const result = await descriptionSingleFile({
-    fileId,
-    description: newDescription,
-  })
-
-  if (result.status === 'success') {
-    alert('설명이 수정되었습니다.')
-    contextMenu.value.item.description = newDescription
-    await fetchItems()
   }
 }
 </script>
