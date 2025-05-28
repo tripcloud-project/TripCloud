@@ -26,7 +26,7 @@ Thumbs.db
 .env
 *.env
 /frontend/.env.*
-application-*.properties
+# application-*.properties
 
 # ===== 임시 파일 =====
 *.bak
