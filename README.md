@@ -202,6 +202,31 @@ TripCloud의 데이터베이스는 다음과 같은 주요 엔티티들로 구�
 ---
 
 ## 실행 및 배포
+### 🔧 환경 변수 설정
+#### 📁 frontend/.env
+```bash
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+```
+
+#### 📁 backend/.env
+```bash
+OPENAI_API_KEY=
+KAKAO_REST_API_KEY=
+
+DB_URL=
+DB_USERNAME=
+DB_PASSWORD=
+
+MINIO_ENDPOINT=
+MINIO_ENDPOINT_PUBLIC=
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
+MINIO_BUCKET=tripcloud
+
+REDIS_PORT=
+REDIS_HOST=
+```
+
 
 ### 🛠️ 개발 시
 
