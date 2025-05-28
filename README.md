@@ -202,6 +202,11 @@ TripCloud의 데이터베이스는 다음과 같은 주요 엔티티들로 구�
 ---
 
 ## 실행 및 배포
+### ✅ 초기 데이터베이스 설정
+```bash
+backend/java/main/resources/schema.sql # 스키마를 사용하여 테이블 생성
+```
+
 ### 🔧 환경 변수 설정
 #### 📁 frontend/.env
 ```bash
