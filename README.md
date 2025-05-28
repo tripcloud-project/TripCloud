@@ -208,6 +208,12 @@ backend/java/main/resources/schema.sql # 스키마를 사용하여 테이블 생
 ```
 
 ### 🔧 환경 변수 설정
+
+#### 📁 /.env
+```bash
+MINIO_ROOT_USER=
+MINIO_ROOT_PASSWORD=
+```
 #### 📁 frontend/.env
 ```bash
 VITE_API_BASE_URL=http://localhost:8080/api/v1
@@ -222,18 +228,23 @@ DB_URL=
 DB_USERNAME=
 DB_PASSWORD=
 
-MINIO_ENDPOINT=
-MINIO_ENDPOINT_PUBLIC=
+MINIO_ENDPOINT=http://localhost:9000
+MINIO_ENDPOINT_PUBLIC=http://localhost:9000 # 실제 서비스에선 다른 포트 사용
 MINIO_ACCESS_KEY=
 MINIO_SECRET_KEY=
 MINIO_BUCKET=tripcloud
 
-REDIS_PORT=
-REDIS_HOST=
+REDIS_PORT=6379
+REDIS_HOST=127.0.0.1
 ```
 
 
 ### 🛠️ 개발 시
+```bash
+# MinIO, Redis
+docker compose up
+```
+
 
 ```bash
 # Frontend
@@ -245,6 +256,7 @@ npm run dev
 ```bash
 # Backend
 cd backend
+chmod +x mvnw
 ./mvnw spring-boot:run
 ```
 
