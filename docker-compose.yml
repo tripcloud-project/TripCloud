@@ -1,16 +1,20 @@
 services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"  # S3 API
+      - "9001:9001"  # 웹 콘솔
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./minio-storage:/data
+    command: server /data --console-address ":9001"
+
   redis:
     image: redis:7.2
     container_name: redis-container
     ports:
       - "6379:6379"
     restart: always
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - redis
