@@ -206,6 +206,14 @@ TripCloud의 데이터베이스는 다음과 같은 주요 엔티티들로 구�
 ```bash
 backend/java/main/resources/schema.sql # 스키마를 사용하여 테이블 생성
 ```
+### 🔐 필수 키 파일 추가
+아래 파일들은 백엔드에서 암호화/복호화 및 JWT 서명 등에 사용되며, 반드시 지정된 경로에 존재해야 합니다:
+
+```bash
+backend/java/resources/aes.key                    # AES 대칭키 파일
+backend/java/resources/private_key_pkcs8.pem      # 비대칭키 (개인키, PKCS#8 형식)
+backend/java/resources/public_key.pem             # 비대칭키 (공개키)
+```
 
 ### 🔧 환경 변수 설정
 
